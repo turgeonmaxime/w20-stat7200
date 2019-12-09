@@ -1,0 +1,9 @@
+public
+content/slides/*.log
+content/slides/*.aux
+content/slides/*.out
+content/slides/*.vrb
+content/slides/*.pdf
+content/slides/*_cache/
+content/slides/*_files/
+static/slides/*_files/
