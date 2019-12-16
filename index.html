@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta name="generator" content="Hugo 0.60.1" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="STAT 7200 - Winter 2020"><meta property="og:title" content="STAT 7200 - Winter 2020" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://turgeonmaxime.github.io/w20-stat7200/" />
+
+<title>STAT 7200 - Winter 2020 | STAT 7200 - Winter 2020</title>
+<link rel="icon" href="/w20-stat7200/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/w20-stat7200/book.min.daeb3603c687f9ac8113081371aff99b3a3a6406ce59d6f8e0a2d0e545b7bd24.css" integrity="sha256-2us2A8aH&#43;ayBEwgTca/5mzo6ZAbOWdb44KLQ5UW3vSQ=">
+
+
+<link rel="alternate" type="application/rss+xml" href="https://turgeonmaxime.github.io/w20-stat7200/index.xml" title="STAT 7200 - Winter 2020" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="https://turgeonmaxime.github.io/w20-stat7200/"><span>STAT 7200 - Winter 2020</span>
+  </a>
+</h2>
+
+
+
+
+
+
+    <ul>
+<li><a href="/w20-stat7200/"class=active><strong>Overview</strong></a></li>
+<li><a href="/w20-stat7200/slides/"><strong>Slides</strong></a></li>
+<li><a href="/w20-stat7200/suppl/"><strong>Supplementary Material</strong></a></li>
+<li><a href="/w20-stat7200/practice/"><strong>Practice Problems</strong></a></li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+    </aside>
+
+    <div class="book-page">
+      <header class="flex align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/w20-stat7200/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+  <strong>STAT 7200 - Winter 2020</strong>
+</header>
+
+      
+<article class="markdown"><h1 id="general-information">General Information</h1>
+<p>This is the course website for <strong>STAT 7200: Multivariate Statistics</strong>. This course aims to provide students with a broad overview of techniques used in multivariate statistical analysis, with an emphasis on <em>Multivariate Linear Regression</em> and <em>Principal Component Analysis</em>. At the end of the course, students will be able to</p>
+<ul>
+<li>make decisions on how and when to use the techniques discussed in class;</li>
+<li>apply and assess multivariate methods on real data;</li>
+<li>make sound statistical conclusions based on a multivariate analysis.</li>
+</ul>
+<p>Moreover, the course aims to make students familiar, or competent, with the <code>R</code> statistical software.</p>
+<ul>
+<li>Instructor: <a href="https://maxturgeon.ca/">Max Turgeon</a></li>
+<li>Email: <a href="mailto:max.turgeon@umanitoba.ca">max.turgeon@umanitoba.ca</a></li>
+<li>Office: 373 Machray Hall</li>
+<li>Website: <a href="https://maxturgeon.ca/w20-stat7200/">https://maxturgeon.ca/w20-stat7200/</a></li>
+<li>Lectures: MWF 9:30 AM&ndash;10:20 AM, 344 Helen Glass Centre</li>
+<li>Office Hours:
+<ul>
+<li>Tuesday 9:30AM-11AM</li>
+<li>Wednesday 10:30AM-12PM (i.e. after class)</li>
+<li>By appointment (if necessary)</li>
+</ul>
+</li>
+</ul>
+<p>The course outline can be downloaded <a href="outline_stat7200_w20.pdf">here</a>.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Consent of the instructor. Good knowledge of linear algebra and mathematical statistics is required.</p>
+<h2 id="textbook">Textbook</h2>
+<p>There is no required textbook for this class. If you are looking for a good reference, I recommend:</p>
+<ul>
+<li>Anderson, <em>An Introduction to Multivariate Statistical Analysis</em>. Wiley (2003).</li>
+<li>Muirhead, <em>Aspects of Multivariate Statistical Theory</em>. Wiley (2005).</li>
+<li>Johnson &amp; Wichern, <em>Applied Multivariate Statistical Analysis</em>. Prentice Hall (2007).</li>
+</ul>
+<h2 id="assessments">Assessments</h2>
+<p>The assessments for this course include:</p>
+<ul>
+<li>Three (3) assignments;</li>
+<li>One (1) midterm test;</li>
+<li>One (1) final project, which includes a written report and an oral presentation.</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>In particular, there is <strong>no final exam</strong>.</p>
+<h1 id="outline-of-topics">Outline of Topics</h1>
+<p>The course is expected to cover the following topics:</p>
+<ol>
+<li><em>Aspects of multivariate analysis</em>: handling multivariate data, graphical displays, statistical distance</li>
+<li><em>Matrix algebra and random vectors</em>: eigenvalues and eigenvectors, positive definite matrices, mean vectors, covariance matrices and matrix decompositions</li>
+<li><em>Random Samples</em>: sample geometry, characterizing random samples</li>
+<li><em>Multivariate normal distribution</em>: definition and properties, estimation and sampling distributions</li>
+<li><em>Inferences about a mean vector</em>: Hotelling's T<!-- raw HTML omitted -->2<!-- raw HTML omitted --> and likelihood ratio tests, confidence regions and multiple comparisons</li>
+<li><em>Multivariate linear regression</em>: multivariate analysis of variance, least squares estimation and inference</li>
+<li><em>Principal Component Analysis</em>: interpretation and use of principal components</li>
+<li><em>Factor Analysis</em>: orthogonal factor model, estimation and inference</li>
+<li><em>Canonical Correlation Analysis</em>: canonical variables and canonical correlations</li>
+<li>Graphical models (if time permits)</li>
+</ol>
+<h1 id="statistical-software">Statistical Software</h1>
+<p>The course will make use of the R statistical software for demonstrating some of the theoretical concepts. Sample codes will be provided to students.</p>
+<p>You can download R for free (for Windows, Mac, Linux, and Solaris) from the <em>Comprehensive R Archive Network</em> at: <a href="https://cran.r-project.org/">https://cran.r-project.org/</a></p>
+<p>For additional resources on R, see <a href="https://turgeonmaxime.github.io/w20-stat7200/suppl/">here</a>.</p>
+</article>
+
+      <div class="book-footer justify-between">
+  
+
+  
+
+  
+
+</div>
+
+      
+    </div>
+
+    
+  
+
+  <aside class="book-toc levels-2 fixed">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#textbook">Textbook</a></li>
+    <li><a href="#assessments">Assessments</a></li>
+  </ul>
+</nav>
+  </aside>
+
+
+
+  </main>
+
+  
+</body>
+
+</html>

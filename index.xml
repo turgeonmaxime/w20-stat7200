@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>STAT 7200 - Winter 2020</title>
+    <link>https://turgeonmaxime.github.io/w20-stat7200/</link>
+    <description>Recent content on STAT 7200 - Winter 2020</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://turgeonmaxime.github.io/w20-stat7200/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Practice Problems</title>
+      <link>https://turgeonmaxime.github.io/w20-stat7200/practice/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://turgeonmaxime.github.io/w20-stat7200/practice/</guid>
+      <description>Here is a list of practice problems.</description>
+    </item>
+    
+    <item>
+      <title>Slides</title>
+      <link>https://turgeonmaxime.github.io/w20-stat7200/slides/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://turgeonmaxime.github.io/w20-stat7200/slides/</guid>
+      <description>Slides </description>
+    </item>
+    
+    <item>
+      <title>Supplementary Material</title>
+      <link>https://turgeonmaxime.github.io/w20-stat7200/suppl/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://turgeonmaxime.github.io/w20-stat7200/suppl/</guid>
+      <description>Supplementary Material On this page, I will post additional resources and supplementary material for the course.
+Resources for R In this course, we will use R as the main computational tool. Below are some resources:
+ R for Data Science by Grolemund and Wickham. Hands-On Programming with R by Grolemund. Jenny Bryan&#39;s course on Data wrangling, exploration, and analysis with R  In particular, I recommend the notes on The Many Flavours of R objects   Mine Cetinkaya&#39;s curated list of resources for R If you&#39;re looking for a deep understanding of R, I recommend Hadley Wickham&#39;s book Advanced R RStudio has several great cheatsheets on their website.</description>
+    </item>
+    
+  </channel>
+</rss>
