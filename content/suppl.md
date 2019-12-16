@@ -25,10 +25,7 @@ In this course, we will use R as the main computational tool. Below are some res
     
 ## Other useful textbooks
 
-Here is a list of other textbooks that provide further (or complementary) details to Johnson & Wichern.
-
+Here is a list of other textbooks that provide further (or complementary) details to the lecture notes
   - Rencher (1998). *Multivariate Statistical Inference and Applications*.
-  - Anderson (2003). *An Introduction to Multivariate Statistical Analysis*.
   - Timm (2002). *Applied Multivariate Analysis*.
-  - Muirhead (1982). *Aspects of Multivariate Statistical Theory*.
-    + This one is a classic text, but it is much more advanced than the other textbooks.
+  - Mardia, Kent, Bibby (1980). *Multivariate Analysis*. 
