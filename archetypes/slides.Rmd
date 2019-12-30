@@ -5,7 +5,7 @@ source: true
 output: binb::metropolis
 fontsize: 12pt
 author: Max Turgeon
-institute: STAT 4690--Applied Multivariate Analysis
+institute: STAT 7200--Multivariate Statistics
 header-includes:
   - \usefonttheme{professionalfonts}
   - \usepackage{graphicx}

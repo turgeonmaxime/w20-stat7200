@@ -46,7 +46,7 @@ knitr::read_chunk("slides-packages.R")
 @
 
 \title{{{ replace .Name "-" " " | title }}}
-\institute{STAT 4690--Applied Multivariate Analysis}
+\institute{STAT 7200--Multivariate Statistics}
 \author{Max Turgeon}
 \date{}
 
