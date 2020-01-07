@@ -145,7 +145,7 @@ all.equal(A, t(L) %*% L) # CHECK
     + $P$ is orthogonal, i.e. $PP^T = P^TP=I$.
   - For a general $n\times p$ matrix $\mathbf{A}$, we have the *Singular Value Decomposition* (SVD). 
   - We can write $\mathbf{A} = UDV^T$, where
-    + $U$ is an $n\times n$ orthonal matrix;
+    + $U$ is an $n\times n$ orthogonal matrix;
     + $V$ is a $p \times p$ orthogonal matrix;
     + $D$ is an $n\times p$ diagonal matrix.
   - We say that:
