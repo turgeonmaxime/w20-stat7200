@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docs on STAT 7200 - Winter 2020</title>
@@ -9,15 +9,6 @@
     
 	<atom:link href="https://turgeonmaxime.github.io/w20-stat7200/docs/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title></title>
-      <link></link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid></guid>
-      <description> Overview Slides Supplementary Material Practice Problems  </description>
-    </item>
     
   </channel>
 </rss>

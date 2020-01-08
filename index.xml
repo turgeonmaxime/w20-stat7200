@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>STAT 7200 - Winter 2020</title>
@@ -25,7 +25,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://turgeonmaxime.github.io/w20-stat7200/slides/</guid>
-      <description> Slides  Course Overview Review of Linear Algebra  R code  Multivariate Distibutions  R code  Random Samples  R code  Multivariate Normal Distribution  R code  Wishart Distribution  R code   </description>
+      <description>Slides  Course Overview Review of Linear Algebra  R code   Multivariate Distibutions  R code   Random Samples  R code   Multivariate Normal Distribution  R code   Wishart Distribution  R code    </description>
     </item>
     
     <item>
@@ -36,7 +36,7 @@
       <guid>https://turgeonmaxime.github.io/w20-stat7200/suppl/</guid>
       <description>Supplementary Material On this page, I will post additional resources and supplementary material for the course.
 Resources for R In this course, we will use R as the main computational tool. Below are some resources:
- R for Data Science by Grolemund and Wickham. Hands-On Programming with R by Grolemund. Jenny Bryan&amp;rsquo;s course on Data wrangling, exploration, and analysis with R  In particular, I recommend the notes on The Many Flavours of R objects  Mine Cetinkaya&amp;rsquo;s curated list of resources for R If you&amp;rsquo;re looking for a deep understanding of R, I recommend Hadley Wickham&amp;rsquo;s book Advanced R RStudio has several great cheatsheets on their website.</description>
+ R for Data Science by Grolemund and Wickham. Hands-On Programming with R by Grolemund. Jenny Bryan&#39;s course on Data wrangling, exploration, and analysis with R  In particular, I recommend the notes on The Many Flavours of R objects   Mine Cetinkaya&#39;s curated list of resources for R If you&#39;re looking for a deep understanding of R, I recommend Hadley Wickham&#39;s book Advanced R RStudio has several great cheatsheets on their website.</description>
     </item>
     
   </channel>

@@ -49,7 +49,7 @@ knitr::opts_chunk$set(cache=TRUE)
 
 ## Example {.allowframebreaks}
 
-  - Let $R = [a_1, b_1] \times \cdots [a_p, b_p] \subseteq \mathbb{R}^p$ be a hyper-rectangle, with $a_i < b_i$, for all $i$. 
+  - Let $R = [a_1, b_1] \times \cdots \times [a_p, b_p] \subseteq \mathbb{R}^p$ be a hyper-rectangle, with $a_i < b_i$, for all $i$. 
   - If $\mathbf{Y} = (Y_1, \ldots, Y_p)$ is **uniformly distributed** on $R$, then its density is given by
   $$ f(y_1, \ldots, y_p) = \begin{cases} \prod_{i=1}^p \frac{1}{b_i - a_i} & (y_1, \ldots, y_p) \in R,\\
   0 & \mbox{else}. \end{cases}$$
@@ -272,7 +272,7 @@ c("GV" = det(B),
   $$ d(x, y) = \sqrt{(x - y)^T\Sigma^{-1}(x-y)}.$$
   - This is called the *Mahalanobis distance* induced by $\Sigma$.
   - **Exercise**: This indeed satisfies the definition of a distance:
-    1.  $d(x,y) = d(y,x)$
+    1. $d(x,y) = d(y,x)$
     2. $d(x,y) \geq 0$ and $d(x,x) = 0 \Leftrightarrow x = 0$
     3. $d(x, z) \leq d(x, y) + d(y, z)$
   - Using this distance, we can construct *hyper-ellipsoids* in $\mathbb{R}^p$ as the set of all points $x$ such that
@@ -313,7 +313,7 @@ c("GV" = det(B),
   \vdots & \ddots & \vdots\\
   \frac{\partial h^{-1}_p}{\partial y_1} & \cdots & \frac{\partial h^{-1}_p}{\partial y_p}\end{pmatrix}.$$
   - Then the density of $\mathbf{X}$ is given by
-  $$g(x_1, \ldots, x_p) = f(h^{-1}_1(y_1), \ldots, h^{-1}_p(y_p)) \lvert\det(J)\rvert.$$
+  $$g(x_1, \ldots, x_p) = f(h^{-1}_1(x_1), \ldots, h^{-1}_p(x_p)) \lvert\det(J)\rvert.$$
   - A few comments:
     + *This result is very useful for computing the density of transformations of normal random variables.*
     + If $h$ is a linear transformation $\mathbf{Y} \mapsto A\mathbf{Y}$, then $J = A^{-1}$ (Exercise!).
@@ -326,8 +326,34 @@ c("GV" = det(B),
   $$ \varphi_Y(\mathbf{t}) = E(\exp(i\mathbf{t}^T\mathbf{Y})),$$
   where $i^2 = -1$.
   - **Note**: The characteristic function of a random variable *always exists*. 
-  
-## Example
+
+## Example I {.allowframebreaks}
+
+  - Take the density of a normal distribution:
+  $$ f(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right).$$
+  - Using the definition, we get
+  \begin{align*}
+  \varphi(t) &= \int_0^\infty \exp(itx) \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) dx\\
+   &= \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2\mu x + \mu^2 -2it\sigma^2 x)}{2\sigma^2}\right) dx\\
+   &= \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2(\mu + it\sigma^2)x + \mu^2)}{2\sigma^2}\right) dx.\\
+   \end{align*}
+  - Let's complete the square:
+  \begin{align*}
+  x^2 - 2(\mu + it\sigma^2)x + \mu^2 &= \left(x - (\mu + it\sigma^2)\right)^2 \\
+  &\quad + \left(\mu^2 - (\mu + it\sigma^2)^2\right)\\
+  &= \left(x - (\mu + it\sigma^2)\right)^2 \\
+  &\quad + \left(\mu^2 - (\mu^2 + 2it\mu\sigma^2 -(t\sigma^2)^2)\right)\\
+  &= \left(x - (\mu + it\sigma^2)\right)^2 \\
+  &\quad + \left((t\sigma^2)^2- 2it\mu\sigma^2\right).\\
+  \end{align*}
+  - We thus get
+   \begin{align*}
+   &\varphi(t)\\ 
+   &= e^{\frac{-\left((t\sigma^2)^2- 2it\mu\sigma^2\right)}{2\sigma^2}} \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x - (\mu + it\sigma^2)\right)^2}{2\sigma^2}\right) dx\\
+   &=  \exp\left(-\frac{t^2\sigma^2}{2} + it\mu\right).
+  \end{align*}
+
+## Example II
 
   - Take the density of a gamma distribution:
   $$ f(x; \alpha, \beta) = \frac{\beta^\alpha x^{\alpha - 1}\exp(-\beta x)}{\Gamma(\alpha)}.$$

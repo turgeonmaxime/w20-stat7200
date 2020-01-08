@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.6)  7 JAN 2020 16:35
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.6)  8 JAN 2020 13:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1404,7 +1404,7 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 
 ]
-Overfull \hbox (3.33388pt too wide) detected at line 274
+Overfull \hbox (3.33388pt too wide) detected at line 275
 \OML/lmm/m/it/12 F[]\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 x\OT1/lmr/m/n/12 ) = [] \
 OML/lmm/m/it/12 F\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 y[]; [] ; y[]\OT1/lmr/m/n/12
  ) = []\OML/lmm/m/it/12 I[]\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 x\OT1/lmr/m/n/12 )
@@ -1499,14 +1499,14 @@ e-random-variables_files/figure-beamer/unnamed-chunk-4-1.pdf Graphic file (type
 
 ]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 515.
+(Font)              <10.95> on input line 516.
 [26
 
 ] [27
 
 
 ]
-Overfull \hbox (30.10747pt too wide) detected at line 543
+Overfull \hbox (30.10747pt too wide) detected at line 544
 []
  []
 
@@ -1519,7 +1519,7 @@ Overfull \hbox (30.10747pt too wide) detected at line 543
 
 
 ]
-Overfull \vbox (16.12108pt too high) detected at line 572
+Overfull \vbox (16.12108pt too high) detected at line 573
  []
 
 [31
@@ -1536,7 +1536,7 @@ Overfull \vbox (16.12108pt too high) detected at line 572
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 694.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 695.
 [35
 
 ] [36
@@ -1557,17 +1557,43 @@ LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
 ] [42
 
 ]
-Overfull \vbox (13.38579pt too high) detected at line 812
+Overfull \hbox (4.59937pt too wide) detected at line 831
+[]
+ []
+
+
+Overfull \hbox (10.48315pt too wide) detected at line 831
+[]
+ []
+
+
+Overfull \hbox (17.97862pt too wide) detected at line 831
+[]
  []
 
 [43
 
 ] [44
 
+
 ] [45
 
 
 ] [46
+
+
+]
+Overfull \vbox (13.38579pt too high) detected at line 851
+ []
+
+[47
+
+] [48
+
+] [49
+
+
+] [50
 
 ]
 \tf@nav=\write7
@@ -1579,25 +1605,25 @@ Overfull \vbox (13.38579pt too high) detected at line 812
 \tf@snm=\write9
 \openout9 = `multivariate-random-variables.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 875.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 875.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 914.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 914.
 (./multivariate-random-variables.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 875.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 875.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 914.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 914.
 Package rerunfilecheck Info: File `multivariate-random-variables.out' has not c
 hanged.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 40342 strings out of 494458
- 819018 string characters out of 6173103
- 920579 words of memory out of 5000000
- 43993 multiletter control sequences out of 15000+600000
+ 40350 strings out of 494458
+ 819088 string characters out of 6173103
+ 920803 words of memory out of 5000000
+ 44001 multiletter control sequences out of 15000+600000
  560881 words of font info for 67 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  66i,15n,96p,1894b,580s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on multivariate-random-variables.pdf (46 pages).
+Output written on multivariate-random-variables.pdf (50 pages).
 
 ! kpathsea:make_tex: Invalid filename `Fira Sans Light', contains ' '
 ! kpathsea:make_tex: Invalid filename `Fira Sans Light Italic', contains ' '
