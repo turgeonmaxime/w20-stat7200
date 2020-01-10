@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.6)  10 JAN 2020 09:14
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.6)  10 JAN 2020 11:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1557,7 +1557,7 @@ LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
 ] [42
 
 ]
-Overfull \hbox (4.59937pt too wide) detected at line 835
+Overfull \hbox (6.76613pt too wide) detected at line 835
 []
  []
 
@@ -1567,7 +1567,7 @@ Overfull \hbox (10.48315pt too wide) detected at line 835
  []
 
 
-Overfull \hbox (17.97862pt too wide) detected at line 835
+Overfull \hbox (20.14539pt too wide) detected at line 835
 []
  []
 

@@ -334,9 +334,9 @@ c("GV" = det(B),
   $$ f(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right).$$
   - Using the definition, we get
   \begin{align*}
-  \varphi(t) &= \int_0^\infty \exp(itx) \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) dx\\
-   &= \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2\mu x + \mu^2 -2it\sigma^2 x)}{2\sigma^2}\right) dx\\
-   &= \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2(\mu + it\sigma^2)x + \mu^2)}{2\sigma^2}\right) dx.\\
+  \varphi(t) &= \int_{-\infty}^\infty \exp(itx) \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) dx\\
+   &= \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2\mu x + \mu^2 -2it\sigma^2 x)}{2\sigma^2}\right) dx\\
+   &= \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2(\mu + it\sigma^2)x + \mu^2)}{2\sigma^2}\right) dx.\\
    \end{align*}
   - Let's complete the square:
   \begin{align*}
@@ -350,7 +350,7 @@ c("GV" = det(B),
   - We thus get
    \begin{align*}
    &\varphi(t)\\ 
-   &= e^{\frac{-\left((t\sigma^2)^2- 2it\mu\sigma^2\right)}{2\sigma^2}} \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x - (\mu + it\sigma^2)\right)^2}{2\sigma^2}\right) dx\\
+   &= e^{\frac{-\left((t\sigma^2)^2- 2it\mu\sigma^2\right)}{2\sigma^2}} \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x - (\mu + it\sigma^2)\right)^2}{2\sigma^2}\right) dx\\
    &=  \exp\left(-\frac{t^2\sigma^2}{2} + it\mu\right).
   \end{align*}
 
@@ -416,11 +416,11 @@ Let $\mathbf{Y}_n$ be a sequence of $p$-dimensional random vectors, and let $\va
   
 ### WLLN
 
-Let $\mathbf{Y}_n$ be a random sample with characteristic function $\varphi$ and mean $\mu$. Then $\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k \to \mu$ in probability as $n\to\infty$.
+Let $\mathbf{Y}_n$ be a random sample with characteristic function $\varphi$ and mean $\mu$. Assume $\varphi$ is differentiable at the origin. Then $\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k \to \mu$ in probability as $n\to\infty$.
 
 ## Proof (WLLN) {.allowframebreaks}
 
-  - First, note that $\varphi$ is differentiable at the origin and $\varphi^\prime(0) = i\mu$.
+  - First, note that since $\varphi$ is differentiable at the origin, we have $\varphi^\prime(0) = i\mu$.
   - We can look at the Taylor expansion of $\varphi$ around 0:
   $$\varphi(\mathbf{t}) = 1 + \mathbf{t}^T\varphi^\prime(0) + o(\mathbf{t}) = 1 + i\mathbf{t}^T\mu + o(\mathbf{t}).$$
   - Now note that the characteristic function of $\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k$ is given by
