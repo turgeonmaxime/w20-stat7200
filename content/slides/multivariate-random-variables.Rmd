@@ -273,7 +273,7 @@ c("GV" = det(B),
   - This is called the *Mahalanobis distance* induced by $\Sigma$.
   - **Exercise**: This indeed satisfies the definition of a distance:
     1. $d(x,y) = d(y,x)$
-    2. $d(x,y) \geq 0$ and $d(x,x) = 0 \Leftrightarrow x = 0$
+    2. $d(x,y) \geq 0$ and $d(x,y) = 0 \Leftrightarrow x = y$
     3. $d(x, z) \leq d(x, y) + d(y, z)$
   - Using this distance, we can construct *hyper-ellipsoids* in $\mathbb{R}^p$ as the set of all points $x$ such that
   $$ d(x,0) = 1.$$
@@ -318,7 +318,7 @@ c("GV" = det(B),
     + *This result is very useful for computing the density of transformations of normal random variables.*
     + If $h$ is a linear transformation $\mathbf{Y} \mapsto A\mathbf{Y}$, then $J = A^{-1}$ (Exercise!).
     + See practice problems for further examples (or go back to your notes from mathematical statistics).
-  
+
 ## Characteristic function
 
   - We will make use of the **characteristic function** $\varphi_Y$ of a $p$-dimensional random vector $\mathbf{Y}$.
@@ -326,6 +326,7 @@ c("GV" = det(B),
   $$ \varphi_Y(\mathbf{t}) = E(\exp(i\mathbf{t}^T\mathbf{Y})),$$
   where $i^2 = -1$.
   - **Note**: The characteristic function of a random variable *always exists*. 
+  - **Example**: The characteristic function of the constant random variable $\mathbf{c}$ is $\varphi(\mathbf{t}) = \exp(i\mathbf{t}^T\mathbf{c})$.
 
 ## Example I {.allowframebreaks}
 
@@ -333,9 +334,9 @@ c("GV" = det(B),
   $$ f(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right).$$
   - Using the definition, we get
   \begin{align*}
-  \varphi(t) &= \int_0^\infty \exp(itx) \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) dx\\
-   &= \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2\mu x + \mu^2 -2it\sigma^2 x)}{2\sigma^2}\right) dx\\
-   &= \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2(\mu + it\sigma^2)x + \mu^2)}{2\sigma^2}\right) dx.\\
+  \varphi(t) &= \int_{-\infty}^\infty \exp(itx) \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) dx\\
+   &= \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2\mu x + \mu^2 -2it\sigma^2 x)}{2\sigma^2}\right) dx\\
+   &= \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x^2 - 2(\mu + it\sigma^2)x + \mu^2)}{2\sigma^2}\right) dx.\\
    \end{align*}
   - Let's complete the square:
   \begin{align*}
@@ -349,7 +350,7 @@ c("GV" = det(B),
   - We thus get
    \begin{align*}
    &\varphi(t)\\ 
-   &= e^{\frac{-\left((t\sigma^2)^2- 2it\mu\sigma^2\right)}{2\sigma^2}} \int_0^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x - (\mu + it\sigma^2)\right)^2}{2\sigma^2}\right) dx\\
+   &= e^{\frac{-\left((t\sigma^2)^2- 2it\mu\sigma^2\right)}{2\sigma^2}} \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x - (\mu + it\sigma^2)\right)^2}{2\sigma^2}\right) dx\\
    &=  \exp\left(-\frac{t^2\sigma^2}{2} + it\mu\right).
   \end{align*}
 
@@ -371,12 +372,72 @@ c("GV" = det(B),
   2. $\lvert \varphi_Y(\mathbf{t}) \rvert \leq 1$ for all $\mathbf{t}$
   3. $\varphi_Y(-\mathbf{t}) = \overline{\varphi_Y(\mathbf{t})}$
   4. $\varphi_Y(\mathbf{t})$ is uniformly continuous.
-  5. Two random vectors are equal in distribution if and only if their characteristic functions are equal.
-  6. The components of $\mathbf{Y} = (Y_1, \ldots, Y_p)$ are mutually independent if and only if $\varphi_Y(\mathbf{t}) = \prod_{i=1}^p \varphi_{Y_i}(t_i)$.
+  5. If $\mathbf{Y} = A\mathbf{X} + b$, then $\varphi_\mathbf{Y}(t) = \exp(it^Tb)\varphi_\mathbf{X}(A^Tt)$ 
+  6. Two random vectors are equal in distribution if and only if their characteristic functions are equal.
+  7. The components of $\mathbf{Y} = (Y_1, \ldots, Y_p)$ are mutually independent if and only if $\varphi_Y(\mathbf{t}) = \prod_{i=1}^p \varphi_{Y_i}(t_i)$.
   
-### Theorem
+### Levy Continuity Theorem
 
 Let $\mathbf{Y}_n$ be a sequence of $p$-dimensional random vectors, and let $\varphi_n$ be the characteristic function of $\mathbf{Y}_n$. Then $\mathbf{Y}_n$ converges in distribution to $\mathbf{Y}$ if and only if the sequence $\varphi_n$ converges pointwise to a function $\varphi$ that is continuous at the origin. When this is the case, the function $\varphi$ is the characteristic function of the limiting distribution $\mathbf{Y}$.
+
+## Example {.allowframebreaks}
+
+  - Let $X_n$ be Poisson with mean $n$.
+    + **Exercise**: The characteristic function of a $Pois(\mu)$ random variable is $\varphi(t) = \exp\left(\mu(e^{it} - 1)\right)$.
+  - Let $Y_n = \frac{X_n - n}{\sqrt{n}}$ be the standardized random variable.
+  - **To show**: $Y_n$ converges in a distribution to a standard normal random variable.
+  - From the properties above, we have
+  \begin{align*} \varphi_{\mathbf{Y}_n}(t) &= \exp(-itn/\sqrt{n})\varphi_{\mathbf{X}_n}(t/\sqrt{n})\\
+  &= \exp\left(n(e^{it/\sqrt{n}} - 1) - itn/\sqrt{n}\right).
+  \end{align*}
+  - We will show that this converges to the characteristic function of the standard normal: $\varphi(t) = \exp(-t^2/2)$.
+    + We will use a **change of variables** and the **Taylor expansion** of the exponential distribution around 0.
+  - First, define $u = it/\sqrt{n}$. We then get $n = -t^2/u^2$ (here we fix $t$).
+    + Note that $u\to 0$ is now equivalent to $n\to\infty$.
+  - Recall the Taylor expansion: as $u\to 0$, we have
+  $$\exp(u) = 1 + u + \frac{u^2}{2} + o(u^2),$$
+  where $o(u^2)$ represents a quantity that goes to zero faster than $u^2$.
+  - We then get
+  \begin{align*}
+  n(e^{it/\sqrt{n}} - 1) - itn/\sqrt{n} &= -\frac{t^2}{u^2}(e^u - 1) + \frac{t^2}{u}\\
+  &= -\frac{t^2}{u^2}\left(u + \frac{u^2}{2} + o(u^2)\right) + \frac{t^2}{u}\\
+  &= -\frac{t^2}{u} - \frac{t^2}{2} -\frac{t^2}{u^2} o(u^2) + \frac{t^2}{u}\\
+  &= - \frac{t^2}{2} -\frac{t^2}{u^2} o(u^2).
+  \end{align*}
+  - Since the second term goes to zero as $u\to 0$, we can conclude that
+  $$n(e^{it/\sqrt{n}} - 1) - itn/\sqrt{n} \to \frac{-t^2}{2}, \qquad n\to\infty.$$
+  - And since the exponential function is continuous everywhere, we get
+  $$\varphi_{\mathbf{Y}_n}(t) \to \exp\left(\frac{-t^2}{2}\right) \mbox{ for all }t, \qquad n\to\infty.$$
+  - The result follows from the Levy Continuity Theorem.
+  
+## Weak Law of Large Numbers
+
+  - We can prove the multivariate (weak) Law of Large Numbers using the Levy Continuity theorem.
+  
+### WLLN
+
+Let $\mathbf{Y}_n$ be a random sample with characteristic function $\varphi$ and mean $\mu$. Assume $\varphi$ is differentiable at the origin. Then $\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k \to \mu$ in probability as $n\to\infty$.
+
+## Proof (WLLN) {.allowframebreaks}
+
+  - First, note that since $\varphi$ is differentiable at the origin, we have $\varphi^\prime(0) = i\mu$.
+  - We can look at the Taylor expansion of $\varphi$ around 0:
+  $$\varphi(\mathbf{t}) = 1 + \mathbf{t}^T\varphi^\prime(0) + o(\mathbf{t}) = 1 + i\mathbf{t}^T\mu + o(\mathbf{t}).$$
+  - Now note that the characteristic function of $\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k$ is given by
+  \begin{align*}
+  \varphi_n(\mathbf{t}) &= E\left(\exp\left(i\mathbf{t}^T\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k\right)\right)\\
+  &= E\left(\prod_{k=1}^n\exp\left(i\left(\frac{\mathbf{t}}{n}\right)^T\mathbf{Y}_i\right)\right)\\
+  &= \prod_{k=1}^nE\left(\exp\left(i\left(\frac{\mathbf{t}}{n}\right)^T\mathbf{Y}_i\right)\right)\\
+  &= \varphi\left(\frac{\mathbf{t}}{n}\right)^n.
+  \end{align*}
+  - Using the Taylor expansion of $\varphi$, we get
+  \begin{align*}
+  \varphi_n(\mathbf{t}) &= \varphi\left(\frac{\mathbf{t}}{n}\right)^n\\
+  &= \left( 1 + i\left(\frac{\mathbf{t}}{n}\right)^T\mu + o\left(\frac{1}{n}\right) \right)^n.
+  \end{align*}
+  - The left-hand side converges to the exponential distribution:
+  $$\varphi_n(\mathbf{t})\to \exp(i\mathbf{t}^T\mu).$$
+  - But this is simply the characteristic function of the constant random variable $\mu$. \hfill\qed
 
 ## Cramer-Wold Theorem
 
@@ -388,3 +449,94 @@ Let $\varphi_\mathbf{X}, \varphi_\mathbf{Y}$ be the characteristic functions of 
 
 $$ \varphi_{\mathbf{t}^T\mathbf{X}}(s) = E(\exp(is(\mathbf{t}^T\mathbf{X}))) = E(\exp(i(s\mathbf{t})^T\mathbf{X})) = \varphi_\mathbf{X}(s\mathbf{t}).$$
 The result follows from the uniqueness of characteristic functions. \hfill\qed
+
+## Multivariate Slutsky's Theorem {.allowframebreaks}
+
+Let $\mathbf{X}_n$ be a sequence of $q$-dimensional random vectors that converge in distribution to $\mathbf{X}$, and let $\mathbf{Y}_n$ be a sequence of $p$-dimensional random vectors that converge in distribution to a constant vector $\mathbf{c} \in \mathbb{R}^p$. Then for any continuous function $f : \mathbb{R}^{p+q}\to \mathbb{R}^{k}$, we have
+$$ f(\mathbf{X}_n, \mathbf{Y}_n) \to f(\mathbf{X}, \mathbf{c})\quad\mbox{in distribution}.$$
+
+  - Common examples of $f$ include:
+    + $f(\mathbf{X}, \mathbf{Y}) = \mathbf{X} + \mathbf{Y}$
+    + $f(\mathbf{X}, \mathbf{Y}) = \mathbf{X}^T\mathbf{Y}$ when $p = q$.
+  - Note that both $\mathbf{X}_n$ or $\mathbf{Y}_n$ could be *matrices*:
+    + This follows from the correspondence between the space of $n\times p$ matrices and $\mathbb{R}^{np}$ given by stacking the columns of a matrix into a single column vector.
+    + For example, if $A_n$ are $r\times q$ matrices converging to $A$, then we could conclude 
+    $$ A_n\mathbf{X}_n \to A\mathbf{X}.$$
+    
+## Proof (Slutsky) {.allowframebreaks}
+
+  - By the Continuous mapping theorem, it is sufficient to show that
+  $$(\mathbf{X}_n, \mathbf{Y}_n) \to (\mathbf{X}, c)\quad\mbox{in distribution}.$$
+  - For any $\mathbf{u}\in\mathbb{R}^q,\mathbf{v}\in\mathbb{R}^p$, the Cramer-Wold theorem implies
+  \begin{align*}
+  \mathbf{u}^T\mathbf{X}_n &\to \mathbf{u}^T\mathbf{X}\\
+  \mathbf{v}^T\mathbf{Y}_n &\to \mathbf{v}^T\mathbf{c}.
+  \end{align*}
+  - From the univariate Slutsky's theorem, we get
+  $$\mathbf{u}^T\mathbf{X}_n + \mathbf{v}^T\mathbf{Y}_n \to \mathbf{u}^T\mathbf{X} + \mathbf{v}^T\mathbf{c}.$$
+  - If we let $\mathbf{w} = (\mathbf{u}, \mathbf{v})$, we have just shown that, for all $\mathbf{w}\in\mathbb{R}^{q+p}$, we have
+  $$\mathbf{w}^T(\mathbf{X}_n, \mathbf{Y}_n) \to \mathbf{w}^T(\mathbf{X}, c).$$
+  - Using once more the Cramer-Wold theorem, we can conclude the proof of this theorem. \hfill\qed
+
+## Sample Statistics {.allowframebreaks}
+
+  - Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample from a $p$-dimensional distribution with mean $\mu$ and covariance matrix $\Sigma$.
+  - **Sample mean**: We define the sample mean $\mathbf{\bar{Y}}_n$ as follows:
+  $$ \mathbf{\bar{Y}}_n = \frac{1}{n}\sum_{i=1}^n\mathbf{Y}_i.$$
+  - *Properties*:
+    + $E(\mathbf{\bar{Y}}_n) = \mu$ (i.e. $\mathbf{\bar{Y}}_n$ is an unbiased estimator of $\mu$);
+    + $\mathrm{Cov}(\mathbf{\bar{Y}}_n) = \frac{1}{n}\Sigma$.
+    + From WLLN: $\mathbf{\bar{Y}}_n\to\mu$ in probability.
+  - **Sample covariance**: We define the sample covariance $\mathbf{S}_n$ as follows:
+  $$ \mathbf{S}_n = \frac{1}{n-1}\sum_{i=1}^n(\mathbf{Y}_i - \mathbf{\bar{Y}}_n)(\mathbf{Y}_i - \mathbf{\bar{Y}}_n)^T.$$
+  - *Properties*:
+    + $E(\mathbf{S}_n) = \frac{n-1}{n}\Sigma$ (i.e. $\mathbf{S}_n$ is a biased estimator of $\Sigma$);
+    + If we define $\mathbf{\tilde{S}}_n$ with $n$ instead of $n-1$ in the denominator above, then $E(\mathbf{\tilde{S}}_n) = \Sigma$ (i.e. $\mathbf{\tilde{S}}_n$ is an unbiased estimator of $\Sigma$).
+
+## Multivariate Central Limit Theorem
+
+Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample from a $p$-dimensional distribution with mean $\mu$ and covariance matrix $\Sigma$. Then
+$$\sqrt{n}\left(\mathbf{\bar{Y}}_n - \mu\right) \to N_p(0, \Sigma).$$
+
+### Proof
+
+This follows from the Cramer-Wold theorem and the univariate CLT (**Exercise**).
+
+## Example {.allowframebreaks}
+
+  - Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample from a $p$-dimensional distribution with mean $\mu$ and covariance matrix $\Sigma$.
+    + **Exercise**: $E(\mathbf{Y}_n\mathbf{Y}_n^T) = \Sigma + \mu\mu^T$.
+  - Using Slutsky's theorem and the WLLN, we will show that $\mathbf{S}_n\to\Sigma$. 
+  - By the WLLN, we have that 
+  $$\frac{1}{n}\sum_{i=1}^n\mathbf{Y}_i\mathbf{Y}_i^T\to\Sigma + \mu\mu^T.$$
+  - We then have that 
+  \begin{align*}
+  \mathbf{\tilde{S}}_n &= \frac{1}{n}\sum_{i=1}^n(\mathbf{Y}_i - \mathbf{\bar{Y}}_n)(\mathbf{Y}_i - \mathbf{\bar{Y}}_n)^T\\
+  &= \frac{1}{n}\sum_{i=1}^n\left(\mathbf{Y}_i\mathbf{Y}_i^T - \mathbf{\bar{Y}}_n\mathbf{Y}_i^T - \mathbf{Y}_i\mathbf{\bar{Y}}_n^T + \mathbf{\bar{Y}}_n\mathbf{\bar{Y}}_n^T\right)\\
+  &= \frac{1}{n}\sum_{i=1}^n\mathbf{Y}_i\mathbf{Y}_i^T - \mathbf{\bar{Y}}_n\mathbf{\bar{Y}}_n^T - \mathbf{\bar{Y}}_n\mathbf{\bar{Y}}_n^T + \mathbf{\bar{Y}}_n\mathbf{\bar{Y}}_n^T\\
+  &= \left(\frac{1}{n}\sum_{i=1}^n\mathbf{Y}_i\mathbf{Y}_i^T\right) - \mathbf{\bar{Y}}_n\mathbf{\bar{Y}}_n^T\to\Sigma\qquad\mbox{(Slutsky)}.
+  \end{align*}
+  - But since $\mathbf{\tilde{S}}_n = \frac{n-1}{n}\mathbf{S}_n$, we also have $\mathbf{S}_n\to\Sigma$. \hfill\qed
+
+## Multivariate Delta Method {.allowframebreaks}
+
+Let $\mathbf{Y}_n$ be a sequence of $p$-dimensional random vectors such that
+$$\sqrt{n}\left(\mathbf{Y}_n - \mathbf{c}\right) \to \mathbf{Z}\quad\mbox{in distribution},$$
+where $\mathbf{c}\in\mathbb{R}^p$. Furthermore, assume $g:\mathbb{R}^p\to\mathbb{R}^q$ is differentiable at $\mathbf{c}$ with derivative $\nabla g(\mathbf{c})$. Then
+$$\sqrt{n}\left(g(\mathbf{Y}_n) - g(\mathbf{c})\right) \to \nabla g(\mathbf{c})\mathbf{Z}\quad\mbox{in distribution}.$$
+\vspace{1in}
+
+*In other words*, we can derive useful approximations: if $\mathbf{Y}_n$ is a random sample with mean $\mathbf{c}$ and covariance matrix $\Sigma$:
+
+  - $E(g(\mathbf{Y}_n)) \approx g(\mathbf{c})$;
+  - $\mathrm{Var}(g(\mathbf{Y}_n)) \approx \nabla g(\mathbf{c})\Sigma\nabla g(\mathbf{c})^T$.
+
+## Example
+
+  - By the Central Limit Theorem, we have
+  $$\sqrt{n}\left(\mathbf{\bar{Y}}_n - \mu\right) \to N_p(0, \Sigma).$$
+  - From the Delta method, we get
+  $$ \sqrt{n}\left(g(\mathbf{\bar{Y}}_n) - g(\mu)\right) \to N_p(0, \nabla g(\mu)\Sigma\nabla g(\mu)^T).$$
+  - For example, if $\mathbf{Y}_n > 0$, then we have
+  $$\sqrt{n}\left(\log(\mathbf{\bar{Y}}_n) - \log(\mu)\right) \to N_p(0, \tilde{\mu}\Sigma\tilde{\mu}^T),$$
+  where $\log$ is applied entrywise, and $\tilde{\mu} = (\mu_1^{-1}, \ldots, \mu_p^{-1})$.
