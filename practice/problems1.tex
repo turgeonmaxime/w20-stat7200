@@ -1,0 +1,92 @@
+\documentclass[12pt]{paper} 
+\usepackage{amsmath, amsfonts, amsthm} % Math packages
+\usepackage{listings} % Code listings, with syntax highlighting
+\usepackage[english]{babel} % English language hyphenation
+\usepackage{graphicx} % Required for inserting images
+\usepackage{booktabs} % Required for better horizontal rules in tables
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage{enumitem} % Required for list customisation
+\setlist{noitemsep} % No spacing between list items
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT MARGINS
+%----------------------------------------------------------------------------------------
+
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+
+\geometry{
+	paper=letterpaper, % Paper size, change to letterpaper for US letter size
+	top=2.5cm, % Top margin
+	bottom=3cm, % Bottom margin
+	left=3cm, % Left margin
+	right=3cm, % Right margin
+	headheight=0.75cm, % Header height
+	footskip=1.5cm, % Space from the bottom margin to the baseline of the footer
+	headsep=0.75cm, % Space from the top margin to the baseline of the header
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Use 8-bit encoding
+
+\usepackage{fourier} % Use the Adobe Utopia font for the document
+
+%----------------------------------------------------------------------------------------
+%	HEADERS AND FOOTERS
+%----------------------------------------------------------------------------------------
+
+\usepackage{scrlayer-scrpage} % Required for customising headers and footers
+
+\ohead*{} % Right header
+\ihead*{} % Left header
+\chead*{} % Centre header
+
+\ofoot*{} % Right footer
+\ifoot*{} % Left footer
+\cfoot*{\pagemark} % Centre footer
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+Problem Set 1--STAT 7200
+}
+
+\author{} % Your name
+\date{} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+
+\begin{enumerate}
+\item Let $A$ be a $p\times q$ matrix, and let $B$ be a $q\times p$ matrix.
+\begin{enumerate}
+\item Prove that $\det(I + AB) = \det(I + BA)$.
+\item Prove that $AB$ and $BA$ have the same nonzero eigenvalues.
+\end{enumerate}
+\vspace{1.5cm}\item Let $\mathbf{x}\in\mathbb{R}^p$, and let $A$ be a $p\times p$ symmetric matrix. Prove that
+$$ \frac{\partial \mathbf{x}^T A \mathbf{x}}{\partial\mathbf{x}} = 2A\mathbf{x}.$$
+\vspace{1.5cm}\item Let $(X, Y)$ be uniformly distributed on the unit disk $D = \{(x,y) \mid x^2 + y^2 \leq 1\}$. Let $R = \sqrt{X^2 + Y^2}$. Find the distribution and the density function of $R$.
+\vspace{1.5cm}\item Let $X,Y\sim U(0, 1)$ be independent. Find the density functions of $U = X - Y$ and $V = X/Y$.
+\vspace{1.5cm}\item Find the characteristic function of the binomial, Poisson, and chi-square distributions.
+\vspace{1.5cm}\item Let $X_1, \ldots, X_n \sim Exp(\beta)$. Find the characteristic function of $X_i$. Use the result to prove that $\sum_{i=1}^nX_i \sim \mathrm{Gamma}(n,\beta)$.
+\vspace{1.5cm}\item Reduce the multivariate Central Limit Theorem to the univariate CLT, i.e.\ assuming the univariate result, prove the multivariate one.
+\vspace{1.5cm}\item Let $(X_{11}, X_{21}), \ldots, (X_{1n}, X_{2n})$ be a random sample with mean $\mu=(\mu_1, \mu_2)$ and variance $\Sigma$. Let
+$$ \bar{X}_1 = \frac{1}{n}\sum_{i=1}^n X_{1i}, \qquad \bar{X}_2 = \frac{1}{n}\sum_{i=1}^n X_{2i}.$$
+Define $Y_n = \bar{X}_1/\bar{X}_2$. Find the limiting distribution of the sequence $Y_n$.
+\end{enumerate}
+
+\end{document}
