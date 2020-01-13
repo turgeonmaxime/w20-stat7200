@@ -10,7 +10,8 @@ type: docs
     + [R code](review-linear-algebra.R)
   - [Multivariate Distibutions](multivariate-random-variables.pdf)
     + [R code](multivariate-random-variables.R)
-  - Multivariate Normal Distribution
-    + R code
+  - [Multivariate Normal Distribution](multivariate-normal.pdf)
+    + [R code](multivariate-normal.R)
+  - Elliptical Distributions
   - Wishart Distribution
     + R code
