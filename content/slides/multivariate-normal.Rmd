@@ -232,9 +232,10 @@ By adding $\Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2$ to the left-hand side, the r
 
 ## Conditional Normal Distributions ii
 
-  - **Corrolary**: Let $\mathbf{Y}_2\sim N_{p-r}(\mu_2, \Sigma_{22})$ and assume that $\mathbf{Y}_1$ given $\mathbf{Y}_2 = y_2$ is multivariate normal $N_r(Ay_2 + b, \Omega)$, where $\Omega$ does not depend on $y_2$. Then $\mathbf{Y} = \begin{pmatrix}\mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}\sim N_p(\mu, \Sigma)$, where
+  - **Theorem**: Let $\mathbf{Y}_2\sim N_{p-r}(\mu_2, \Sigma_{22})$ and assume that $\mathbf{Y}_1$ given $\mathbf{Y}_2 = y_2$ is multivariate normal $N_r(Ay_2 + b, \Omega)$, where $\Omega$ does not depend on $y_2$. Then $\mathbf{Y} = \begin{pmatrix}\mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}\sim N_p(\mu, \Sigma)$, where
     + $\mu = \begin{pmatrix}A\mu_2+b\\\mu_2\end{pmatrix}$;
     + $\Sigma = \begin{pmatrix} \Omega+A\Sigma_{22}A^T & A\Sigma_{22}\\\Sigma_{22}A^T & \Sigma_{22}\end{pmatrix}$. 
+  - Proof: **Exercise** (e.g. compute joint density).
     
 ## Exercise
 
@@ -254,3 +255,289 @@ By adding $\Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2$ to the left-hand side, the r
   $$P\left((\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu) \leq \chi^2(\alpha;p) \right) = 1 - \alpha.$$
     + We can use this to construct a confidence region around the sample mean.
     
+## Application {.allowframebreaks}
+
+  - We can use the result above to construct a graphical test of multivariate normality.
+    + **Note**: The chi-square distribution does not yield a good approximation for large $p$. A more accurate graphical test can be constructed using a beta distribution.
+  - *Procedure*: Given a random sample $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of p-dimensional random vectors:
+    + Compute $D_i^2 = (\mathbf{Y}_i - \bar{\mathbf{Y}})^T S^{-1} (\mathbf{Y}_i - \bar{\mathbf{Y}})$.
+    + Compare the (observed) quantiles of the $D_i$s with the (theoretical) quantiles of a $\chi^2(p)$ distribution.
+    
+```{r}
+# Ramus data, Timm (2002)
+ramus <- read.csv("https://maxturgeon.ca/w20-stat7200/Ramus.csv")
+head(ramus)
+```
+
+```{r}
+var_names <- c("Age8", "Age8.5",
+               "Age9", "Age9.5")
+
+par(mfrow = c(2, 2))
+for (var in var_names) {
+  qqnorm(ramus[, var], main = var)
+  qqline(ramus[, var])
+}
+```
+
+```{r}
+ramus <- ramus[,var_names]
+sigma_hat <- cov(ramus)
+
+ramus_cent <- scale(ramus, center = TRUE, 
+                    scale = FALSE)
+
+D_vect <- apply(ramus_cent, 1, function(row) {
+  t(row) %*% solve(sigma_hat) %*% row
+})
+```
+
+```{r}
+qqplot(qchisq(ppoints(length(D_vect)), df = 4),
+       D_vect, xlab = "Theoretical Quantiles")
+qqline(D_vect, distribution = function(p) {
+  qchisq(p, df = 4)
+  })
+```
+
+# Estimation
+
+## Sufficient Statistics {.allowframebreaks}
+
+  - We saw in the previous lecture that the multivariate normal distribution is completely determined by its mean vector $\mu \in\mathbb{R}^p$ and its covariance matrix $\Sigma$.
+  - Therefore, given a sample $\mathbf{Y}_1, \ldots, \mathbf{Y}_n\sim N_p(\mu, \Sigma)$ ($n > p$), we only need to estimate $(\mu,\Sigma)$. 
+    + Obvious candidates: sample mean $\bar{\mathbf{Y}}$ and sample covariance $S_n$.
+  - Write down the *likelihood*:
+  \begin{align*} 
+  L &= \prod_{i=1}^n\left(\frac{1}{\sqrt{(2\pi)^p\lvert\Sigma\rvert}}\exp\left(-\frac{1}{2}(\mathbf{Y}_i - \mu)^T\Sigma^{-1}(\mathbf{Y}_i - \mu)\right)\right)\\
+   &= \frac{1}{(2\pi)^{np/2}\lvert\Sigma\rvert^{n/2}}\exp\left(-\frac{1}{2}\sum_{i=1}^n(\mathbf{Y}_i - \mu)^T\Sigma^{-1}(\mathbf{Y}_i - \mu)\right)
+  \end{align*}
+  - If we take the (natural) logarithm of $L$ and drop any term that does not depend on $(\mu,\Sigma)$, we get
+  $$\ell = -\frac{n}{2}\log\lvert\Sigma\rvert - \frac{1}{2}\sum_{i=1}^n(\mathbf{Y}_i - \mu)^T\Sigma^{-1}(\mathbf{Y}_i - \mu).$$
+  - If we can re-express the second summand in terms of $\bar{\mathbf{Y}}$ and $S_n$, by the Fisher-Neyman factorization theorem, we will then know that $(\bar{\mathbf{Y}},S_n)$ is jointly **sufficient** for $(\mu,\Sigma)$.
+  - First, we have
+  \begin{multline*}
+  \sum_{i=1}^n(\mathbf{Y}_i - \mu)(\mathbf{Y}_i - \mu)^T = \sum_{i=1}^n(\mathbf{Y}_i - \bar{\mathbf{Y}} + \bar{\mathbf{Y}} - \mu)(\mathbf{Y}_i - \bar{\mathbf{Y}} + \bar{\mathbf{Y}} - \mu)^T\\
+  = \sum_{i=1}^n\left((\mathbf{Y}_i - \bar{\mathbf{Y}})(\mathbf{Y}_i - \bar{\mathbf{Y}})^T + (\mathbf{Y}_i - \bar{\mathbf{Y}})(\bar{\mathbf{Y}} - \mu)^T\right.\\
+  \quad \left.+ (\bar{\mathbf{Y}} - \mu)(\mathbf{Y}_i - \bar{\mathbf{Y}})^T + (\bar{\mathbf{Y}} - \mu)(\bar{\mathbf{Y}} - \mu)^T\right)\\
+  = \sum_{i=1}^n(\mathbf{Y}_i - \bar{\mathbf{Y}})(\mathbf{Y}_i - \bar{\mathbf{Y}})^T + n(\bar{\mathbf{Y}} - \mu)(\bar{\mathbf{Y}} - \mu)^T\\
+  \quad \quad= (n-1)S_n + n(\bar{\mathbf{Y}} - \mu)(\bar{\mathbf{Y}} - \mu)^T.\hfill
+  \end{multline*}
+  - Next, using the fact that $\mathrm{tr}(ABC) = \mathrm{tr}(BCA)$, we have
+  \begin{align*}
+  \sum_{i=1}^n(\mathbf{Y}_i - \mu)^T\Sigma^{-1}(\mathbf{Y}_i - \mu) &= \mathrm{tr}\left(\sum_{i=1}^n(\mathbf{Y}_i - \mu)^T\Sigma^{-1}(\mathbf{Y}_i - \mu)\right) \\
+  &= \mathrm{tr}\left(\sum_{i=1}^n\Sigma^{-1}(\mathbf{Y}_i - \mu)(\mathbf{Y}_i - \mu)^T\right) \\
+  &= \mathrm{tr}\left(\Sigma^{-1}\sum_{i=1}^n(\mathbf{Y}_i - \mu)(\mathbf{Y}_i - \mu)^T\right) \\
+  &= (n-1)\mathrm{tr}\left(\Sigma^{-1}S_n\right)\\ 
+  &\qquad + n\mathrm{tr}\left(\Sigma^{-1}(\bar{\mathbf{Y}} - \mu)(\bar{\mathbf{Y}} - \mu)^T\right) \\
+  &= (n-1)\mathrm{tr}\left(\Sigma^{-1}S_n\right)\\ 
+  &\qquad + n(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu). \\
+  \end{align*}
+  
+## Maximum Likelihood Estimation {.allowframebreaks}
+
+  - Going back to the log-likelihood, we get:
+  $$\ell = -\frac{n}{2}\log\lvert\Sigma\rvert - \frac{(n-1)}{2}\mathrm{tr}\left(\Sigma^{-1}S_n\right) - \frac{n}{2}(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu).$$
+  - First, fix $\Sigma$ and maximise over $\mu$. The only term that depends on $\mu$ is
+  $$- \frac{n}{2}(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu).$$
+  - We can maximise this term by minimising
+  $$(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu).$$
+  - But since $\Sigma^{-1}$ is positive definite, we have 
+  $$(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu) \geq 0,$$
+  with equality if and only if $\mu = \bar{\mathbf{Y}}$.
+  - In other words, the log-likelihood is maximised at
+  $$\hat{\mu} = \bar{\mathbf{Y}}.$$
+  - Now, we can turn our attention to $\Sigma$. We want to maximise 
+  $$\ell = -\frac{n}{2}\log\lvert\Sigma\rvert - \frac{(n-1)}{2}\mathrm{tr}\left(\Sigma^{-1}S_n\right) - \frac{n}{2}(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu).$$
+  - At $\mu = \bar{\mathbf{Y}}$, it reduces to 
+  $$-\frac{n}{2}\log\lvert\Sigma\rvert - \frac{(n-1)}{2}\mathrm{tr}\left(\Sigma^{-1}S_n\right).$$
+  - Write $V = (n-1)S_n$. We then have
+  $$-\frac{n}{2}\log\lvert\Sigma\rvert - \frac{1}{2}\mathrm{tr}\left(\Sigma^{-1}V\right).$$
+  - Maximising this quantity is equivalent to minimising
+  $$\log\lvert\Sigma\rvert + \frac{1}{n}\mathrm{tr}\left(\Sigma^{-1}V\right),$$
+  and by adding the constant $\log\lvert nV^{-1}\rvert$, we get
+  $$\log\lvert\Sigma\rvert + \frac{1}{n}\mathrm{tr}\left(\Sigma^{-1}V\right) + \log\lvert nV^{-1}\rvert = \log\lvert nV^{-1}\Sigma\rvert + \mathrm{tr}\left(n^{-1}\Sigma^{-1}V\right).$$
+  - Set $T = nV^{-1}\Sigma$. Our maximum likelihood problem now reduces to minimising
+  $$\log\lvert T\rvert + \mathrm{tr}\left(T^{-1}\right).$$
+  - Let $\lambda_1, \ldots, \lambda_p$ be the (positive) eigenvalues of $T$. We now have
+  \begin{align*}
+  \log\lvert T\rvert + \mathrm{tr}\left(T^{-1}\right) &= \log\left(\prod_{i=1}^p \lambda_i\right) + \sum_{i=1}^p \lambda_i^{-1}\\
+  &= \sum_{i=1}^p \log\lambda_i + \lambda_i^{-1}.
+  \end{align*}
+  - Each summand can be minimised individually, and the minimum occurs at $\lambda_i = 1$. In other words, the (overall) minimum is when $T = I_p$, which is equivalent to 
+  $$\Sigma = \frac{n-1}{n}S_n = \frac{1}{n}\sum_{i=1}^n(\mathbf{Y}_i - \bar{\mathbf{Y}})(\mathbf{Y}_i - \bar{\mathbf{Y}})^T.$$
+  - *In other words*: $\left(\bar{\mathbf{Y}},\frac{n-1}{n}S_n\right)$ are the **maximum likelihood estimators** for $(\mu,\Sigma)$.
+  
+## Maximum Likelihood Estimators
+
+  - Since the multivariate normal density is "well-behaved", we can deduce the usual properties:
+    + **Consistency**: $(\bar{\mathbf{Y}},\hat{\Sigma})$ converges in probability to $(\mu,\Sigma)$.
+    + **Efficiency**: Asymptotically, the covariance of $(\bar{\mathbf{Y}},\hat{\Sigma})$ achieves the Cramér-Rao lower bound.
+    + **Invariance**: For any transformation $(g(\mu),G(\Sigma))$ of $(\mu,\Sigma)$, its MLE is $(g(\bar{\mathbf{Y}}),G(\hat{\Sigma}))$.
+    
+## Visualizing the likelihood {.allowframebreaks}
+
+```{r}
+library(mvtnorm)
+set.seed(123)
+
+n <- 50; p <- 2
+
+mu <- c(1, 2)
+Sigma <- matrix(c(1, 0.5, 0.5, 1), ncol = p)
+
+Y <- rmvnorm(n, mean = mu, sigma = Sigma)
+```
+
+```{r}
+loglik <- function(mu, sigma, data = Y) {
+  # Compute quantities
+  y_bar <- colMeans(Y)
+  quad_form <- t(y_bar - mu) %*% solve(sigma) %*%
+    (y_bar - mu)
+  
+  -0.5*n*log(det(sigma)) -
+    0.5*(n - 1)*sum(diag(solve(sigma) %*% cov(Y))) -
+    0.5*n*drop(quad_form)
+}
+```
+
+```{r}
+grid_xy <- expand.grid(seq(0, 2, length.out = 32), 
+                       seq(0, 4, length.out = 32))
+
+head(grid_xy, n = 5)
+```
+
+
+```{r}
+contours <- purrr::map_df(seq_len(nrow(grid_xy)), 
+                          function(i) {
+  # Where we will evaluate loglik
+  mu_obs <- as.numeric(grid_xy[i,])
+  # Evaluate at the pop covariance
+  z <- loglik(mu_obs, sigma = Sigma)
+  # Output data.frame
+  data.frame(x = mu_obs[1],
+             y = mu_obs[2],
+             z = z)
+})
+```
+
+
+```{r, message = FALSE}
+library(tidyverse)
+library(ggrepel)
+# Create df with pop and sample means
+data_means <- data.frame(x = c(mu[1], mean(Y[,1])),
+                         y = c(mu[2], mean(Y[,2])),
+                         label = c("Pop.", "Sample"))
+```
+
+
+```{r, message = FALSE}
+ggplot(contours, aes(x, y)) + 
+  geom_contour(aes(z = z)) + 
+  geom_point(data = data_means) +
+  geom_label_repel(data = data_means,
+                   aes(label = label))
+```
+
+```{r}
+library(scatterplot3d)
+with(contours, scatterplot3d(x, y, z))
+```
+
+```{r, echo = FALSE, eval = FALSE}
+x <- seq(0, 2, length.out = 32)
+y <- seq(0, 4, length.out = 32)
+z <- matrix(NA, ncol = 32, nrow = 32)
+for (i in seq_len(32)) {
+  for (j in seq_len(32))
+    z[i,j] <- loglik(c(x[i], y[j]), sigma = Sigma)
+}
+persp(x, y, z, theta = 30, phi = 30, expand = 0.5, col = "lightblue")
+```
+
+## Sampling Distributions
+
+  - Recall the univariate case:
+    + $\bar{X} \sim N\left(\mu, \sigma^2/n\right)$;
+    + $\frac{(n-1)s^2}{\sigma^2} \sim \chi^2(n-1)$;
+    + $\bar{X}$ and $s^2$ are independent.
+  - In the multivariate case, we have similar results:
+    + $\bar{\mathbf{Y}}\sim N_p\left(\mu, \frac{1}{n}\Sigma\right)$;
+    + $(n-1)S_n = n\hat{\Sigma}$ follows a *Wishart* distribution with $n-1$ degrees of freedom;
+    + $\bar{\mathbf{Y}}$ and $S_n$ are independent.
+  - **We will prove the last two properties later.**
+
+## Bayesian analysis {.allowframebreaks}
+
+  - In *Frequentist* statistics, parameters are fixed quantities that we are trying to estimate and about which we want to make inference.
+  - In *Bayesian* statistics, parameters are given a distribution that models the uncertainty/knowledge we have about the underlying population quantity.
+    + And as we collect data, our knowledge changes, and so does the distribution.
+    
+    \vspace{1in}
+  - Some vocabulary:
+    + **Prior distribution**: Distribution of the parameters *before* data collection/analysis. It represents our *current* knowledge.
+    + **Posterior distribution**: Distribution of the parameters *after* data collection/analysis. It represents our *updated* knowledge.
+  - **Bayesian statistics** is based on the following updating rule:
+  $$\mbox{Posterior distribution} \propto \mbox{Prior distribution} \times \mbox{Likelihood}.$$
+  - We will look at the posterior distribution of the multivariate normal mean $\mu$, assuming $\Sigma$ is known, when the prior is also normally distributed.
+  - Let's start with a single $p$-dimensional observation $\mathbf{Y}\sim N(\mu, \Sigma)$. The log-likelihood (keeping only terms depending on $\mu$) is equal to
+  $$\log L(\mathbf{Y} \mid \mu) \propto -\frac{1}{2}(\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu).$$
+  - Let $p(\mu) = N(\mu_0, \Sigma_0)$ be the prior distribution for $\mu$. On the log scale, we have
+  $$\log p(\mu) \propto -\frac{1}{2}(\mu - \mu_0)^T\Sigma_0^{-1}(\mu - \mu_0).$$
+  - Using the updating rule, we have
+  $$\log p(\mu \mid \mathbf{Y}) \propto  -\frac{1}{2}(\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu) - \frac{1}{2}(\mu - \mu_0)^T\Sigma_0^{-1}(\mu - \mu_0).$$
+  - If we expand both quadratic forms and only keep terms that depend on $\mu$, we get
+  \begin{align*}
+  \log p(\mu \mid \mathbf{Y}) &\propto  -\frac{1}{2}\left(\mu^T\Omega^{-1}\mu - (\mathbf{Y}^T\Sigma^{-1} + \mu_0^T\Sigma_0^{-1})\mu \right.\\
+  &\qquad\qquad \left.- \mu^T(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\right),
+  \end{align*}
+  where $\Omega^{-1} = \Sigma^{-1} + \Sigma_0^{-1}$.
+  - Since $\Omega^{-1}$ is the sum of two positive definite matrices, it is itself positive definite. 
+  - Using the Cholesky decomposition, we can write $\Omega^{-1} = U^TU$ with $U$ triangular and invertible. We therefore have
+  \begin{align*}
+  \log p(\mu \mid \mathbf{Y}) &\propto  -\frac{1}{2}\left(\mu^TU^TU\mu - (\mathbf{Y}^T\Sigma^{-1} + \mu_0^T\Sigma_0^{-1})U^{-1}U\mu \right.\\
+  &\qquad\qquad \left.- \mu^T(U^T)(U^T)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\right)\\
+  &\propto  -\frac{1}{2}\left((U\mu)^T(U\mu) - (\mathbf{Y}^T\Sigma^{-1} + \mu_0^T\Sigma_0^{-1})U^{-1}(U\mu) \right.\\
+  &\qquad\qquad \left.- (U\mu)^T(U^T)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\right).
+  \end{align*}
+  - Set $\nu = (U^T)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)$ and complete the square:
+  \begin{align*}
+  \log p(\mu \mid \mathbf{Y}) &\propto -\frac{1}{2}\left((U\mu)^T(U\mu) - \nu^T(U\mu) - (U\mu)^T\nu\right) \\
+  &\propto -\frac{1}{2}\left((U\mu - \nu)^T(U\mu - \nu) - \nu^T\nu\right)\\
+  &\propto -\frac{1}{2}\left((\mu - U^{-1}\nu)^TU^TU(\mu - U^{-1}\nu) - \nu^T\nu\right)\\
+  &\propto -\frac{1}{2}\left((\mu - U^{-1}\nu)^T\Omega^{-1}(\mu - U^{-1}\nu) - \nu^T\nu\right).\\
+  \end{align*}
+  - Now, note that
+  \begin{align*}
+  U^{-1}\nu &= U^{-1}(U^T)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\\
+  &= (U^TU)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\\
+  &= \Omega(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\\
+  &= \left(\Sigma^{-1} + \Sigma_0^{-1}\right)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0).
+  \end{align*}
+  - Moreover, we have
+  \begin{align*}
+  \nu^T\nu &= \left((U^T)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\right)^T\left((U^T)^{-1}(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0)\right)\\
+  &= \left(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0\right)^T(U)^{-1}(U^T)^{-1}\left(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0\right)\\
+  &= \left(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0\right)^T(U^TU)^{-1}\left(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0\right)\\
+  &= \left(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0\right)^T\Omega\left(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0\right).\\
+  \end{align*}
+  - In other words, $\nu^T\nu$ does not depend on $\mu$, and therefore we can drop it from our expression above. The conclusion is that the log-posterior distribution is proportional to
+  $$-\frac{1}{2}\left((\mu - \Omega(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0))^T\Omega^{-1}(\mu - \Omega(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0))\right).$$
+  - As a function of $\mu$, this is the kernel of a multivariate normal density:
+  $$p(\mu \mid \mathbf{Y}) \sim N\left(\Omega(\Sigma^{-1}\mathbf{Y} + \Sigma_0^{-1}\mu_0), \Omega\right).$$
+  - Now, assume we have a random sample $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$. We know that
+  $$\bar{\mathbf{Y}} \sim N(\mu, n^{-1}\Sigma).$$
+  - Therefore, the posterior distribution of $\mu$ given the random sample is
+  $$p(\mu \mid \mathbf{Y}_1, \ldots, \mathbf{Y}_n) \sim N\left(\Omega(n\Sigma^{-1}\bar{\mathbf{Y}} + \Sigma_0^{-1}\mu_0), \Omega\right),$$
+  where $\Omega = \left(n\Sigma^{-1} + \Sigma_0^{-1}\right)^{-1}$.
+
+## A few comments
+
+  - The inverse covariance matrix $n\Sigma^{-1} + \Sigma_0^{-1}$ is also called the *precision* matrix.
+    + We can see that the larger the sample size $n$, the less significant the prior precision $\Sigma_0^{-1}$ becomes.
+  - The posterior mean is a (scaled) linear combination of the sample mean and prior mean.
+    + Again, as the sample size increases, the less significant the prior mean becomes.
