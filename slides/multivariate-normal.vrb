@@ -1,5 +1,4 @@
 \frametitle{Visualizing the likelihood}
-\protect\hypertarget{visualizing-the-likelihood}{}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -85,7 +84,7 @@
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{multivariate-normal_files/figure-beamer/unnamed-chunk-13-1.pdf}
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/multivariate-normal_files/figure-beamer/unnamed-chunk-13-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -94,5 +93,5 @@
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{multivariate-normal_files/figure-beamer/unnamed-chunk-14-1.pdf}
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/multivariate-normal_files/figure-beamer/unnamed-chunk-14-1.pdf}
 

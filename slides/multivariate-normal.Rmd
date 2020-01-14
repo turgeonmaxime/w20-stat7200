@@ -15,7 +15,7 @@ header-includes:
 ---
 
 ```{r,setup, include=FALSE}
-knitr::opts_chunk$set(cache=TRUE, eval = FALSE)
+knitr::opts_chunk$set(cache=TRUE)
 ```
 
 ## Building the multivariate density {.allowframebreaks}
