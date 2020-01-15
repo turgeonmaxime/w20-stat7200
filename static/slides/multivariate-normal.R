@@ -43,8 +43,9 @@ Y %>%
 
 ## -----------------------------------------------------------------------------
 # Ramus data, Timm (2002)
-ramus <- read.csv("https://maxturgeon.ca/w20-stat7200/Ramus.csv")
-head(ramus)
+main_page <- "https://maxturgeon.ca/w20-stat7200/"
+ramus <- read.csv(paste0(main_page, "Ramus.csv"))
+head(ramus, n = 5)
 
 
 ## -----------------------------------------------------------------------------
@@ -71,7 +72,7 @@ D_vect <- apply(ramus_cent, 1, function(row) {
 
 
 ## -----------------------------------------------------------------------------
-qqplot(qchisq(ppoints(length(D_vect)), df = 4),
+qqplot(qchisq(ppoints(D_vect), df = 4),
        D_vect, xlab = "Theoretical Quantiles")
 qqline(D_vect, distribution = function(p) {
   qchisq(p, df = 4)

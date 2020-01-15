@@ -29,3 +29,10 @@ Here is a list of other textbooks that provide further (or complementary) detail
   - Rencher (1998). *Multivariate Statistical Inference and Applications*.
   - Timm (2002). *Applied Multivariate Analysis*.
   - Mardia, Kent, Bibby (1980). *Multivariate Analysis*. 
+  
+## Resources on Matrix algebra
+
+  - The [first appendix](Mardia_Kent_Bibby-Matrix_Algebra-Appendix.pdf) of Mardia, Kent, Bibby (1980) provides a good review of basic matrix algebra.
+  - Puntanen, Styan, Isotalo (2011) *Matrix Tricks for Linear Statistical Models*
+  - Golub, Van Loan (2013) *Matrix Computations*
+    + Highly recommended book on numerical linear algebra. Excellent introduction to important algorithms for matrix computations.
