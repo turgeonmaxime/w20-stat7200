@@ -186,12 +186,30 @@ Which of the following random variables are independent? Explain.
     + $\mathbf{Y} = \begin{pmatrix}\mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}$, $\mu = \begin{pmatrix}\mu_1\\\mu_2\end{pmatrix}$;
     + $\Sigma = \begin{pmatrix} \Sigma_{11} & \Sigma_{12}\\\Sigma_{21} & \Sigma_{22}\end{pmatrix}$. 
   - Then the *conditional distribution* of $\mathbf{Y}_1$ given $\mathbf{Y}_2 = \mathbf{y}_2$ is multivariate normal $N_r(\mu_{1\mid 2}, \Sigma_{1\mid 2})$, where
-    + $\mu_{1\mid 2} = \mu_1 + \Sigma_{12} \Sigma_{22}^{-1}(y_2 - \mu_2)$
+    + $\mu_{1\mid 2} = \mu_1 + \Sigma_{12} \Sigma_{22}^{-1}(\mathbf{y}_2 - \mu_2)$
     + $\Sigma_{1\mid 2} = \Sigma_{11} - \Sigma_{12} \Sigma_{22}^{-1}\Sigma_{21}$.
     
 ## Proof {.allowframebreaks}
 
-Let $B$ be the same dimension as $\Sigma_{12}$. We have
+Let $B$ be a matrix of the same dimension as $\Sigma_{12}$. We will look at the following linear transformation of $\mathbf{Y}$:
+
+\begin{align*}
+\begin{pmatrix}
+ I & -B\\
+ 0 & I
+ \end{pmatrix} \mathbf{Y} &= \begin{pmatrix} \mathbf{Y}_1 - B\mathbf{Y}_2\\ \mathbf{Y}_2\end{pmatrix}.
+\end{align*}
+
+Using the properties of the mean, we have
+
+\begin{align*}
+ \begin{pmatrix}
+ I & -B\\
+ 0 & I
+ \end{pmatrix} \mu &= \begin{pmatrix} \mu_1 - B\mu_2\\ \mu_2\end{pmatrix}.
+\end{align*}
+
+Similarly, using the properties of the covariance, we have
 \begin{align*}
  &\begin{pmatrix}
  I & -B\\
@@ -207,32 +225,32 @@ Let $B$ be the same dimension as $\Sigma_{12}$. We have
  \end{pmatrix}.
 \end{align*}
 
-If we take $B = \Sigma_{12}\Sigma_{22}^{-1}$, the two off-diagonal blocks become 0, which implies that the blocks are independent. Also, the left-upper block simplifies to
+\vspace{1in}
+
+Recall that subsets of a multivariate normal variable are again multivariate normal:
+
+\begin{align*}
+\mathbf{Y}_1 - B\mathbf{Y}_2 &\sim N\left(\mu_1 - B\mu_2, \Sigma_{11} - B\Sigma_{21} - \Sigma_{12}B^T + B\Sigma_{22}B^T\right),\\
+\mathbf{Y}_2 &\sim N(\mu_2, \Sigma_{22}).
+\end{align*}
+
+If we take $B = \Sigma_{12}\Sigma_{22}^{-1}$, the two off-diagonal blocks of the covariance matrix above become 0. This implies that $\mathbf{Y}_1 - B\mathbf{Y}_2$ is independent of $\mathbf{Y}_2$.
+
+Given $B = \Sigma_{12}\Sigma_{22}^{-1}$, we can deduce that 
+$$\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2 \sim N\left(\mu_1 - \Sigma_{12}\Sigma_{22}^{-1}\mu_2, \Sigma_{1\mid 2}\right),$$
+where 
 $$\Sigma_{1\mid 2} = \Sigma_{11} + \Sigma_{12} \Sigma_{22}^{-1}\Sigma_{21}.$$
 
-On the other hand, we also have
-\begin{align*}
-\begin{pmatrix}
- I & -B\\
- 0 & I
- \end{pmatrix} \mathbf{Y} &= \begin{pmatrix} \mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2\\ \mathbf{Y}_2\end{pmatrix}\\
- \begin{pmatrix}
- I & -B\\
- 0 & I
- \end{pmatrix} \mu &= \begin{pmatrix} \mu_1 - \Sigma_{12}\Sigma_{22}^{-1}\mu_2\\ \mu_2\end{pmatrix}.
-\end{align*}
+Using the fact that $\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2$ and $\mathbf{Y}_2$ are independent, we can conclude that
+$$\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2 = \mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2 \mid \mathbf{Y}_2 = \mathbf{y}_2.$$
 
-We can therefore conclude
-\begin{align*}
-\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2 &= \mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2 \mid \mathbf{Y}_2 = \mathbf{y}_2\\
-&\sim N(\mu_1 - \Sigma_{12}\Sigma_{22}^{-1}\mu_2, \Sigma_{1\mid 2}).
-\end{align*}
-
-By adding $\Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2$ to the left-hand side, the result follows.\hfill\qed
+Finally, by adding $\Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2$ to the right-hand side, we get
+$$\mathbf{Y}_1 \mid \mathbf{Y}_2 = \mathbf{y}_2 \sim N\left(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1}(\mathbf{y}_2 - \mu_2), \Sigma_{1\mid 2}\right).$$
+\.\hfill\qed
 
 ## Conditional Normal Distributions ii
 
-  - **Theorem**: Let $\mathbf{Y}_2\sim N_{p-r}(\mu_2, \Sigma_{22})$ and assume that $\mathbf{Y}_1$ given $\mathbf{Y}_2 = y_2$ is multivariate normal $N_r(Ay_2 + b, \Omega)$, where $\Omega$ does not depend on $y_2$. Then $\mathbf{Y} = \begin{pmatrix}\mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}\sim N_p(\mu, \Sigma)$, where
+  - **Theorem**: Let $\mathbf{Y}_2\sim N_{p-r}(\mu_2, \Sigma_{22})$ and assume that $\mathbf{Y}_1$ given $\mathbf{Y}_2 = \mathbf{y}_2$ is multivariate normal $N_r(A\mathbf{y}_2 + b, \Omega)$, where $\Omega$ does not depend on $\mathbf{y}_2$. Then $\mathbf{Y} = \begin{pmatrix}\mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}\sim N_p(\mu, \Sigma)$, where
     + $\mu = \begin{pmatrix}A\mu_2+b\\\mu_2\end{pmatrix}$;
     + $\Sigma = \begin{pmatrix} \Omega+A\Sigma_{22}A^T & A\Sigma_{22}\\\Sigma_{22}A^T & \Sigma_{22}\end{pmatrix}$. 
   - Proof: **Exercise** (e.g. compute joint density).
@@ -261,12 +279,13 @@ By adding $\Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2$ to the left-hand side, the r
     + **Note**: The chi-square distribution does not yield a good approximation for large $p$. A more accurate graphical test can be constructed using a beta distribution.
   - *Procedure*: Given a random sample $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of p-dimensional random vectors:
     + Compute $D_i^2 = (\mathbf{Y}_i - \bar{\mathbf{Y}})^T S^{-1} (\mathbf{Y}_i - \bar{\mathbf{Y}})$.
-    + Compare the (observed) quantiles of the $D_i$s with the (theoretical) quantiles of a $\chi^2(p)$ distribution.
+    + Compare the (observed) quantiles of the $D_i^2$s with the (theoretical) quantiles of a $\chi^2(p)$ distribution.
     
 ```{r}
 # Ramus data, Timm (2002)
-ramus <- read.csv("https://maxturgeon.ca/w20-stat7200/Ramus.csv")
-head(ramus)
+main_page <- "https://maxturgeon.ca/w20-stat7200/"
+ramus <- read.csv(paste0(main_page, "Ramus.csv"))
+head(ramus, n = 5)
 ```
 
 ```{r}
@@ -293,7 +312,7 @@ D_vect <- apply(ramus_cent, 1, function(row) {
 ```
 
 ```{r}
-qqplot(qchisq(ppoints(length(D_vect)), df = 4),
+qqplot(qchisq(ppoints(D_vect), df = 4),
        D_vect, xlab = "Theoretical Quantiles")
 qqline(D_vect, distribution = function(p) {
   qchisq(p, df = 4)
@@ -334,6 +353,8 @@ qqline(D_vect, distribution = function(p) {
   &\qquad + n(\bar{\mathbf{Y}} - \mu)^T\Sigma^{-1}(\bar{\mathbf{Y}} - \mu). \\
   \end{align*}
   
+\.\hfill\qed
+
 ## Maximum Likelihood Estimation {.allowframebreaks}
 
   - Going back to the log-likelihood, we get:
@@ -367,6 +388,8 @@ qqline(D_vect, distribution = function(p) {
   - Each summand can be minimised individually, and the minimum occurs at $\lambda_i = 1$. In other words, the (overall) minimum is when $T = I_p$, which is equivalent to 
   $$\Sigma = \frac{n-1}{n}S_n = \frac{1}{n}\sum_{i=1}^n(\mathbf{Y}_i - \bar{\mathbf{Y}})(\mathbf{Y}_i - \bar{\mathbf{Y}})^T.$$
   - *In other words*: $\left(\bar{\mathbf{Y}},\frac{n-1}{n}S_n\right)$ are the **maximum likelihood estimators** for $(\mu,\Sigma)$.
+  
+\.\hfill\qed
   
 ## Maximum Likelihood Estimators
 
