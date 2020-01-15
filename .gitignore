@@ -7,3 +7,10 @@ content/slides/*.pdf
 content/slides/*_cache/
 content/slides/*_files/
 static/slides/*_files/
+
+content/practice/*
+!content/practice/*.tex
+
+static/practice/*
+!static/practice/*.pdf
+

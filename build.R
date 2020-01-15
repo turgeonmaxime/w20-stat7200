@@ -43,3 +43,20 @@ for (source in slide_sources) {
                 quiet = TRUE)
   }
 }
+
+# Compile practice problems tex files
+practice_sources <- list.files("content/practice",
+                               full.names = TRUE,
+                               pattern = "tex$")
+
+for (source in practice_sources) {
+  problem_pdf <- str_replace(source, "content/practice", "static/practice") %>% 
+    str_replace(".tex", ".pdf")
+  
+  if (require_rebuild(problem_pdf, source)) {
+    system2("pdflatex", c("-output-directory=static/practice", source), 
+            stdout = FALSE)
+  }
+}
+
+
