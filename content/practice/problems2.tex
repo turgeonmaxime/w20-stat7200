@@ -1,0 +1,125 @@
+\documentclass[12pt]{paper} 
+\usepackage{amsmath, amsfonts, amsthm} % Math packages
+\usepackage{listings} % Code listings, with syntax highlighting
+\usepackage[english]{babel} % English language hyphenation
+\usepackage{graphicx} % Required for inserting images
+\usepackage{booktabs} % Required for better horizontal rules in tables
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage{enumitem} % Required for list customisation
+\setlist{noitemsep} % No spacing between list items
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT MARGINS
+%----------------------------------------------------------------------------------------
+
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+
+\geometry{
+	paper=letterpaper, % Paper size, change to letterpaper for US letter size
+	top=2.5cm, % Top margin
+	bottom=3cm, % Bottom margin
+	left=3cm, % Left margin
+	right=3cm, % Right margin
+	headheight=0.75cm, % Header height
+	footskip=1.5cm, % Space from the bottom margin to the baseline of the footer
+	headsep=0.75cm, % Space from the top margin to the baseline of the header
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Use 8-bit encoding
+
+\usepackage{fourier} % Use the Adobe Utopia font for the document
+
+%----------------------------------------------------------------------------------------
+%	HEADERS AND FOOTERS
+%----------------------------------------------------------------------------------------
+
+\usepackage{scrlayer-scrpage} % Required for customising headers and footers
+
+\ohead*{} % Right header
+\ihead*{} % Left header
+\chead*{} % Centre header
+
+\ofoot*{} % Right footer
+\ifoot*{} % Left footer
+\cfoot*{\pagemark} % Centre footer
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+Problem Set 2--STAT 7200
+}
+
+\author{} % Your name
+\date{} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+
+\begin{enumerate}
+\item Prove the result on Slide 33 of the notes on the Multivariate Normal distribution.
+
+\vspace{1.5cm}\item Let $\mathbf{Y} = (Y_1, Y_2, Y_3)$ be a multivariate normal random vector with
+$$ \mu = (3, 0, 6),\qquad \Sigma = \begin{pmatrix} 1&1&1\\1&3&2\\1&2&2\end{pmatrix},$$
+and let $\mathbf{U} = (3Y_1 - 2Y_2 + Y_3, Y_2 - 2Y_3)$.
+\begin{enumerate}
+  \item Write $\mathbf{U} = (U_1, U_2)$ as $\mathbf{U} = A\mathbf{Y}$ for a suitable matrix $A$.
+  \item Find the distribution of $\mathbf{U}$.
+  \item Find a two-dimensional vector $\mathbf{w}=(w_1, w_2)$ such that 
+  $$ Y_2, \qquad Y_2 - \mathbf{w}^T\begin{pmatrix}Y_1\\Y_3\end{pmatrix}$$
+  are jointly independent.
+  \item Find the conditional distribution of $Y_3$ given $Y_1=3$ and $Y_2=1$.
+\end{enumerate}
+
+\vspace{1.5cm}\item Let $Y_1$ be univariate standard normal $N(0, 1)$, and let
+$$ Y_2 = \begin{cases} -Y_1 & -1 \leq Y_1 \leq 1,\\ Y_1 & \mbox{otherwise.}\end{cases}$$
+Show that
+\begin{enumerate}
+\item $Y_2$ also follows a standard normal distribution;
+\item $(Y_1, Y_2)$ does \emph{not} follow a bivariate normal distribution.
+\end{enumerate}
+
+\vspace{1.5cm}\item Let $\mathbf{Y}$ be a random vector defined by
+$$\mathbf{Y} = X\beta + Z \mathbf{B} + \mathbf{E},$$
+where $X$ is $p\times q$, $Z$ is $p\times r$, both are non-random; $\beta$ is a $q$-dimensional parameter vector; and $\mathbf{B}\sim N_r(0, \Omega)$, $\mathbf{E}\sim N_p(0, \sigma^2 I_p)$, and both are independent. Show that
+\begin{enumerate}
+  \item $\mathbf{Y}\sim N_p(X\beta, \Sigma)$, where $\Sigma = Z\Omega Z^T + \sigma^2 I_p$.
+  \item $\begin{pmatrix} \mathbf{Y}\\ \mathbf{B}\end{pmatrix} \sim N_{p+r} \left(\begin{pmatrix} X\beta\\ 0\end{pmatrix}, \begin{pmatrix} \Sigma & Z\Omega\\ \Omega Z^T & \Omega\end{pmatrix}\right)$.
+  \item $E(\mathbf{B} \mid \mathbf{Y}) = \Omega Z \Sigma^{-1}\left(\mathbf{Y} - X\beta\right)$.
+  \item $\mathbf{Y} \mid \mathbf{B} \sim N_p(X\beta + Z\mathbf{B}, \sigma^2 I_p)$.
+\end{enumerate}
+
+\vspace{1.5cm}\item Let $\mathbf{Y}\sim N_p(\mu, \Sigma)$. Compute the characteristic function of $\mathbf{Y}^T A \mathbf{Y}$, where $A$ is a non-random matrix.
+
+\vspace{1.5cm}\item Let $\mathbf{Y}$ be such that $E(\mathbf{Y}) = \mu$ and $\mathrm{Cov}(\mathbf{Y}) = \Sigma$. Show that
+$$\min_\mathbf{c} E\left((\mathbf{Y} - \mathbf{c})^T(\mathbf{Y} - \mathbf{c})\right) = \mathrm{tr} \Sigma,$$
+and that the minimum is attained at $\mathbf{c} = \mu$.
+
+\vspace{1.5cm}\item Assume $\mathbf{Y} \sim t_{p,\nu} (\mu, \Lambda)$ follows a multivariate $t$ distribution. Let $\mathbf{Y}$ be partitioned as $\mathbf{Y} = \begin{pmatrix} \mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}$, with $\mathbf{Y}_i$ of dimension $p_i$ and $p = p_1 + p_2$. Demonstrate the following:
+\begin{enumerate}
+  \item The expected value is $E(\mathbf{Y}) = \mu$, and the covariance is $\mathrm{Cov}(\mathbf{Y}) = [\nu/(\nu - 2)]\Lambda$, $\nu > 2$.
+  \item The quadratic form $p^{-1} (\mathbf{Y} -\mu)^T \Lambda^{-1} (\mathbf{Y} -\mu)$ follows an $F$ distribution $F(p, \nu)$.
+  \item The marginal distribution is $\mathbf{Y}_2 \sim t_{p_2, \nu}(\mu_2 , \Lambda_{22})$, where
+  $$\mu = \begin{pmatrix} \mu_1\\\mu_2\end{pmatrix},$$
+  and
+  $$\Lambda = \begin{pmatrix} \Lambda_{11} & \Lambda_{12} \\ \Lambda_{21} & \Lambda_{22}\end{pmatrix}.$$
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
