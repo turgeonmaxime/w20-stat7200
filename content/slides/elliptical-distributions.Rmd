@@ -1,0 +1,285 @@
+---
+title: "Elliptical Distributions"
+draft: false
+source: true
+output: binb::metropolis
+fontsize: 12pt
+author: Max Turgeon
+institute: STAT 7200--Multivariate Statistics
+header-includes:
+  - \usefonttheme{professionalfonts}
+  - \usepackage{graphicx}
+  - \usepackage{tikzpagenodes}
+  - \usetikzlibrary{calc}
+  - \usepackage{caption}
+  - \usepackage{xcolor}
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE, message = FALSE)
+```
+
+## Density contours {.allowframebreaks}
+
+  - Recall the density of the multivariate normal distribution:
+  $$f(\mathbf{Y}) = \frac{1}{\sqrt{(2\pi)^p\lvert\Sigma\rvert}}\exp\left(-\frac{1}{2}(\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu)\right).$$
+  - For a real number $k > 0$, we can look at the values of $\mathbf{Y}$ for which $f(\mathbf{Y}) = k$. We have
+  \begin{align*}
+  f(\mathbf{Y}) = k &\Leftrightarrow \frac{1}{\sqrt{(2\pi)^p\lvert\Sigma\rvert}}\exp\left(-\frac{1}{2}(\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu)\right) = k\\
+  &\Leftrightarrow \exp\left(-\frac{1}{2}(\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu)\right) = k\sqrt{(2\pi)^p\lvert\Sigma\rvert}\\
+  &\Leftrightarrow (\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu) = -2\log\left(k\sqrt{(2\pi)^p\lvert\Sigma\rvert}\right).\\
+  \end{align*}
+  - In other words, the sets of constant density correspond to the sets where the quadratic form
+  $$(\mathbf{Y} - \mu)^T\Sigma^{-1}(\mathbf{Y} - \mu)$$
+  is constant.
+  - The latter sets are **ellipses** (or multivariate generalizations thereof).
+
+## Example {.allowframebreaks}
+
+```{r}
+library(mvtnorm)
+
+mu <- c(2, 1)
+Sigma <- matrix(c(1, 0.5, 0.5, 1), ncol = 2)
+data <- expand.grid(seq(0, 4, length.out = 32),
+                    seq(0, 2, length.out = 32))
+data["dvalues"] <- dmvnorm(data, mean = mu, 
+                           sigma = Sigma)
+```
+
+```{r}
+library(tidyverse)
+ggplot(data, aes(Var1, Var2)) + 
+  geom_contour(aes(z = dvalues))  +
+  coord_fixed(ratio = 1)
+```
+
+```{r}
+k <- 0.12
+const <- -2*log(k*2*pi*sqrt(det(Sigma)))
+
+# Generate a circle
+# First create a circle of radius const
+theta_vect <- seq(0, 2*pi, length.out = 100)
+circle <- const * cbind(cos(theta_vect), 
+                        sin(theta_vect))
+```
+
+
+```{r}
+# Compute inverse Cholesky
+transf_mat <- solve(chol(solve(Sigma)))
+# Then turn circle into ellipse
+ellipse <- circle %*% t(transf_mat)
+# Then translate
+ellipse <- t(apply(ellipse, 1, function(row) row + mu))
+```
+
+```{r}
+# Add ellipse to previous plot
+ggplot(data, aes(Var1, Var2)) + 
+  geom_contour(aes(z = dvalues)) +
+  geom_polygon(data = data.frame(ellipse),
+            aes(X1, X2), colour = 'red', fill = NA) +
+  coord_fixed(ratio = 1)
+```
+
+## Elliptical distributions
+
+  - Elliptical distributions are a generalization of the multivariate normal distribution that retain the property that lines of constant density are ellipses.
+  - More formally, let $\mu\in\mathbb{R}^p$ and $\Lambda$ be a $p\times p$ positive-definite matrix. If $\mathbf{Y}$ has density
+  $$f(\mathbf{Y}) = \lvert\Lambda\rvert^{-1/2}g\left((\mathbf{Y} - \mu)^T\Lambda^{-1}(\mathbf{Y} - \mu)\right),$$
+  where $g:[0, \infty)\to [0, \infty)$ does not depend on $\mu,\Lambda$, we say that $\mathbf{Y}$ follows an **elliptical distribution** with location-scale parameters $\mu,\Lambda$, and we write $\mathbf{Y}\sim E_p(\mu,\Lambda)$.
+
+## Properties {.allowframebreaks}
+
+  - The class $E_p(\mu,\Lambda)$ contains the multivariate normal distribution $N_p(\mu, \Lambda)$.
+    + With $g(t) = (2\pi)^{-p/2}\exp\left(-\frac{1}{2}t\right).$
+  - Affine transformations of elliptical distributions are again elliptical:
+    + If $\mathbf{Y} \sim E_p(\mu,\Lambda)$ and $B$ is invertible, then $B\mathbf{Y} + b \sim E_p(B\mu + b, B\Lambda B^T)$.
+  - We call $E_p(0, I_p)$ the class of *spherical distributions*.
+  - If $\mathbf{Y} \sim E_p(\mu,\Lambda)$, then its characteristic function is given by
+  $$\varphi_\mathbf{Y}(\mathbf{t}) = \exp(i\mathbf{t}^T\mu) \psi(\mathbf{t}^T\Lambda\mathbf{t}),$$
+  for some real-valued function $\psi$.
+  - If $\mathbf{Y} \sim E_p(\mu,\Lambda)$ has moments of order 2, then $E(\mathbf{Y}) = \mu$ and $\mathrm{Cov}(\mathbf{Y}) = \alpha \Lambda$, where $\alpha = -2\psi^\prime(0)$.
+  
+## Proposition 
+
+Let $\mathbf{Y}\sim E_p(\mu,\Lambda)$, and write
+\begin{align*}
+\mathbf{Y} &= \begin{pmatrix}\mathbf{Y}_1\\\mathbf{Y}_2\end{pmatrix}, \qquad \mu = \begin{pmatrix}\mu_1\\\mu_2\end{pmatrix},\\
+\Lambda &= \begin{pmatrix} \Lambda_{11} & \Lambda_{12}\\ \Lambda_{21} & \Lambda_{22}\end{pmatrix}.\\
+\end{align*}
+Then $\mathbf{Y}_1\sim E_{p_1}(\mu_1,\Lambda_{11})$ and $\mathbf{Y}_2\sim E_{p_1}(\mu_2,\Lambda_{22})$.
+
+## Theorem
+
+Let $\mathbf{Y}\sim E_p(\mu, \Lambda)$, and assume the same partition of $\mu$ and $\Lambda$ as previously. Then
+$$\mathbf{Y}_1 \mid \mathbf{Y}_2 =\mathbf{y}_2 \sim E_{p_1}(\mu_{1\mid 2},\Lambda_{1\mid 2}),$$
+where
+\begin{align*}
+\mu_{1\mid 2} &= \mu_1 + \Lambda_{12} \Lambda_{22}^{-1}(\mathbf{y}_2 - \mu_2),\\
+\Lambda_{1\mid 2} &= \Lambda_{11} - \Lambda_{12} \Lambda_{22}^{-1}\Lambda_{21}.\\
+\end{align*}
+
+Unlike the normal distribution, the conditional covariance $\mathrm{Cov}(\mathbf{Y}_1 \mid \mathbf{Y}_2 =\mathbf{y}_2)$ will in general depend on $\mathbf{y}_2$.
+
+## First Example--Mixture of standard normal
+
+  - Let $\mathbf{Z}\sim N_p(0, I_p)$ and $w\sim F$, where $F$ is supported on $[0,\infty)$.
+  - If we set $\mathbf{Y} = W^{1/2}\mathbf{Z}$, then $\mathbf{Y}\sim E_{p}(0,I_p)$ has a spherical distribution.
+  - Examples:
+    + $P(W = \sigma^2) = 1$ gives the multivariate normal $N_p(0, \sigma^2 I_p)$.
+    + $P(W = 1) = 1 - \epsilon$ and $P(W = \sigma^2) = \epsilon$ gives the *symmetric contaminated normal distribution*. 
+  - We can generate data from these distributions by sampling $W$ and $\mathbf{Z}$ *independently* and then calculating $\mathbf{Y}$.
+    
+## Simulating data {.allowframebreaks}
+
+```{r}
+set.seed(7200)
+
+n <- 1000
+p <- 2
+Z <- rmvnorm(n, sigma = diag(p))
+```
+
+```{r}
+sigma <- 2
+epsilon <- 0.25
+w <- sample(c(sigma, 1), size = n, replace = TRUE,
+            prob = c(epsilon, 1 - epsilon))
+
+Y <- w*Z
+```
+
+```{r}
+# Plot the results
+par(mfrow = c(1, 2))
+plot(Z, main = 'Standard Normal',
+     xlim = c(-4.5, 6.5), ylim = c(-7, 5))
+plot(Y, main = 'Contaminated Normal',
+     xlim = c(-4.5, 6.5), ylim = c(-7, 5))
+```
+
+```{r}
+# Colour points of Y according to 
+# which distribution they come from
+plot(Y, main = 'Contaminated Normal', col = w, 
+     xlim = c(-4.5, 6.5), ylim = c(-7, 5))
+legend("bottomleft", legend = c("Sigma = 1", "Sigma = 2"),
+       col = c(1, 2), pch = 1)
+```
+
+```{r}
+# Let's look at the distribution of the sample means
+B <- 1000; n <- 100
+data <- purrr::map_df(seq_len(B), function(b) {
+  Z <- rmvnorm(n, sigma = diag(p))
+  Y <- sample(c(sigma, 1), size = n, replace = TRUE,
+            prob = c(epsilon, 1 - epsilon)) * Z
+  
+  out <- data.frame(rbind(colMeans(Z), colMeans(Y)))
+  out$Dist <- c("Standard", "Contaminated")
+  return(out)
+  })
+```
+
+```{r}
+ggplot(data, aes(X1, X2)) + 
+  geom_point(aes(colour = Dist)) +
+  theme(legend.position = 'top')
+```
+
+## Second Example--$t$ distribution {.allowframebreaks}
+
+  - Let $\nu > 0$. If we take $W$ in the mixture distribution above to be such that $\nu W^{-1}\sim\chi^2(\nu)$, we get the multivariate $t$ distribution $t_{p,\nu}$. Its density is given by
+  $$f(\mathbf{Y}) = c_{p,\nu}(1 + \mathbf{Y}^T\mathbf{Y}/\nu)^{-(\nu+p)/2},$$
+  where
+  $$c_{p,\nu} = \frac{(\nu\pi)^{-p/2} \Gamma\left(\frac{1}{2} (\nu + p)\right)}{\Gamma\left(\frac{1}{2}\nu\right)}.$$
+  - By relocating and rescaling, we can obtain the general multivariate $t$ distribution $t_{p,\nu}(\mu, \Lambda)$: assume $\mathbf{Z} \sim t_{p,\nu}$ and set $\mathbf{Y} = \Lambda^{1/2}\mathbf{Z} + \mu$. The density of $\mathbf{Y}$ is now
+  $$f(\mathbf{Y}) = c_{p,\nu}\lvert\Lambda\vert^{-1/2}(1 + (\mathbf{Y} - \mu)^T\Lambda^{-1}(\mathbf{Y} - \mu)/\nu)^{-(\nu+p)/2}.$$
+
+  - Note that the multivariate $t_{p, 1}$ with $\nu = 1$ is known as the *multivariate Cauchy distribution*.
+  \vspace{1in}
+  
+  - The following side-by-side comparison may be helpful: Let $\mathbf{Z} \sim N(0, I_p)$, $\nu > 0$, $\mu \in \mathbb{R}^p$ and $\Lambda$ $p\times p$ and positive definite.
+    + $\mu + \Lambda^{1/2}\mathbf{Z} \sim N_p(\mu, \Lambda)$;
+    + $\mu + {\color{red}\sqrt{W}}\Lambda^{1/2}\mathbf{Z} \sim t_{p,\nu}(\mu, \Lambda)$, where $\nu W^{-1}\sim\chi^2(\nu)$.
+  - Finally, note that if $\mathbf{Y}\sim t_{p,\nu}(\mu, \Lambda)$, we have
+    + $E(\mathbf{Y}) = \mu$, assuming $\nu > 1$;
+    + $\mathrm{Cov}\left(\mathbf{Y}\right) = \frac{\nu}{\nu - 2} \Lambda$, assuming $\nu > 2$.
+
+## Example {.allowframebreaks}
+
+```{r}
+library(mvtnorm)
+n <- 1000
+mu <- c(1, 2)
+Sigma <- matrix(c(1, 0.5, 0.5, 1), ncol = 2)
+# Recall the multivariate case
+Y_norm <- rmvnorm(n, mean = mu, sigma = Sigma)
+
+colMeans(Y_norm)
+cov(Y_norm)
+```
+
+```{r}
+# Now the t distribution
+nu <- 4
+Y_t <- rmvt(n, sigma = Sigma, df = nu, delta = mu)
+
+colMeans(Y_t)
+cov(Y_t)
+```
+
+```{r}
+data_plot <- rbind(
+  mutate(data.frame(Y_norm), dist = "normal"),
+  mutate(data.frame(Y_t), dist = "t")
+)
+
+ggplot(data_plot, aes(X1, X2)) +
+  geom_point(alpha = 0.25) +
+  geom_density_2d() +
+  facet_grid(~ dist, labeller = label_both)
+```
+
+## Estimation {.allowframebreaks}
+
+  - Given a random sample $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ from an elliptical distribution $E_p(\mu, \Lambda)$, we are interested in estimating $\mu$ and $\Lambda$. 
+  - Recall that the sample mean and the sample covariance are *still* consistent:
+  \begin{align*}
+  \bar{\mathbf{Y}} &\to \mu\\
+  S_n &\to \alpha \Lambda.
+  \end{align*}
+  - However, in general, they are no longer efficient.
+    + You can build estimators with smaller variance.
+  - The log-likelihood for our random sample is
+  $$\ell(\mu, \Lambda) = \sum_{i=1}^n \log\left(g\left((\mathbf{Y}_i - \mu)^T\Lambda^{-1}(\mathbf{Y}_i - \mu)\right)\right) -\frac{n}{2}\log\lvert\Lambda\rvert.$$
+  - Differentiating with respect to $\mu$ and $\Lambda$ and setting the derivatives equal to zero, we get a system of equations:
+  \begin{align*}
+  \sum_{i=1}^n u(s_i)\Lambda^{-1}(\mathbf{Y}_i - \mu) &= 0\\
+  \frac{1}{2}\sum_{i=1}^n u(s_i)\Lambda^{-1}(\mathbf{Y}_i - \mu)(\mathbf{Y}_i - \mu)^T\Lambda^{-1} -\frac{n}{2} \Lambda^{-1} &= 0,\\
+  \end{align*}
+  where 
+  \begin{align*}
+  u(s) &= -2g^\prime(s)/g(s),\\
+  s_i &= (\mathbf{Y}_i - \mu)^T\Lambda^{-1}(\mathbf{Y}_i - \mu).
+  \end{align*}
+  - Therefore, the MLE estimators (if they exist!) satisfy the following equations:
+  \begin{align*}
+  \hat{\mu} &= \frac{\frac{1}{n}\sum_{i=1}^n u(s_i)\mathbf{Y}_i}{\frac{1}{n}\sum_{i=1}^n u(s_i)},\\
+  \hat{\Lambda} &= \frac{1}{n}\sum_{i=1}^n u(s_i) (\mathbf{Y}_i - \hat{\mu})(\mathbf{Y}_i - \hat{\mu})^T.
+  \end{align*}
+  - In other words, the MLE are in general **weighted** sample estimators. 
+  
+## Additional comments
+  
+  - The MLEs do not have a closed form solution.
+    + They must be computed using an iterative scheme.
+  - The existence and uniqueness of a solution to these estimating equations is a difficult theoretical problem.
+  - Alternatively, one can use *robust* estimators that have good properties for most elliptical distributions.
+    + E.g $M$-estimators and $S$-estimators.
+    + For details, see Chapter 13 of *Theory of Multivariate Statistics*
+  - On the Bayesian side of estimation, there is in general no closed form for the posterior distribution.
+    + But efficient MCMC strategies can be developed for elliptical distributions.

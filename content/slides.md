@@ -12,6 +12,7 @@ type: docs
     + [R code](multivariate-random-variables.R)
   - [Multivariate Normal Distribution](multivariate-normal.pdf)
     + [R code](multivariate-normal.R)
-  - Elliptical Distributions
+  - [Elliptical Distributions](elliptical-distributions.pdf)
+    + [R code](elliptical-distributions.R)
+    + [Hofert, M. (2013). *On sampling from the multivariate t distribution*. The R Journal.](https://journal.r-project.org/archive/2013/RJ-2013-033/RJ-2013-033.pdf)
   - Wishart Distribution
-    + R code
