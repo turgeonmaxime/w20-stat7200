@@ -36,3 +36,4 @@ Here is a list of other textbooks that provide further (or complementary) detail
   - Puntanen, Styan, Isotalo (2011) *Matrix Tricks for Linear Statistical Models*
   - Golub, Van Loan (2013) *Matrix Computations*
     + Highly recommended book on numerical linear algebra. Excellent introduction to important algorithms for matrix computations.
+  - Notes on [quadratic forms and ellipses](https://www.maxturgeon.ca/f19-stat4690/slides/quadratic_forms_ellipses.pdf)
