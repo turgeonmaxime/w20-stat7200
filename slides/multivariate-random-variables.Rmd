@@ -426,8 +426,8 @@ Let $\mathbf{Y}_n$ be a random sample with characteristic function $\varphi$ and
   - Now note that the characteristic function of $\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k$ is given by
   \begin{align*}
   \varphi_n(\mathbf{t}) &= E\left(\exp\left(i\mathbf{t}^T\frac{1}{n}\sum_{k=1}^n\mathbf{Y}_k\right)\right)\\
-  &= E\left(\prod_{k=1}^n\exp\left(i\left(\frac{\mathbf{t}}{n}\right)^T\mathbf{Y}_i\right)\right)\\
-  &= \prod_{k=1}^nE\left(\exp\left(i\left(\frac{\mathbf{t}}{n}\right)^T\mathbf{Y}_i\right)\right)\\
+  &= E\left(\prod_{k=1}^n\exp\left(i\left(\frac{\mathbf{t}}{n}\right)^T\mathbf{Y}_k\right)\right)\\
+  &= \prod_{k=1}^nE\left(\exp\left(i\left(\frac{\mathbf{t}}{n}\right)^T\mathbf{Y}_k\right)\right)\\
   &= \varphi\left(\frac{\mathbf{t}}{n}\right)^n.
   \end{align*}
   - Using the Taylor expansion of $\varphi$, we get

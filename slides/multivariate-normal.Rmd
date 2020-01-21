@@ -239,7 +239,7 @@ If we take $B = \Sigma_{12}\Sigma_{22}^{-1}$, the two off-diagonal blocks of the
 Given $B = \Sigma_{12}\Sigma_{22}^{-1}$, we can deduce that 
 $$\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2 \sim N\left(\mu_1 - \Sigma_{12}\Sigma_{22}^{-1}\mu_2, \Sigma_{1\mid 2}\right),$$
 where 
-$$\Sigma_{1\mid 2} = \Sigma_{11} + \Sigma_{12} \Sigma_{22}^{-1}\Sigma_{21}.$$
+$$\Sigma_{1\mid 2} = \Sigma_{11} - \Sigma_{12} \Sigma_{22}^{-1}\Sigma_{21}.$$
 
 Using the fact that $\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2$ and $\mathbf{Y}_2$ are independent, we can conclude that
 $$\mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{Y}_2 = \mathbf{Y}_1 - \Sigma_{12}\Sigma_{22}^{-1}\mathbf{y}_2 \mid \mathbf{Y}_2 = \mathbf{y}_2.$$

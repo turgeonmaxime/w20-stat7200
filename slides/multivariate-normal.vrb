@@ -1,0 +1,97 @@
+\frametitle{Visualizing the likelihood}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(mvtnorm)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+
+\NormalTok{n <-}\StringTok{ }\DecValTok{50}\NormalTok{; p <-}\StringTok{ }\DecValTok{2}
+
+\NormalTok{mu <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{Sigma <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{ncol =}\NormalTok{ p)}
+
+\NormalTok{Y <-}\StringTok{ }\KeywordTok{rmvnorm}\NormalTok{(n, }\DataTypeTok{mean =}\NormalTok{ mu, }\DataTypeTok{sigma =}\NormalTok{ Sigma)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{loglik <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(mu, sigma, }\DataTypeTok{data =}\NormalTok{ Y) \{}
+  \CommentTok{# Compute quantities}
+\NormalTok{  y_bar <-}\StringTok{ }\KeywordTok{colMeans}\NormalTok{(Y)}
+\NormalTok{  quad_form <-}\StringTok{ }\KeywordTok{t}\NormalTok{(y_bar }\OperatorTok{-}\StringTok{ }\NormalTok{mu) }\OperatorTok{%*%}\StringTok{ }\KeywordTok{solve}\NormalTok{(sigma) }\OperatorTok{%*%}
+\StringTok{    }\NormalTok{(y_bar }\OperatorTok{-}\StringTok{ }\NormalTok{mu)}
+
+  \FloatTok{-0.5}\OperatorTok{*}\NormalTok{n}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\KeywordTok{det}\NormalTok{(sigma)) }\OperatorTok{-}
+\StringTok{    }\FloatTok{0.5}\OperatorTok{*}\NormalTok{(n }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)}\OperatorTok{*}\KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(}\KeywordTok{solve}\NormalTok{(sigma) }\OperatorTok{%*%}\StringTok{ }\KeywordTok{cov}\NormalTok{(Y))) }\OperatorTok{-}
+\StringTok{    }\FloatTok{0.5}\OperatorTok{*}\NormalTok{n}\OperatorTok{*}\KeywordTok{drop}\NormalTok{(quad_form)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{grid_xy <-}\StringTok{ }\KeywordTok{expand.grid}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{32}\NormalTok{), }
+                       \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{32}\NormalTok{))}
+
+\KeywordTok{head}\NormalTok{(grid_xy, }\DataTypeTok{n =} \DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         Var1 Var2
+## 1 0.00000000    0
+## 2 0.06451613    0
+## 3 0.12903226    0
+## 4 0.19354839    0
+## 5 0.25806452    0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{contours <-}\StringTok{ }\NormalTok{purrr}\OperatorTok{::}\KeywordTok{map_df}\NormalTok{(}\KeywordTok{seq_len}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(grid_xy)), }
+                          \ControlFlowTok{function}\NormalTok{(i) \{}
+  \CommentTok{# Where we will evaluate loglik}
+\NormalTok{  mu_obs <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(grid_xy[i,])}
+  \CommentTok{# Evaluate at the pop covariance}
+\NormalTok{  z <-}\StringTok{ }\KeywordTok{loglik}\NormalTok{(mu_obs, }\DataTypeTok{sigma =}\NormalTok{ Sigma)}
+  \CommentTok{# Output data.frame}
+  \KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ mu_obs[}\DecValTok{1}\NormalTok{],}
+             \DataTypeTok{y =}\NormalTok{ mu_obs[}\DecValTok{2}\NormalTok{],}
+             \DataTypeTok{z =}\NormalTok{ z)}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\KeywordTok{library}\NormalTok{(ggrepel)}
+\CommentTok{# Create df with pop and sample means}
+\NormalTok{data_means <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{c}\NormalTok{(mu[}\DecValTok{1}\NormalTok{], }\KeywordTok{mean}\NormalTok{(Y[,}\DecValTok{1}\NormalTok{])),}
+                         \DataTypeTok{y =} \KeywordTok{c}\NormalTok{(mu[}\DecValTok{2}\NormalTok{], }\KeywordTok{mean}\NormalTok{(Y[,}\DecValTok{2}\NormalTok{])),}
+                         \DataTypeTok{label =} \KeywordTok{c}\NormalTok{(}\StringTok{"Pop."}\NormalTok{, }\StringTok{"Sample"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(contours, }\KeywordTok{aes}\NormalTok{(x, y)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_contour}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{z =}\NormalTok{ z)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ data_means) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_label_repel}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ data_means,}
+                   \KeywordTok{aes}\NormalTok{(}\DataTypeTok{label =}\NormalTok{ label))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/multivariate-normal_files/figure-beamer/unnamed-chunk-13-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(scatterplot3d)}
+\KeywordTok{with}\NormalTok{(contours, }\KeywordTok{scatterplot3d}\NormalTok{(x, y, z))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/multivariate-normal_files/figure-beamer/unnamed-chunk-14-1.pdf}
+
