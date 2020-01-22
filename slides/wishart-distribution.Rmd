@@ -112,7 +112,7 @@ Now note that
 $$ \mathrm{rank}(S) = \mathrm{rank}(\mathbb{Y}^T\mathbb{Y}) = \mathrm{rank}(\mathbb{Y}).$$
 
 Furthermore, if we write $\Sigma = LL^T$ using the Cholesky decomposition, then we can write
-$$\mathbb{Z} = \mathbb{Y}L^T,$$
+$$\mathbb{Z} = \mathbb{Y}(L^{-1})^T,$$
 where the rows $\mathbf{Z}_i$ of $\mathbb{Z}$ are $N_p(0, I_p)$ and $\mathrm{rank}(\mathbb{Z}) = \mathrm{rank}(\mathbb{Y})$.
 
 Finally, we have
@@ -233,7 +233,7 @@ Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample with $\mathbf{Y}_i \
 
 ## Proof (Cochran theorem) {.allowframebreaks}
 
-**Note 1**: We typically only use one direction ($\Rightarrow$).
+**Note 1**: We typically only use one direction ($\Leftarrow$).
 
 **Note 2**: We will only prove the first part.
 
@@ -243,7 +243,7 @@ Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample with $\mathbf{Y}_i \
   $$ \Lambda^2 = \Lambda.$$
   - But only two real numbers are possible $\lambda_i \in \{0, 1\}$.
   - Given that $\mathrm{tr} A = m$, and after perhaps reordering the eigenvalues, we have
-  $$\lambda_1 = \cdots = \lambda_m = 1, \quad \lambda_{m-1} = \cdots = \lambda_n = 1.$$
+  $$\lambda_1 = \cdots = \lambda_m = 1, \quad \lambda_{m-1} = \cdots = \lambda_n = 0.$$
   - Now, set $\mathbb{Z} = U^T\mathbb{Y}$, and let $\mathbf{Z}_i$ be the $i$-th row of $\mathbb{Z}$. We have
   \begin{align*}
   \mathrm{Cov}(\mathbb{Z}) &= E((U^T\mathbb{Y})^T(U^T\mathbb{Y}))\\

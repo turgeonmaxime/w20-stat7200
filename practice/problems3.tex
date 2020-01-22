@@ -1,0 +1,102 @@
+\documentclass[12pt]{paper} 
+\usepackage{amsmath, amsfonts, amsthm} % Math packages
+\usepackage{listings} % Code listings, with syntax highlighting
+\usepackage[english]{babel} % English language hyphenation
+\usepackage{graphicx} % Required for inserting images
+\usepackage{booktabs} % Required for better horizontal rules in tables
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage{enumitem} % Required for list customisation
+\setlist{noitemsep} % No spacing between list items
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT MARGINS
+%----------------------------------------------------------------------------------------
+
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+
+\geometry{
+	paper=letterpaper, % Paper size, change to letterpaper for US letter size
+	top=2.5cm, % Top margin
+	bottom=3cm, % Bottom margin
+	left=3cm, % Left margin
+	right=3cm, % Right margin
+	headheight=0.75cm, % Header height
+	footskip=1.5cm, % Space from the bottom margin to the baseline of the footer
+	headsep=0.75cm, % Space from the top margin to the baseline of the header
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Use 8-bit encoding
+
+\usepackage{fourier} % Use the Adobe Utopia font for the document
+
+%----------------------------------------------------------------------------------------
+%	HEADERS AND FOOTERS
+%----------------------------------------------------------------------------------------
+
+\usepackage{scrlayer-scrpage} % Required for customising headers and footers
+
+\ohead*{} % Right header
+\ihead*{} % Left header
+\chead*{} % Centre header
+
+\ofoot*{} % Right footer
+\ifoot*{} % Left footer
+\cfoot*{\pagemark} % Centre footer
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+Problem Set 3--STAT 7200
+}
+
+\author{} % Your name
+\date{} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+
+\begin{enumerate}
+	\item Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample with $\mathbf{Y}_i \sim N_p(0, \Sigma)$, and write $\mathbb{Y}$ for the $n\times p$ matrix whose $i$-th row is $\mathbf{Y}_i$. Let $C = \frac{1}{n}\mathbf{1}^T$, where $\mathbf{1}$ is the $n$-dimensional vector of ones, and let $A = I_n - \frac{1}{n}\mathbf{1}\mathbf{1}^T$. Show that
+	\begin{enumerate}
+		\item $\mathbb{Y}^T A \mathbb{Y} = (n-1)S_n$;
+		\item $C \mathbb{Y} = \bar{\mathbf{Y}}^T$.
+	\end{enumerate}
+	
+	\vspace{1.5cm}\item Let $S\sim W_p(m, \Sigma)$, and let $B$ be a $q\times p$ matrix. Show that
+	$$ BSB^T \sim W_p(m, B\Sigma B^T).$$
+	
+	\vspace{1.5cm}\item Let $S\sim W_p(m)$, with $m\geq p$. Show that
+	\begin{enumerate}
+		\item $\frac{1}{\mathbf{t}^TS^{-1}\mathbf{t}}\sim \chi^2(m - p + 1)$ for any $\mathbf{t}\in\mathbb{R}^p$ with unit norm.
+		\item If $\mathbf{Y}$ and $S$ are independent and $\mathbf{Y} \neq 0$ almost surely, then $\mathbf{Y}$ is independent of
+		$$\frac{\mathbf{Y}^T\mathbf{Y}}{\mathbf{Y}^TS^{-1}\mathbf{Y}}\sim \chi^2(m - p + 1).$$
+	\end{enumerate}
+	\textbf{Hint}: You can use the fact that if $H$ is an orthogonal matrix, then $HSH^T\sim W_p(m)$.
+	
+	\vspace{1.5cm}\item Let $S\sim W_p(m)$ with $m \geq p$, and consider the correlation matrix $R$, where the $(i,j)$-th entry is given by
+	$$r_{ij} = \frac{w_{ij}}{w_{ii}^{1/2}w_{jj}^{1/2}}.$$
+	Show that the density of $R$ is given by
+	$$ f(R) = \frac{(\Gamma(m/2))^p}{\Gamma_p(m/2)}\lvert R \rvert^{(m-p-1)/2}.$$
+	\textbf{Hint}: Use the transformation $S \mapsto  \left(w_{11} ,\ldots, w_{pp} , R\right)$.
+	
+	\vspace{1.5cm}\item Let $S\sim W_p(m, \Sigma)$, and let $\mathbf{a},\mathbf{b}\in\mathbb{R}^p$ be fixed. Show that the quadratic forms $\mathbf{a}^T S \mathbf{a}$ and $\mathbf{b}^T S \mathbf{b}$ are independent if and only if $\mathbf{a}^T \Sigma \mathbf{b} = 0$.
+	
+\end{enumerate}
+
+\end{document}
