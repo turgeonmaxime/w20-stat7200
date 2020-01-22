@@ -37,6 +37,8 @@ There is no required textbook for this class. If you are looking for a good refe
   - Anderson, *An Introduction to Multivariate Statistical Analysis*. Wiley (2003).
   - Muirhead, *Aspects of Multivariate Statistical Theory*. Wiley (2005).
   - Johnson & Wichern, *Applied Multivariate Statistical Analysis*. Prentice Hall (2007).
+  - Fujikoshi, Ulyanov & Shimizu, *Multivariate Statistics--High-Dimensional and Large-Sample Approximations*. Wiley (2010).
+  - Bilodeau & Brenner, *Theory of Multivariate Statistics*. Springer (1999).
 
 ## Assessments
 
