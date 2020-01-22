@@ -1,0 +1,50 @@
+\frametitle{Example}
+
+\begin{itemize}
+\tightlist
+\item
+  Let \(S \sim W_p(m)\) be Wishart distributed, with scale matrix
+  \(\Sigma = I_p\).
+\item
+  We can therefore write
+  \(S = \sum_{i=1}^m \mathbf{Z}_i\mathbf{Z}_i^T\), with
+  \(\mathbf{Z}_i \sim N_p(0, I_p)\).
+\item
+  Using the properties of the trace, we have
+
+  \begin{align*}
+    \mathrm{tr}\left(S\right) &= \mathrm{tr}\left(\sum_{i=1}^m \mathbf{Z}_i\mathbf{Z}_i^T\right)\\
+    &= \sum_{i=1}^m \mathrm{tr}\left(\mathbf{Z}_i\mathbf{Z}_i^T\right)\\
+    &= \sum_{i=1}^m \mathrm{tr}\left(\mathbf{Z}_i^T\mathbf{Z}_i\right)\\
+    &= \sum_{i=1}^m \mathbf{Z}_i^T\mathbf{Z}_i.
+    \end{align*}
+\item
+  Recall that \(\mathbf{Z}_i^T\mathbf{Z}_i \sim \chi^2(p)\).
+\item
+  Therefore \(\mathrm{tr}\left(S\right)\) is the sum of \(m\)
+  independent copies of a \(\chi^2(p)\), and so we have
+  \[ \mathrm{tr}\left(S\right) \sim \chi^2 (mp).\]
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{B <-}\StringTok{ }\DecValTok{1000}
+\NormalTok{n <-}\StringTok{ }\DecValTok{10}\NormalTok{; p <-}\StringTok{ }\DecValTok{4}
+
+\NormalTok{traces <-}\StringTok{ }\KeywordTok{replicate}\NormalTok{(B, \{}
+\NormalTok{  Z <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(n}\OperatorTok{*}\NormalTok{p), }\DataTypeTok{ncol =}\NormalTok{ p)}
+\NormalTok{  W <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(Z)}
+  \KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(W))}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{hist}\NormalTok{(traces, }\DecValTok{50}\NormalTok{, }\DataTypeTok{freq =} \OtherTok{FALSE}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(}\KeywordTok{density}\NormalTok{(}\KeywordTok{rchisq}\NormalTok{(B, }\DataTypeTok{df =}\NormalTok{ n}\OperatorTok{*}\NormalTok{p)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-distribution_files/figure-beamer/unnamed-chunk-2-1.pdf}
+

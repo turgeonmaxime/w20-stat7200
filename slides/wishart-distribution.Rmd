@@ -24,7 +24,6 @@ knitr::opts_chunk$set(cache=TRUE)
   - Understand the distribution of the MLEs for the multivariate normal distribution
   - Understand the distribution of *functionals* of covariance matrices
   - Visualize covariance matrices and their distribution
-  - Perform Box-Cox transformations to obtain multivariate normal data
 
 ## Before we begin... {.allowframebreaks}
 
@@ -39,12 +38,12 @@ knitr::opts_chunk$set(cache=TRUE)
 ## Wishart distribution {.allowframebreaks}
 
   - Let $S$ be a random, positive semidefinite matrix of dimension $p \times p$.
-    + We say $S$ follows a *standard Wishart distributio*n $W_p(m)$ if we can write
-    $$ S = \sum_{i=1}^m \mathbf{Z}_i\mathbf{Z}_i^T, \quad \mathbf{Z}_i \sim N_p(0, I_p).$$
+    + We say $S$ follows a *standard Wishart distribution* $W_p(m)$ if we can write
+    $$ S = \sum_{i=1}^m \mathbf{Z}_i\mathbf{Z}_i^T, \quad \mathbf{Z}_i \sim N_p(0, I_p)\mbox{ indep.}.$$
     + We say $S$ follows a *Wishart distribution* $W_p(m, \Sigma)$ with scale matrix $\Sigma$ if we can write
-    $$ S = \sum_{i=1}^m \mathbf{Y}_i\mathbf{Y}_i^T, \quad \mathbf{Y}_i \sim N_p(0, \Sigma).$$
+    $$ S = \sum_{i=1}^m \mathbf{Y}_i\mathbf{Y}_i^T, \quad \mathbf{Y}_i \sim N_p(0, \Sigma)\mbox{ indep.}.$$
     + We say $S$ follows a *non-central Wishart distribution* $W_p(m, \Sigma; \Delta)$ with scale matrix $\Sigma$ and non-centrality parameter $\Delta$ if we can write
-    $$ S = \sum_{i=1}^m \mathbf{Y}_i\mathbf{Y}_i^T, \quad \mathbf{Y}_i \sim N_p(\mu_i, \Sigma),\quad \Delta= \sum_{i=1}^m \mu_i\mu_i^T.$$
+    $$ S = \sum_{i=1}^m \mathbf{Y}_i\mathbf{Y}_i^T, \quad \mathbf{Y}_i \sim N_p(\mu_i, \Sigma)\mbox{ indep.},\quad \Delta= \sum_{i=1}^m \mu_i\mu_i^T.$$
     
 ## Example {.allowframebreaks}
 
@@ -81,7 +80,7 @@ lines(density(rchisq(B, df = n*p)))
 ## Non-singular Wishart distribution {.allowframebreaks}
 
   - As defined above, there is no guarantee that a Wishart variate is invertible.
-  - We will show that for $S \sim W_p(m, \Sigma)$ with $\Sigma$ positive definite, $S$ is invertible almost surely whenever $m \geq p$.
+  - **To show**: if $S \sim W_p(m, \Sigma)$ with $\Sigma$ positive definite, $S$ is invertible almost surely whenever $m \geq p$.
 
 **Lemma**: Let $Z$ be an $n\times n$ random matrix where the entries $Z_{ij}$ are iid $N(0,1)$. Then $P(\det Z = 0) = 0$.
 
@@ -101,10 +100,9 @@ P(\lvert Z\rvert = 0) &= P(\lvert Z \rvert= 0, \lvert Z_{22}\rvert \neq 0) + P(\
 &= P(Z_{11} = Z_{12}Z_{22}^{-1}Z_{21}, \lvert Z_{22}\rvert \neq 0)\\
 &= E\left(P(Z_{11} = Z_{12}Z_{22}^{-1}Z_{21}, \lvert Z_{22}\rvert \neq 0 \mid Z_{12}, Z_{22}, Z_{21})\right)\\
 &= E(0)\\
-&= 0.
+&= 0,
 \end{align*}
-
-Therefore, the result follows from induction. \hfill\qed
+where we used the laws of total probability (Line 1) and total expectation (Line 4). Therefore, the result follows from induction. \hfill\qed
 
 We are now ready to prove the main result: let $S\sim W_p(m, \Sigma)$ with $\det\Sigma\neq 0$, and write $S = \sum_{i=1}^m \mathbf{Y}_i\mathbf{Y}_i^T$, with $\mathbf{Y}_i \sim N_p(0, \Sigma)$. If we let $\mathbb{Y}$ be the $m\times p$ matrix whose $i$-th row is $\mathbf{Y}_i$. Then
 
@@ -147,3 +145,119 @@ with $S_{ii}$ and $\Sigma_{ii}$ of dimension $p_i\times p_i$. We then have
 
   - $S_{ii} \sim W_{p_i}(m, \Sigma_{ii})$
   - If $\Sigma_{12} = 0$, then $S_{11}$ and $S_{22}$ are independent.
+  
+## Characteristic function {.allowframebreaks}
+
+  - The definition of characteristic function can be extended to *random matrices*:
+    + Let $S$ be a $p\times p$ random matrix. The characteristic function of $S$ evaluated at a $p\times p$ symmetric matrix $T$ is defined as
+    $$\varphi_S(T) = E\left(\exp(i\mathrm{tr}(TS))\right).$$
+  - We will show that if $S\sim W_p(m, \Sigma)$, then
+  $$\varphi_S(T) = \lvert I_p - 2i\Sigma T \rvert^{-m/2}.$$
+  - First, we will use the Cholesky decomposition $\Sigma = LL^T$.
+  - Next, we can write
+  $$ S = L\left(\sum_{j=1}^m \mathbf{Z}_j\mathbf{Z}_j^T\right)L^T,$$
+  where $\mathbf{Z}_j \sim N_p(0, I_p)$.
+  - Now, fix a symmetric matrix $T$. The matrix $L^T T L$ is also symmetric, and therefore we can compute its spectral decomposition:
+  $$ L^T T L = U \Lambda U^T,$$
+  where $\Lambda = \mathrm{diag}(\lambda_1, \ldots, \lambda_p)$ is diagonal and $UU^T = I_p$.
+  - We can now write
+  \begin{align*}
+  \mathrm{tr}(TS) &= \mathrm{tr}\left(TL\left(\sum_{j=1}^m \mathbf{Z}_j\mathbf{Z}_j^T\right)L^T\right)\\
+    %% &= \mathrm{tr}\left(L^TTL\left(\sum_{j=1}^m \mathbf{Z}_j\mathbf{Z}_j^T\right)\right)\\
+    &= \mathrm{tr}\left(U \Lambda U^T\left(\sum_{j=1}^m \mathbf{Z}_j\mathbf{Z}_j^T\right)\right)\\
+    &= \mathrm{tr}\left(\Lambda U^T\left(\sum_{j=1}^m \mathbf{Z}_j\mathbf{Z}_j^T\right)U \right)\\
+    &= \mathrm{tr}\left(\Lambda \left(\sum_{j=1}^m (U^T\mathbf{Z}_j)(U^T\mathbf{Z}_j)^T\right) \right).\\
+  \end{align*}
+  - Two key observations:
+    + $U^T\mathbf{Z}_j \sim N_p(0, I_p)$;
+    + $\mathrm{tr}\left(\Lambda \mathbf{Z}_j\mathbf{Z}_j^T\right) = \sum_{k=1}^p\lambda_k Z_{jk}^2$.
+  - Putting all this together, we get
+  \begin{align*}
+  E\left(\exp(i\mathrm{tr}(TS))\right) &= E\left(\exp\left(i\sum_{j=1}^m \sum_{k=1}^p\lambda_k Z_{jk}^2\right)\right)\\
+    &= \prod_{j=1}^m \prod_{k=1}^p E\left(\exp\left(i\lambda_k Z_{jk}^2\right)\right).
+  \end{align*}
+  - But $Z_{jk}^2 \sim \chi^2(1)$, and so we have
+  $$ \varphi_S(T) = \prod_{j=1}^m \prod_{k=1}^p \varphi_{\chi^2(1)}(\lambda_k).$$
+  - Recall that $\varphi_{\chi^2(1)}(t) = (1 - 2it)^{-1/2}$, and therefore we have
+  $$ \varphi_S(T) = \prod_{j=1}^m \prod_{k=1}^p(1 - 2i\lambda_k)^{-1/2}.$$
+  - Since $\prod_{k=1}^p(1 - 2i\lambda_k)^{-1/2} = \lvert I_p - 2i\Lambda\rvert^{-1/2}$, we then have
+  \begin{align*}
+  \varphi_S(T) &= \prod_{j=1}^m \lvert I_p - 2i\Lambda\rvert^{-1/2}\\
+    &= \lvert I_p - 2i\Lambda\rvert^{-m/2}\\
+    &= \lvert I_p - 2i U\Lambda U^T\rvert^{-m/2}\\
+    &= \lvert I_p - 2i L^T T L\rvert^{-m/2}\\
+    &= \lvert I_p - 2i\Sigma T \rvert^{-m/2}\\
+  \end{align*}
+  \hfill\qed
+  
+## Density of Wishart distribution
+
+  - Let $S\sim W_p(m, \Sigma)$ with $\Sigma$ positive definite and $m\geq p$. The density of $S$ is given by
+  $$ f(S) = \frac{1}{2^{pm/2}\Gamma_p(\frac{m}{2})\lvert\Sigma\rvert^{m/2}}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}S)\right)\lvert S\rvert^{(m-p-1)/2},$$
+  where 
+  $$\Gamma_p(u) = \pi^{p(p-1)/4}\prod_{i=0}^{p-1}\Gamma\left(u - \frac{i}{2}\right),\quad u > \frac{1}{2}(p-1).$$
+  - *Proof*: Compute the characteristic function using the expression for the density and check that we obtain the same result as before (**Exercise**).
+  
+## Sampling distribution of sample covariance
+
+  - We are now ready to prove the results we stated a few lectures ago.
+  - Recall again the univariate case:
+    + $\frac{(n-1)s^2}{\sigma^2} \sim \chi^2(n-1)$;
+    + $\bar{X}$ and $s^2$ are independent.
+  - In the multivariate case, we want to prove:
+    + $(n-1)S_n \sim W_p(n-1, \Sigma)$;
+    + $\bar{\mathbf{Y}}$ and $S_n$ are independent.
+  - We will show that using the **multivariate Cochran theorem**
+  
+## Cochran theorem
+
+Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample with $\mathbf{Y}_i \sim N_p(0, \Sigma)$, and write $\mathbb{Y}$ for the $n\times p$ matrix whose $i$-th row is $\mathbf{Y}_i$. Let $A,B$ be $n\times n$ symmetric matrices, and let $C$ be a $q\times n$ matrix of rank $q$. Then
+
+  1. $\mathbb{Y}^T A \mathbb{Y} \sim W_p(m, \Sigma)$ if and only if $A^2 = A$ and $\mathrm{tr} A = m$.
+  2. $\mathbb{Y}^T A \mathbb{Y}$ and $\mathbb{Y}^T B \mathbb{Y}$ are independent if and only if $AB = 0$. 
+  3. $\mathbb{Y}^T A \mathbb{Y}$ and $C \mathbb{Y}$ are independent if and only if $CA = 0$.
+
+## Application {.allowframebreaks}
+
+  - Let $C = \frac{1}{n}\mathbf{1}^T$, where $\mathbf{1}$ is the $n$-dimensional vector of ones.
+  - Let $A = I_n - \frac{1}{n}\mathbf{1}\mathbf{1}^T$.
+  - Then we have
+  $$ \mathbb{Y}^T A \mathbb{Y} = (n-1)S_n, \qquad C \mathbb{Y} = \bar{\mathbf{Y}}^T.$$
+  - We need to check the conditions of Cochran's theorem:
+    + $A^2 = A$;
+    + $CA = 0$;
+    + $\mathrm{tr} A = n-1$.
+  - Using Parts 1. and 3. of the theorem, we can conclude that
+    + $(n-1)S_n \sim W_p(n-1, \Sigma)$;
+    + $\bar{\mathbf{Y}}$ and $S_n$ are independent.
+
+## Proof (Cochran theorem) {.allowframebreaks}
+
+**Note 1**: We typically only use one direction ($\Rightarrow$).
+
+**Note 2**: We will only prove the first part.
+
+  - Since $A$ is symmetric, we can compute its spectral decomposition as usual:
+  $$ A = U \Lambda U^T.$$
+  - By assuming $A^2 = A$, we are forcing the same condition on the eigenvalues:
+  $$ \Lambda^2 = \Lambda.$$
+  - But only two real numbers are possible $\lambda_i \in \{0, 1\}$.
+  - Given that $\mathrm{tr} A = m$, and after perhaps reordering the eigenvalues, we have
+  $$\lambda_1 = \cdots = \lambda_m = 1, \quad \lambda_{m-1} = \cdots = \lambda_n = 1.$$
+  - Now, set $\mathbb{Z} = U^T\mathbb{Y}$, and let $\mathbf{Z}_i$ be the $i$-th row of $\mathbb{Z}$. We have
+  \begin{align*}
+  \mathrm{Cov}(\mathbb{Z}) &= E((U^T\mathbb{Y})^T(U^T\mathbb{Y}))\\
+    &= E(\mathbb{Y}^TUU^T\mathbb{Y})\\
+    &= E(\mathbb{Y}^T\mathbb{Y})\\
+    &= \mathrm{Cov}(\mathbb{Y}).
+  \end{align*}
+  - Therefore, the covariance structures of $\mathbb{Y}$ and $\mathbb{Z}$ are the same:
+    + The vectors $\mathbf{Z}_1, \ldots, \mathbf{Z}_n$ are still independent.
+    + $\mathbf{Z}_i \sim N_p(0, \Sigma)$.
+  - We can now write
+  \begin{align*}
+  \mathbb{Y}^T A \mathbb{Y} &= \mathbb{Y}^T U \Lambda U^T \mathbb{Y}\\
+    &= \mathbb{Z}^T \Lambda \mathbb{Z}\\
+    &= \sum_{i=1}^m \mathbf{Z}_i\mathbf{Z}_i^T.
+  \end{align*}
+  - Therefore, we conlude that $\mathbb{Y}^T A \mathbb{Y} \sim W_p(m, \Sigma)$.\hfill\qed
