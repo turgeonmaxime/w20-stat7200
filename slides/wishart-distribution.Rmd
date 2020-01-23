@@ -261,3 +261,302 @@ Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ be a random sample with $\mathbf{Y}_i \
     &= \sum_{i=1}^m \mathbf{Z}_i\mathbf{Z}_i^T.
   \end{align*}
   - Therefore, we conlude that $\mathbb{Y}^T A \mathbb{Y} \sim W_p(m, \Sigma)$.\hfill\qed
+  
+## Bartlett decomposition {.allowframebreaks}
+
+  - Recall that the Wishart distribution is a distribution on the set of *positive semi-definite matrices*.
+    + This implies symmetry and a non-negative eigenvalues.
+  - These constraints are natural for covariance matrices, but it forces dependence between the entries that can make computations difficult.
+  - The **Bartlett decomposition** is a reparametrization of the Wishart distribution in terms of $p(p+1)/2$ *independent* entries.
+    + You can think of it as a *stochastic* version of the Cholesky decomposition.
+  - Let $S\sim W_p(m, \Sigma)$, where $m\geq p$ and $\Sigma$ is positive definite, and write $S = LL^T$ using the Cholesky decomposition. Then the density of $L$ is given by
+  $$ f(L) = \frac{2^p}{K}\prod_{i=1}^p \ell_{ii}^{m-i}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}LL^T)\right),$$
+  where $K = 2^{mp/2}\lvert\Sigma\rvert\Gamma_p(m/2)$ and $\ell_{ij}$ is the $(i,j)$-th entry of $L$.
+  
+## Proof {.allowframebreaks}
+
+  - This result will follow from the formula for the density after a transformation.
+  - Recall that the density of $S$ is:
+   $$ f(S) = \frac{1}{K}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}S)\right)\lvert S\rvert^{(m-p-1)/2}.$$
+  - Note that we have
+  \begin{align*}
+  \mathrm{tr}(\Sigma^{-1}S) &= \mathrm{tr}(\Sigma^{-1}LL^T),\\
+  \lvert S\rvert &= \lvert LL^T\rvert = \lvert L\rvert^2 = \prod_{i=1}^p\ell_{ii}^2.
+  \end{align*}
+  - Putting all this together, we have 
+  \begin{align*}
+  f(LL^T) &= \frac{1}{K}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}S)\right)\lvert S\rvert^{(m-p-1)/2}\\
+    &= \frac{1}{K}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}LL^T)\right)\prod_{i=1}^p\ell_{ii}^{m-p-1}.
+  \end{align*}
+  - To get the density of $L$, we need to multiply by the Jacobian of the inverse transformation $L\mapsto LL^T$.
+  - A simple yet tedious computation (see for example Theorem 2.1.9 in Muirhead) gives:
+  $$ \lvert J \rvert = 2^p\prod_{i=1}^p \ell_{ii}^{p-i+1}.$$
+  - Finally, we get the expression we wanted:
+  \begin{align*}
+  f(L) &= \frac{2^p\prod_{i=1}^p \ell_{ii}^{p-i+1}}{K}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}LL^T)\right)\prod_{i=1}^p\ell_{ii}^{m-p-1}\\
+    &= \frac{2^p}{K}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}LL^T)\right)\prod_{i=1}^p\ell_{ii}^{m-i}.
+  \end{align*}
+  \hfill\qed
+
+## Corollary {.allowframebreaks}
+
+If $\Sigma = I_p$, the elements $\ell_{ij}$ are all independent, and they follow the following distributions:
+\begin{align*}
+\ell_{ii}^2 &\sim \chi^2(m-i+1),\\
+\ell_{ij} &\sim N(0,1), \quad i > j.
+\end{align*}
+
+**Proof**:
+
+  - When $\Sigma = I_p$, the expression for $\mathrm{tr}(\Sigma^{-1}LL^T)$ simplifies:
+  $$\mathrm{tr}(\Sigma^{-1}LL^T) = \mathrm{tr}(LL^T) = \sum_{i \geq j} \ell_{ij}^2.$$
+  - This allows us to rewrite the density $f(L)$ (up to a constant):
+  \begin{align*}
+  f(L) &\propto \exp\left(-\frac{1}{2}\mathrm{tr}(LL^T)\right)\prod_{i=1}^p\ell_{ii}^{m-i}\\
+    &= \exp\left(-\frac{1}{2}\sum_{i \geq j} \ell_{ij}^2\right)\prod_{i=1}^p\ell_{ii}^{m-i}\\
+    &= \left\{\prod_{i > j} \exp\left(-\frac{1}{2}\ell_{ij}^2\right)\right\}\left\{\prod_{i=1}^p\exp\left(-\frac{1}{2}\ell_{ii}^2\right)\ell_{ii}^{m-i}\right\},\\
+  \end{align*}
+  which is the product of the marginals we wanted.\hfill\qed
+
+## Example {.allowframebreaks}
+
+```{r}
+B <- 1000
+n <- 10
+p <- 5
+
+bartlett <- replicate(B, {
+  X <- matrix(rnorm(n*p), ncol = p)
+  L <- chol(crossprod(X))
+})
+
+dim(bartlett)
+```
+
+```{r, message = FALSE}
+library(tidyverse)
+
+# Extract and plot diagonal^2
+diagonal <- purrr::map_df(seq_len(B), function(i) {
+  tmp <- diag(bartlett[,,i])^2
+  data.frame(matrix(tmp, nrow = 1))
+})
+```
+
+```{r}
+# Put into long format
+diag_plot <- gather(diagonal, Entry, Value)
+
+# Add chi-square means
+diag_means <- data.frame(
+  Entry = paste0("X", seq_len(p)),
+  mean = n - seq_len(p) + 1
+)
+```
+
+
+```{r}
+ggplot(diag_plot, aes(Value, fill = Entry)) +
+  geom_density(alpha = 0.2) +
+  theme_minimal() +
+  geom_vline(data = diag_means,
+             aes(xintercept = mean, 
+                 colour = Entry),
+             linetype = 'dashed')
+```
+
+```{r, message = FALSE}
+# Extract and plot off-diagonal
+off_diagonal <- purrr::map_df(seq_len(B), function(i) {
+  tmp <- bartlett[,,i][upper.tri(bartlett[,,i])]
+  data.frame(matrix(tmp, nrow = 1))
+})
+dim(off_diagonal)
+```
+
+```{r}
+# Put into long format
+offdiag_plot <- gather(off_diagonal, Entry, Value)
+```
+
+
+```{r}
+ggplot(offdiag_plot, aes(Value, group = Entry)) +
+  geom_density(fill = NA) +
+  theme_minimal()
+```
+
+## Distribution of the Generalized Variance {.allowframebreaks}
+
+  - As an application of the Bartlett decomposition, we will look at the distribution of the *generalized variance*:
+  $$ GV(S) = \lvert S\rvert, \quad S\sim W_p(m, \Sigma).$$
+  - **Theorem**: If $S\sim W_p(m, \Sigma)$ with $m\geq p$ and $\Sigma$ positive definite, then the ratio
+  $$ GV(S)/GV(\Sigma) = \lvert S\rvert/\lvert \Sigma\rvert$$
+  follows the same distribution as a product of chi-square distributions:
+  $$ \prod_{i=1}^p\chi^2(m-i+1).$$
+  
+**Proof**:
+
+  - First, we have
+  $$ \frac{\lvert S\rvert}{\lvert \Sigma\rvert} = \lvert S\rvert\lvert \Sigma^{-1}\rvert = \lvert \Sigma^{-1/2}\rvert\lvert S\rvert\lvert \Sigma^{-1/2}\rvert = \lvert \Sigma^{-1/2} S \Sigma^{-1/2}\rvert.$$
+  - Moreover, we have that $\Sigma^{-1/2} S \Sigma^{-1/2} \sim W_p(m, I_p)$, so we can use the result of the Corollary above.
+  - If we write $\Sigma^{-1/2} S \Sigma^{-1/2} = LL^T$ using the Bartlett decomposition, we have
+  $$ \frac{\lvert S\rvert}{\lvert \Sigma\rvert} = \lvert LL^T \rvert = \lvert L \rvert^2 = \prod_{i=1}^p \ell_{ii}^2.$$
+  - Our result follows from the characterisation of the distribution of $\ell_{ii}^2$. \hfill\qed
+  - **Note**: The distribution of $GV(S)/GV(\Sigma)$ does not depend on $\Sigma$.
+    + It is a pivotal quantity.
+  - **Note 2**: If $S_n$ is the sample covariance, then $(n-1)S_n \sim W_p(n-1, \Sigma)$ and therefore
+  $${\color{red}(n-1)^p} \frac{GV(S_n)}{GV(\Sigma)} \sim \prod_{i=1}^p\chi^2(n-i).$$
+  
+## Example {.allowframebreaks}
+
+  - We will use the Ramus dataset (see slides on *Multivariate normal*).
+  - We will construct a 95% confidence interval for the population generalized variance.
+    + Under a multivariate normality assumption, which probably doesn't hold...
+  
+```{r, eval=TRUE, echo = FALSE}
+# Ramus data, Timm (2002)
+main_page <- "https://maxturgeon.ca/w20-stat7200/"
+ramus <- read.csv(paste0(main_page, "Ramus.csv"))
+```
+
+```{r}
+var_names <- c("Age8", "Age8.5",
+               "Age9", "Age9.5")
+
+dataset <- ramus[,var_names]
+dim(dataset)
+```
+
+```{r}
+# Sample covariance
+Sn <- cov(dataset)
+
+# Generalized variance
+det(Sn)
+```
+
+```{r}
+# Simulate quantiles
+set.seed(7200)
+n <- nrow(dataset)
+p <- ncol(dataset)
+B <- 1000
+
+simulated_vals <- replicate(B, {
+  prod(rchisq(p, df = n - seq_len(p)))/((n-1)^p)
+})
+```
+
+
+```{r}
+bounds <- quantile(simulated_vals,
+                   probs = c(0.025, 0.975))
+
+bounds
+```
+
+\vspace{1in}
+
+```{r}
+# 95% Confidence interval (reverse bounds)
+det(Sn)/rev(bounds)
+```
+
+## Visualization {.allowframebreaks}
+
+  - Visualizing covariance/correlation matrices can be difficult, especially when the number of variables $p$ increases.
+    + One possibility is a **heatmap**, that assign a colour to the individual coariances/correlations.
+  - Visualizing *distributions* of random matrices is even harder
+    + Already when $p=2$, this is a 3-dimensional object...
+    
+  \vspace{1.5in}
+  
+  - One possibility is to decompose the distribution of a random matrix (or a sample thereof) into a series of univariate and bivariate graphical summaries. For example:
+    + Histograms of the covariances/correlations;
+    + Scatter plots for pairs of covariances;
+    + Histograms of traces and determinants.
+    
+## Example {.allowframebreaks}
+
+```{r}
+# Recall our covariance matrix for the Ramus dataset
+round(Sn, 2)
+
+# Visually we get
+lattice::levelplot(Sn, xlab = "", ylab = "")
+```
+
+```{r}
+# Perhaps easier to interpret as correlations
+# But be careful with the scale!
+lattice::levelplot(cov2cor(Sn), 
+                   xlab = "", ylab = "")
+
+```
+
+Next, we will visualize the distribution of $S_n$ using bootstrap.
+
+```{r}
+B <- 1000
+n <- nrow(dataset)
+
+boot_covs <- lapply(seq_len(B), function(b) {
+  data_boot <- dataset[sample(n, n, replace = TRUE),]
+  return(cov(data_boot))
+})
+```
+
+```{r}
+# Extract the diagonal entries
+diagonal <- purrr::map_df(boot_covs, function(Sn) {
+  tmp <- diag(Sn)
+  data.frame(matrix(tmp, nrow = 1))
+  })
+```
+
+```{r}
+# Put into long format
+diag_plot <- gather(diagonal, Entry, Value)
+
+ggplot(diag_plot, aes(Value, fill = Entry)) +
+  geom_density(alpha = 0.2) +
+  theme_minimal()
+```
+
+```{r}
+# Multivariate normal theory predicts
+# the diagonal entry should be scaled chi-square
+ggplot(diag_plot, aes(sample = Value)) +
+  geom_qq(distribution = qchisq, 
+          dparams = list(df = n - 1)) +
+  theme_minimal() + facet_wrap(~ Entry) + 
+  geom_qq_line(distribution = qchisq, 
+               dparams = list(df = n - 1))
+```
+
+```{r}
+# Finally, let's look at pairwise scatterplots 
+# for off-diagonal entries
+off_diag <- purrr::map_df(boot_covs, function(Sn) {
+  tmp <- Sn[upper.tri(Sn)]
+  data.frame(matrix(tmp, nrow = 1))
+  })
+```
+
+```{r, message = FALSE}
+# Add column names
+names(off_diag) <- c(paste0("8:",c("8.5","9","9.5")),
+                     paste0("8.5:",c("9","9.5")), 
+                     "9:9.5")
+
+GGally::ggpairs(off_diag)
+```
+
+## Summary
+
+  - **Wishart random matrices** are sums of outer products of independent multivariate normal variables with the same scale matrix $\Sigma$.
+  - They allow us to give a description of the sample covariance matrices and its *functionals*:
+    + E.g. trace, generalized variance, etc.
+  - The **Bartlett decomposition** gives us a reparametrization of the Wishart distribution with independent constaints of the entries.
+    + Positive diagonal entries; contant zero above the diagonal; unconstrained below the diagonal.

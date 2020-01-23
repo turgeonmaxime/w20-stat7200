@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.15)  22 JAN 2020 11:11
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.15)  23 JAN 2020 14:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1477,6 +1477,162 @@ Overfull \hbox (13.64159pt too wide) detected at line 535
 ] [34
 
 
+] [35
+
+] [36
+
+
+] [37
+
+] [38
+
+
+] [39
+
+
+] [40
+
+] [41
+
+
+] [42
+
+
+]
+\openout4 = `wishart-distribution.vrb'.
+
+(./wishart-distribution.vrb
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-6-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-6-1.pdf>
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-9-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-9-1.pdf>
+) [43
+
+] [44
+
+
+] [45
+
+
+] [46
+
+
+] [47
+
+
+] [48
+
+
+] [49
+
+
+] [50
+
+
+] [51
+
+] [52
+
+
+] [53
+
+
+]
+\openout4 = `wishart-distribution.vrb'.
+
+(./wishart-distribution.vrb) [54
+
+] [55
+
+
+] [56
+
+
+] [57
+
+
+] [58
+
+
+] [59
+
+
+] [60
+
+] [61
+
+
+]
+\openout4 = `wishart-distribution.vrb'.
+
+(./wishart-distribution.vrb
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-16-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-16-1.pdf>
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-17-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-17-1.pdf>
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-20-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-20-1.pdf>
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-21-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-21-1.pdf>
+File: /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dis
+tribution_files/figure-beamer/unnamed-chunk-23-1.pdf Graphic file (type pdf)
+<use /home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-dist
+ribution_files/figure-beamer/unnamed-chunk-23-1.pdf>
+) [62
+
+] [63
+
+
+] [64
+
+
+] [65
+
+
+] [66
+
+
+] [67
+
+
+] [68
+
+
+] [69
+
+
+] [70
+
+
+] [71
+
+
+] [72
+
+
+] [73
+
+
+] [74
+
+
+] [75
+
+
+] [76
+
 ]
 \tf@nav=\write7
 \openout7 = `wishart-distribution.nav'.
@@ -1487,24 +1643,25 @@ Overfull \hbox (13.64159pt too wide) detected at line 535
 \tf@snm=\write9
 \openout9 = `wishart-distribution.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 691.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 691.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1234.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1234.
 (./wishart-distribution.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 691.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 691.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1234.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1234.
+
 Package rerunfilecheck Info: File `wishart-distribution.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 40091 strings out of 494458
- 812720 string characters out of 6173102
- 921584 words of memory out of 5000000
- 43761 multiletter control sequences out of 15000+600000
- 560865 words of font info for 65 fonts, out of 8000000 for 9000
+ 40230 strings out of 494458
+ 818466 string characters out of 6173102
+ 923936 words of memory out of 5000000
+ 43884 multiletter control sequences out of 15000+600000
+ 560881 words of font info for 67 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  66i,13n,96p,1885b,580s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on wishart-distribution.pdf (34 pages).
+Output written on wishart-distribution.pdf (76 pages).
 
 ! kpathsea:make_tex: Invalid filename `Fira Sans Light', contains ' '
 ! kpathsea:make_tex: Invalid filename `Fira Sans Light Italic', contains ' '

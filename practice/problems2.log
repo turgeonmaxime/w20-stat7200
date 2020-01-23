@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.1.15)  15 JAN 2020 14:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.1.15)  22 JAN 2020 15:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**content/practice/problems2.tex
-(./content/practice/problems2.tex
+**problems2.tex
+(./problems2.tex
 LaTeX2e <2019-10-01> patch level 3
 (/home/turgeonm/.TinyTeX/texmf-dist/tex/latex/paper/paper.cls
 Document Class: paper 2008/05/30 1.0l LaTeX document class (wm).
@@ -548,7 +548,7 @@ Package scrlayer Info: patching LaTeX kernel macro \pagestyle on input line 210
 ))
 Package scrlayer-scrpage Info: auto-selection of `pagestyleset=standard'.
 
-No file problems2.aux.
+(./problems2.aux)
 \openout1 = `problems2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 68.
@@ -566,6 +566,7 @@ LaTeX Font Info:    ... okay on input line 68.
 LaTeX Font Info:    Checking defaults for FML/futm/m/it on input line 68.
 LaTeX Font Info:    Trying to load font information for FML+futm on input line 
 68.
+
 (/home/turgeonm/.TinyTeX/texmf-dist/tex/latex/fourier/fmlfutm.fd
 File: fmlfutm.fd 2004/10/30 Fontinst v1.926 font definitions for FML/futm.
 )
@@ -697,27 +698,26 @@ LaTeX Font Info:    Font shape `T1/futs/bx/n' in size <7> not available
  [1
 
 
-{/home/turgeonm/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-(static/practice/problems2.aux) ) 
+{/home/turgeonm/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] (./
+problems2.aux) ) 
 Here is how much of TeX's memory you used:
  7664 strings out of 494107
- 139128 string characters out of 6173241
+ 139027 string characters out of 6173241
  251489 words of memory out of 5000000
  11649 multiletter control sequences out of 15000+600000
  68088 words of font info for 79 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 47i,18n,66p,348b,619s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/home/turgeonm/.TinyTeX/texmf-dist/fonts/enc/
-dvips/base/8r.enc} </home/turgeonm/.texlive2017/texmf-var/fonts/pk/ljfour/jknap
-pen/ec/ecsx2074.600pk></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fo
-urier/fourier-mex.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fo
-urier/fourier-ml.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fou
-rier/fourier-mlit.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fo
-urier/fourier-ms.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/adobe/utop
-ia/putb8a.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/adobe/utopia/putr
-8a.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/adobe/utopia/putri8a.pfb
->
-Output written on static/practice/problems2.pdf (2 pages, 62425 bytes).
+ 47i,18n,66p,331b,619s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/home/turgeonm/.TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc
+} </home/turgeonm/.texlive2017/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2074.6
+00pk></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fourier/fourier-mex
+.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fourier/fourier-ml.
+pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fourier/fourier-mlit
+.pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/public/fourier/fourier-ms.
+pfb></home/turgeonm/.TinyTeX/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></h
+ome/turgeonm/.TinyTeX/texmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></home/tur
+geonm/.TinyTeX/texmf-dist/fonts/type1/adobe/utopia/putri8a.pfb>
+Output written on problems2.pdf (2 pages, 62425 bytes).
 PDF statistics:
  59 PDF objects out of 1000 (max. 8388607)
  32 compressed objects within 1 object stream
