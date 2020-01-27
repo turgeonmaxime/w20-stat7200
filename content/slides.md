@@ -18,3 +18,6 @@ type: docs
   - [Wishart Distribution](wishart-distribution.pdf)
     + [R code](wishart-distribution.R)
     + [Blog post](http://djalil.chafai.net/blog/2015/10/20/bartlett-decomposition-and-other-factorizations/) on different decompositions for random matrices
+  - [Test for multivariate means](test-means.pdf)
+    + [R code](test-means.R)
+  - Test for covariance matrices
