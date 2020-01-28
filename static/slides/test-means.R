@@ -60,15 +60,12 @@ drop(test_statistic) > critical_val
 ## ---------------------------------------------------------------
 n <- nrow(dataset); p <- ncol(dataset)
 
-# Test mu = mu_0
-mu_0 <- c(25, 50, 3)
-test_statistic <- n * t(mu_hat - mu_0) %*% 
-  solve(cov(dataset)) %*% (mu_hat - mu_0)
-
 critical_val <- (n - 1)*p*qf(0.95, df1 = p,
                              df2 = n - p)/(n-p)
 sample_cov <- diag(cov(dataset))
 
+
+## ---------------------------------------------------------------
 cbind(mu_hat - sqrt(critical_val*
                       sample_cov/n),
       mu_hat + sqrt(critical_val*
@@ -86,7 +83,8 @@ transf <- chol(R)
 ## ---------------------------------------------------------------
 # First create a circle of radius c
 theta_vect <- seq(0, 2*pi, length.out = 100)
-circle <- sqrt(critical_val) * cbind(cos(theta_vect), sin(theta_vect))
+circle <- sqrt(critical_val) * cbind(cos(theta_vect), 
+                                     sin(theta_vect))
 # Then turn into ellipse
 ellipse <- circle %*% t(solve(transf)) + 
   matrix(mu_hat[1:2], ncol = 2, 
@@ -96,6 +94,7 @@ ellipse <- circle %*% t(solve(transf)) +
 
 ## ---------------------------------------------------------------
 # Eigendecomposition
+# To visualize the principal axes
 decomp <- eigen(t(U) %*% cov(dataset) %*% U)
 first <- sqrt(decomp$values[1]) *
   decomp$vectors[,1] * sqrt(critical_val)
@@ -104,7 +103,7 @@ second <- sqrt(decomp$values[2]) *
 
 
 ## ---- echo = FALSE----------------------------------------------
-plot(ellipse, type = 'l',
+plot(ellipse, type = 'l', asp = 1,
      xlab = colnames(dataset)[1],
      ylab = colnames(dataset)[2])
 lines(x = c(0 + mu_hat[1], first[1]/sqrt(n) + mu_hat[1]),
@@ -206,24 +205,27 @@ bind_rows(
         legend.title=element_blank()) +
   scale_linetype_discrete(breaks = c('T2-intervals',
                                      'Bonferroni',
-                                     'Unadjusted'))
+                                     'Unadjusted')) +
+  coord_fixed()
 
 
 ## ----message = FALSE--------------------------------------------
-dataset1 <- gapminder %>% 
-  filter(year == 2012, 
-         continent == "Africa",
-         !is.na(infant_mortality)) %>% 
-  select(life_expectancy, infant_mortality) %>% 
-  as.matrix()
+dataset1 <- filter(gapminder, year == 2012, 
+                   continent == "Africa",
+                   !is.na(infant_mortality))
+
+dataset1 <- dataset1[,c("life_expectancy",
+                        "infant_mortality")]
+dataset1 <- as.matrix(dataset1)
 dim(dataset1)
 
-dataset2 <- gapminder %>% 
-  filter(year == 2012, 
-         continent == "Asia",
-         !is.na(infant_mortality)) %>% 
-  select(life_expectancy, infant_mortality) %>% 
-  as.matrix()
+dataset2 <- filter(gapminder, year == 2012, 
+                   continent == "Asia",
+                   !is.na(infant_mortality))
+
+dataset2 <- dataset2[,c("life_expectancy",
+                        "infant_mortality")]
+dataset2 <- as.matrix(dataset2)
 dim(dataset2)
 
 n1 <- nrow(dataset1); n2 <- nrow(dataset2)
@@ -253,6 +255,10 @@ const <- (n1 + n2 - 2)*p/(n1 + n2 - p - 2)
 critical_val <- const * qf(0.95, df1 = p,
                            df2 = n1 + n2 - p - 2)
 
+
+## ---------------------------------------------------------------
+c(drop(test_statistic), critical_val)
+
 drop(test_statistic) > critical_val
 
 
@@ -269,7 +275,7 @@ ellipse1 <- circle %*% t(solve(transf)) +
          nrow = nrow(circle), 
          byrow = TRUE)
 
-plot(ellipse1, type = 'l',
+plot(ellipse1, type = 'l', asp = 1,
      xlab = colnames(dataset1)[1],
      ylab = colnames(dataset1)[2],
      main = "Comparing Africa vs. Asia")
@@ -283,6 +289,7 @@ test_statistic <- t(mu_hat_diff) %*%
 
 critical_val <- qchisq(0.95, df = p)
 
+c(drop(test_statistic), critical_val)
 drop(test_statistic) > critical_val
 
 
@@ -317,6 +324,7 @@ const <- nu*p/(nu - p - 1)
 critical_val <- const * qf(0.95, df1 = p,
                            df2 = nu - p - 1)
 
+c(drop(test_statistic), critical_val)
 drop(test_statistic) > critical_val
 
 
@@ -337,7 +345,7 @@ ylim <- range(c(ellipse1[,2],
                 ellipse2[,2],
                 ellipse3[,2]))
 
-plot(ellipse2, type = 'l',
+plot(ellipse2, type = 'l', asp = 1,
      xlab = colnames(dataset1)[1],
      ylab = colnames(dataset1)[2],
      xlim = xlim, ylim = ylim,
