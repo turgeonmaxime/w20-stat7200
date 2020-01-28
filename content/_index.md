@@ -47,7 +47,7 @@ The assessments for this course include:
   - Three (3) assignments;
   - One (1) midterm test;
   - One (1) final project, which includes a written report and an oral presentation.
-<!--    + The guidelines for the term project can be found [here](stat7200-term_project-guidelines.pdf).-->
+    + The guidelines for the term project can be found [here](term_project-guidelines.pdf).
   
 In particular, there is **no final exam**.
 
