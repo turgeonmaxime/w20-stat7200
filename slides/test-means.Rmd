@@ -127,7 +127,7 @@ where $F(\alpha, \beta)$ denotes the non-central $F$-distribution with $\alpha,\
 
 ## Proof {.allowframebreaks}
 
-  - First, if we write $\Sigma = LL^T$, we can replace $\mathbf{Y}$ by $L^{-1}\mathbf{Y}$ and $W$ with $L^TWL$ without changing $T^2$.
+  - First, if we write $\Sigma = LL^T$, we can replace $\mathbf{Y}$ by $L^{-1}\mathbf{Y}$ and $W$ with $(L^{-1})^TW(L^{-1})$ without changing $T^2$.
     + In other words, without loss of generality, we can assume $\Sigma = I_p$.
   - Now, note that since $\mathbf{Y}$ and $W$ are independent, the conditional distribution of $mW$ given $\mathbf{Y}$ is also $W_p(m, I_p)$.
   - Consider $\mathbf{Y}$ a fixed quantity, and let $H$ be an orthogonal matrix whose first column is $\mathbf{Y}(\mathbf{Y}^T\mathbf{Y})^{-1/2}$.
@@ -143,12 +143,12 @@ where $F(\alpha, \beta)$ denotes the non-central $F$-distribution with $\alpha,\
   - We now have
   \begin{align*}
   \frac{1}{m}T^2 &= \mathbf{Y}^T W^{-1}\mathbf{Y}\\
-    &= (H\mathbf{Y})^T (H^TWH)^{-1}(H^T\mathbf{Y})\\
-    &= (H\mathbf{Y})^T (V)^{-1}(H^T\mathbf{Y})\\
+    &= (H^T\mathbf{Y})^T (H^TWH)^{-1}(H^T\mathbf{Y})\\
+    &= (H^T\mathbf{Y})^T (V)^{-1}(H^T\mathbf{Y})\\
     &= (\mathbf{Y}^T\mathbf{Y})^{1/2} v^{-1}_{11\mid 2}(\mathbf{Y}^T\mathbf{Y})^{1/2}\\
     &= (\mathbf{Y}^T\mathbf{Y})/v_{11\mid 2}.
   \end{align*}
-  - In other words, we have expressed $\frac{1}{m}T^2$ as a ratio of chi-squares. 
+  - In other words, we have expressed $\frac{1}{m}T^2$ as a ratio of independent chi-squares. 
   - Therefore, we have
   \begin{align*}
   \frac{m - p + 1}{mp} T^2 &= \left((\mathbf{Y}^T\mathbf{Y})/p\right)/\left(v_{11\mid 2}/(m - p + 1)\right) \\
@@ -178,20 +178,18 @@ where $F(\alpha, \beta)$ denotes the non-central $F$-distribution with $\alpha,\
   UB &= \bar{\mathbf{Y}}_j + \sqrt{\frac{(n-1)p}{(n-p)}F_\alpha(p, n-p)(s^2_{jj}/n}).
   \end{align*}
 
-## Example
+## Example {.allowframebreaks}
 
 ```{r}
 n <- nrow(dataset); p <- ncol(dataset)
 
-# Test mu = mu_0
-mu_0 <- c(25, 50, 3)
-test_statistic <- n * t(mu_hat - mu_0) %*% 
-  solve(cov(dataset)) %*% (mu_hat - mu_0)
-
 critical_val <- (n - 1)*p*qf(0.95, df1 = p,
                              df2 = n - p)/(n-p)
 sample_cov <- diag(cov(dataset))
+```
 
+
+```{r}
 cbind(mu_hat - sqrt(critical_val*
                       sample_cov/n),
       mu_hat + sqrt(critical_val*
@@ -218,7 +216,8 @@ transf <- chol(R)
 ```{r}
 # First create a circle of radius c
 theta_vect <- seq(0, 2*pi, length.out = 100)
-circle <- sqrt(critical_val) * cbind(cos(theta_vect), sin(theta_vect))
+circle <- sqrt(critical_val) * cbind(cos(theta_vect), 
+                                     sin(theta_vect))
 # Then turn into ellipse
 ellipse <- circle %*% t(solve(transf)) + 
   matrix(mu_hat[1:2], ncol = 2, 
@@ -229,6 +228,7 @@ ellipse <- circle %*% t(solve(transf)) +
 
 ```{r}
 # Eigendecomposition
+# To visualize the principal axes
 decomp <- eigen(t(U) %*% cov(dataset) %*% U)
 first <- sqrt(decomp$values[1]) *
   decomp$vectors[,1] * sqrt(critical_val)
@@ -238,7 +238,7 @@ second <- sqrt(decomp$values[2]) *
 
 
 ```{r, echo = FALSE}
-plot(ellipse, type = 'l',
+plot(ellipse, type = 'l', asp = 1,
      xlab = colnames(dataset)[1],
      ylab = colnames(dataset)[2])
 lines(x = c(0 + mu_hat[1], first[1]/sqrt(n) + mu_hat[1]),
@@ -273,9 +273,9 @@ abline(h = axis_proj[2,], lty = 2)
   $$\max_w t^2(w) = \max_w \frac{n(w^T(\mathbf{\bar{Y}} - \mu))^2}{w^TS_n w}.$$
   - Using the Cauchy-Schwarz Inequality:
   \begin{align*}
-  (w^T(\mathbf{\bar{Y}} - \mu))^2 &= (w^TS^{1/2}S^{-1/2}(\mathbf{\bar{Y}} - \mu))^2 \\
-  &= ((S^{1/2}w)^T(S^{-1/2}(\mathbf{\bar{Y}} - \mu)))^2 \\
-  &\leq (w^TS_nw)((\mathbf{\bar{Y}} - \mu)^TS_n^{-1}(\mathbf{\bar{Y}} - \mu)).
+  (w^T(\mathbf{\bar{Y}} - \mu))^2 &= (w^TS_n^{1/2}S_n^{-1/2}(\mathbf{\bar{Y}} - \mu))^2 \\
+    &= ((S_n^{1/2}w)^T(S_n^{-1/2}(\mathbf{\bar{Y}} - \mu)))^2 \\
+    &\leq (w^TS_n w)((\mathbf{\bar{Y}} - \mu)^TS_n^{-1}(\mathbf{\bar{Y}} - \mu)).
   \end{align*}
   - Dividing both sides by $w^TS_n w/n$, we get
   $$t^2(w) \leq n(\mathbf{\bar{Y}} - \mu)^TS_n^{-1}(\mathbf{\bar{Y}} - \mu).$$
@@ -397,7 +397,8 @@ bind_rows(
         legend.title=element_blank()) +
   scale_linetype_discrete(breaks = c('T2-intervals',
                                      'Bonferroni',
-                                     'Unadjusted'))
+                                     'Unadjusted')) +
+  coord_fixed()
 ```
 
 ## Summary of confidence statements
@@ -434,13 +435,31 @@ bind_rows(
   $$\Lambda = \frac{L(\mu_0, \hat{\Sigma}_0)}{L(\hat{\mu}, \hat{\Sigma})} = \left(\frac{\lvert\hat{\Sigma}\rvert}{\lvert\hat{\Sigma}_0\rvert}\right)^{n/2}.$$
   - The equivalent statistic $\Lambda^{2/n}=\lvert\hat{\Sigma}\rvert/\lvert\hat{\Sigma}_0\rvert$ is called *Wilks' lambda*.
   
-## Distribution of Wilk's Lambda
+## Distribution of Wilk's Lambda {.allowframebreaks}
 
-  - What is the sampling distribution of $\Lambda$ under the null hypothesis? It turns out that
-  $$ \Lambda^{2/n} = \left(1 + \frac{T^2}{n-1}\right)^{-1},$$
-  where $T^2$ is Hotelling's statistic.
+  - Let $\Lambda$ be the Likelihood Ratio Test statistic, and let $T^2$ be Hotelling's statistic. We have
+  $$ \Lambda^{2/n} = \left(1 + \frac{T^2}{n-1}\right)^{-1}.$$
     + Therefore the two tests are equivalent.
     + But note that $\Lambda^{2/n}$ involves computing two determinants, whereas $T^2$ involves inverting a matrix.
+    
+**Proof**:
+
+  - Write $V = \sum_{i=1}^n(\mathbf{Y}_i - \bar{\mathbf{Y}})(\mathbf{Y}_i - \bar{\mathbf{Y}})^T$, which allows us to write $\hat{\Sigma} = n^{-1}V$.
+  - Using a familiar trick, we can write
+  \begin{align*}
+  n\hat{\Sigma}_0 &= \sum_{i=1}^n(\mathbf{Y}_i - \mu_0)(\mathbf{Y}_i - \mu_0)^T\\
+    &= \sum_{i=1}^n(\mathbf{Y}_i - \bar{\mathbf{Y}} + \bar{\mathbf{Y}} - \mu_0)(\mathbf{Y}_i - \bar{\mathbf{Y}} + \bar{\mathbf{Y}} - \mu_0)^T\\
+    &= V + n(\bar{\mathbf{Y}} - \mu_0)(\bar{\mathbf{Y}} - \mu_0)^T.
+  \end{align*}
+  - We can now write
+  \begin{align*}
+  \frac{\lvert n\hat{\Sigma}_0\rvert}{\lvert n\hat{\Sigma}\rvert} &= \frac{\lvert V + n(\bar{\mathbf{Y}} - \mu_0)(\bar{\mathbf{Y}} - \mu_0)^T \rvert}{\lvert V \rvert}\\
+    &= \lvert I_p + nV^{-1}(\bar{\mathbf{Y}} - \mu_0)(\bar{\mathbf{Y}} - \mu_0)^T \rvert\\
+    &= (1 + n(\bar{\mathbf{Y}} - \mu_0)^TV^{-1}(\bar{\mathbf{Y}} - \mu_0))\\
+    &= \left(1 + \frac{n}{n-1}(\bar{\mathbf{Y}} - \mu_0)^TS_n^{-1}(\bar{\mathbf{Y}} - \mu_0)\right)\\
+    &= \left(1 + \frac{T^2}{n-1}\right),
+  \end{align*}
+  where the third equality follows from Problem 1 of Assignment 1. \hfill\qed
     
 # Comparing two multivariate means
 
@@ -456,29 +475,32 @@ bind_rows(
   $$ \mathbf{\bar{Y}}_1 - \mathbf{\bar{Y}}_2 \sim N_p\left( \mu_1 - \mu_2, \left(\frac{1}{n_1} + \frac{1}{n_2}\right)\Sigma \right).$$
   - Second, we also have that $(n_i - 1)S_i$ is an estimator for $(n_i - 1)\Sigma$, for $i=1,2$.
     + Therefore, we can *pool* both $(n_1 - 1)S_1$ and $(n_2 - 1)S_2$ into a single estimator for $\Sigma$:
-  $$S_{pool} = \frac{(n_1 - 1)S_1 + (n_2 - 1)S_2}{n_1 + n_2 - 2}.$$
+  $$S_{pool} = \frac{(n_1 - 1)S_1 + (n_2 - 1)S_2}{n_1 + n_2 - 2},$$
+  where $(n_1 + n_2 - 2)S_{pool} \sim W_p(n_1 + n_2 - 2, \Sigma)$.
   - Putting these two observations together, we get a test statistic for $H_0:\mu_1=\mu_2$:
   $$ T^2 = (\mathbf{\bar{Y}}_1 - \mathbf{\bar{Y}}_2)^T\left[\left(\frac{1}{n_1} + \frac{1}{n_2}\right)S_{pool}\right]^{-1}(\mathbf{\bar{Y}}_1 - \mathbf{\bar{Y}}_2).$$
-  - Under the null hypothesis, we get
+  - Using our theorem, we can that conclude that under the null hypothesis, we get
   $$ T^2 \sim \frac{(n_1 + n_2 - 2)p}{(n_1 + n_2 - p - 1)}F(p, n_1 + n_2 - p - 1).$$
 
 ## Example {.allowframebreaks}
 
 ```{r message = FALSE}
-dataset1 <- gapminder %>% 
-  filter(year == 2012, 
-         continent == "Africa",
-         !is.na(infant_mortality)) %>% 
-  select(life_expectancy, infant_mortality) %>% 
-  as.matrix()
+dataset1 <- filter(gapminder, year == 2012, 
+                   continent == "Africa",
+                   !is.na(infant_mortality))
+
+dataset1 <- dataset1[,c("life_expectancy",
+                        "infant_mortality")]
+dataset1 <- as.matrix(dataset1)
 dim(dataset1)
 
-dataset2 <- gapminder %>% 
-  filter(year == 2012, 
-         continent == "Asia",
-         !is.na(infant_mortality)) %>% 
-  select(life_expectancy, infant_mortality) %>% 
-  as.matrix()
+dataset2 <- filter(gapminder, year == 2012, 
+                   continent == "Asia",
+                   !is.na(infant_mortality))
+
+dataset2 <- dataset2[,c("life_expectancy",
+                        "infant_mortality")]
+dataset2 <- as.matrix(dataset2)
 dim(dataset2)
 
 n1 <- nrow(dataset1); n2 <- nrow(dataset2)
@@ -507,6 +529,11 @@ test_statistic <- t(mu_hat_diff) %*%
 const <- (n1 + n2 - 2)*p/(n1 + n2 - p - 2)
 critical_val <- const * qf(0.95, df1 = p,
                            df2 = n1 + n2 - p - 2)
+```
+
+
+```{r}
+c(drop(test_statistic), critical_val)
 
 drop(test_statistic) > critical_val
 ```
@@ -526,7 +553,7 @@ ellipse1 <- circle %*% t(solve(transf)) +
          nrow = nrow(circle), 
          byrow = TRUE)
 
-plot(ellipse1, type = 'l',
+plot(ellipse1, type = 'l', asp = 1,
      xlab = colnames(dataset1)[1],
      ylab = colnames(dataset1)[2],
      main = "Comparing Africa vs. Asia")
@@ -573,6 +600,7 @@ test_statistic <- t(mu_hat_diff) %*%
 
 critical_val <- qchisq(0.95, df = p)
 
+c(drop(test_statistic), critical_val)
 drop(test_statistic) > critical_val
 ```
 
@@ -608,6 +636,7 @@ const <- nu*p/(nu - p - 1)
 critical_val <- const * qf(0.95, df1 = p,
                            df2 = nu - p - 1)
 
+c(drop(test_statistic), critical_val)
 drop(test_statistic) > critical_val
 ```
 
@@ -630,7 +659,7 @@ ylim <- range(c(ellipse1[,2],
                 ellipse2[,2],
                 ellipse3[,2]))
 
-plot(ellipse2, type = 'l',
+plot(ellipse2, type = 'l', asp = 1,
      xlab = colnames(dataset1)[1],
      ylab = colnames(dataset1)[2],
      xlim = xlim, ylim = ylim,
