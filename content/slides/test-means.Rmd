@@ -15,7 +15,7 @@ header-includes:
 ---
 
 ```{r,setup, include=FALSE}
-knitr::opts_chunk$set(cache=TRUE)
+knitr::opts_chunk$set(cache=FALSE)
 ```
 
 ## Objectives
@@ -671,14 +671,294 @@ lines(ellipse3, lty = 3)
 legend('topright', legend = c("Unequal", "Equal", "Nel-VDM"), lty = 1:3)
 ```
 
-<!-- ## Robustness -->
+## Robustness
 
-<!--   - To perform the tests on means, we made two main assumptions (listed in order of **importance**): -->
-<!--     1. Independence of the observations; -->
-<!--     2. Normality of the observations. -->
-<!--   - Independence is the most important assumption:  -->
-<!--     + Departure from independence can introduce significant bias and will impact the coverage probability. -->
-<!--   - Normality is not as important: -->
-<!--     + Both tests for one or two means are relatively robust to heavy tail distributions. -->
-<!--     + Test for one mean can be sensitive to skewed distributions; test for two means is more robust. -->
+  - To perform the tests on means, we made two main assumptions (listed in order of **importance**):
+    1. Independence of the observations;
+    2. Normality of the observations.
+  - Independence is the most important assumption:
+    + Departure from independence can introduce significant bias and will impact the coverage probability.
+  - Normality is not as important:
+    + Both tests for one or two means are relatively robust to heavy tail distributions.
+    + Test for one mean can be sensitive to skewed distributions; test for two means is more robust.
+    
+## Simulation {.allowframebreaks}
 
+```{r}
+library(mvtnorm)
+set.seed(7200)
+
+n <- 50; p <- 10
+B <- 1000
+
+# Simulate under the null
+mu <- mu_0 <- rep(0, p)
+# Cov: diag = 1; off-diag = 0.5
+Sigma <- matrix(0.5, ncol = p, nrow = p)
+diag(Sigma) <- 1
+```
+
+
+```{r}
+critical_val <- (n - 1)*p*qf(0.95, df1 = p,
+                             df2 = n - p)/(n-p)
+
+null_dist <- replicate(B, {
+  Y_norm <- rmvnorm(n, mean = mu, sigma = Sigma)
+  mu_hat <- colMeans(Y_norm)
+  # Test mu = mu_0
+  test_statistic <- n * t(mu_hat - mu_0) %*% 
+    solve(cov(Y_norm)) %*% (mu_hat - mu_0)
+})
+```
+
+
+```{r}
+# Type I error
+mean(null_dist > critical_val)
+```
+
+```{r echo = FALSE}
+# Actual density
+x_vect <- 35*ppoints(B)
+d_vect <- df(x_vect*(n-p)/((n - 1)*p), df1 = p,
+             df2 = n - p)*(n-p)/((n - 1)*p)
+
+hist(null_dist, 20, freq = FALSE,
+     xlab = "Simulated data",
+     main = "Black is smoothed density; Blue is theoretical density")
+lines(density(null_dist), col = 'black')
+lines(x_vect, d_vect, col = 'blue')
+```
+
+```{r}
+# Now the t distribution
+nu <- 3
+
+null_dist_t <- replicate(B, {
+  Y_t <- rmvt(n, sigma = Sigma, df = nu, delta = mu)
+  mu_hat <- colMeans(Y_t)
+  # Test mu = mu_0
+  test_statistic <- n * t(mu_hat - mu_0) %*% 
+    solve(cov(Y_t)) %*% (mu_hat - mu_0)
+})
+```
+
+```{r}
+# Type I error
+mean(null_dist_t > critical_val)
+```
+
+```{r echo = FALSE}
+# Actual density
+hist(null_dist_t, 20, freq = FALSE,
+     xlab = "Simulated data",
+     main = "Black is smoothed density; Blue is theoretical density")
+lines(density(null_dist_t), col = 'black')
+lines(x_vect, d_vect, col = 'blue')
+```
+
+```{r}
+# Now a contaminated normal
+sigma <- 3; epsilon <- 0.25
+null_dist_cont <- replicate(B, {
+  Z <- rmvnorm(n, sigma = diag(p))
+  Y <- sample(c(sigma, 1), size = n, replace = TRUE,
+              prob = c(epsilon, 1 - epsilon))*Z
+  mu_hat <- colMeans(Y)
+  # Test mu = mu_0
+  test_statistic <- n * t(mu_hat - mu_0) %*% 
+    solve(cov(Y)) %*% (mu_hat - mu_0)
+})
+```
+
+```{r}
+# Type I error
+mean(null_dist_cont > critical_val)
+```
+
+```{r echo = FALSE}
+# Actual density
+hist(null_dist_cont, 20, freq = FALSE,
+     xlab = "Simulated data",
+     main = "Black is smoothed density; Blue is theoretical density")
+lines(density(null_dist_cont), col = 'black')
+lines(x_vect, d_vect, col = 'blue')
+```
+
+```{r echo = FALSE, cache = TRUE}
+library(tidyverse)
+B <- 10000
+
+# Simulate for several values of n
+results <- purrr::map_df(seq(50, 300, by = 50),
+                         function(n) {
+  # First normal
+  null_dist <- replicate(B, {
+    Y_norm <- rmvnorm(n, mean = mu, sigma = Sigma)
+    mu_hat <- colMeans(Y_norm)
+    # Test mu = mu_0
+    test_statistic <- n * t(mu_hat - mu_0) %*% 
+      solve(cov(Y_norm)) %*% (mu_hat - mu_0)
+  })
+  
+  # Second t distribution
+  null_dist_t <- replicate(B, {
+    Y_t <- rmvt(n, sigma = Sigma, df = nu, delta = mu)
+    mu_hat <- colMeans(Y_t)
+    # Test mu = mu_0
+    test_statistic <- n * t(mu_hat - mu_0) %*% 
+      solve(cov(Y_t)) %*% (mu_hat - mu_0)
+  })
+  
+  # Third a contaminated normal
+  null_dist_cont <- replicate(B, {
+    Z <- rmvnorm(n, sigma = diag(p))
+    Y <- sample(c(sigma, 1), size = n, replace = TRUE,
+                prob = c(epsilon, 1 - epsilon))*Z
+    mu_hat <- colMeans(Y)
+    # Test mu = mu_0
+    test_statistic <- n * t(mu_hat - mu_0) %*% 
+      solve(cov(Y)) %*% (mu_hat - mu_0)
+  })
+  
+  # Return in a data.frame
+  bind_rows(
+    mutate(tibble(statistics = null_dist), model = "Normal"),
+    mutate(tibble(statistics = null_dist_t), model = "t-dist"),
+    mutate(tibble(statistics = null_dist_cont), model = "Contaminated")
+  ) %>% 
+    mutate(n = n)
+})
+```
+
+```{r echo = FALSE}
+# Compute Type I error rate and plot as function of n
+results %>% 
+  group_by(model, n) %>% 
+  # summarise(TypeI_fdist = mean(statistics > (n - 1)*p*qf(0.95, df1 = p,
+  #                                                        df2 = n - p)/(n-p)),
+  #           TypeI_chisq = mean(statistics > qchisq(0.95, df = p))) %>% 
+  # gather(Test, TypeI, TypeI_fdist, TypeI_chisq) %>% 
+  # mutate(Test = str_replace(Test, "TypeI_", "")) %>% 
+  summarise(TypeI = mean(statistics > (n - 1)*p*qf(0.95, df1 = p,
+                                                   df2 = n - p)/(n-p))) %>%
+  ggplot(aes(n, TypeI, colour = model)) +
+  geom_line() + geom_point() +
+  # facet_grid(. ~ Test) %>% 
+  theme_minimal() +
+  theme(legend.position = 'top') +
+  geom_hline(yintercept = 0.05, linetype = 'dashed') +
+  expand_limits(y = 0) +
+  scale_y_continuous(breaks = seq(0, 0.05, by = 0.01))
+```
+
+## Robust $T^2$ test statistic
+
+  - One potential solution:
+    + Fix the distribution, and derive an approximation of the null distribution.
+  - However, you could potentially get a different approximation for each distribution, and it is not clear which one to use for a given dataset.
+  - A different solution:
+    + Replace the sample mean and sample covariance with **robust estimates** and derive an approximation under general assumptions.
+  - Generally valid for a large class of distributions, but it will typically at a cost of lower efficiency (i.e. lower power).
+  
+## Minimum Covariance Determinant Estimator {.allowframebreaks}
+
+  - This is a robust estimator of the mean and the covariance introduced by Rousseeuw (JASA, 1984).
+    + *Robustness* can mean many things; in this setting, it means that the estimators are stable in the presence of outliers.
+  - It is defined as follows: 
+    + Let $h$ be an integer between $n$ (i.e. the sample size) and $\lfloor(n+p+1)/2 \rfloor$ (where $p$ is the number of variables).
+    + Let $\bar{\mathbf{Y}}_{MCD}$ be the mean of the $h$ observations for which the determinant of the sample covariance matrix is minimised.
+    + Let $S_{MCD}$ be the corresponding sample covariance scaled by a constant $C$.
+  - It can be shown that the smaller $h$, the more robust $(\bar{\mathbf{Y}}_{MCD}, S_{MCD})$.
+  - However, there is cost in efficiency. This is can be counterbalanced by *reweighting* the estimators:
+    + Let $d_i^2 = (\mathbf{Y} - \bar{\mathbf{Y}}_{MCD})^TS_{MCD}^{-1}(\mathbf{Y} - \bar{\mathbf{Y}}_{MCD})$ be the Mahalanobis distances under the original MCD estimate.
+    + Define a weighting function $W(d^2) = I(d^2 \leq \chi^2_{0.975}(p))$.
+    + Compute the reweighted MCD estimates:
+    \begin{align*}
+    \bar{\mathbf{Y}}_{R} &= \frac{\sum_{i=1}^n W(d_i^2) \mathbf{Y}_i}{\sum_{i=1}^n W(d_i^2)}\\ 
+    S_{R} &= C\frac{\sum_{i=1}^n W(d_i^2)(\mathbf{Y}_i - \bar{\mathbf{Y}}_R)(\mathbf{Y}_i - \bar{\mathbf{Y}}_R)^T}{\sum_{i=1}^n W(d_i^2)}.
+    \end{align*}
+  - This reweighted estimator $(\bar{\mathbf{Y}}_{R}, S_{R})$ has the same robustness properties as $(\bar{\mathbf{Y}}_{MCD}, S_{MCD})$, but with higher efficiency.
+    + This makes sense, as we are generally including more data points when reweighting, but still controlling for outliers.
+    
+## Example {.allowframebreaks}
+
+```{r, cache = FALSE}
+# Recall our dataset
+dataset <- filter(gapminder, year == 2012, 
+                  !is.na(infant_mortality))
+
+dataset <- dataset[,c("infant_mortality",
+                      "life_expectancy")]
+dataset <- as.matrix(dataset)
+```
+
+```{r}
+# The sample estimators
+colMeans(dataset)
+cov(dataset)
+```
+
+```{r, message = FALSE}
+# The MCD estimators
+library(rrcov)
+
+mcd <- CovMcd(dataset)
+getCenter(mcd)
+getCov(mcd)
+```
+
+## Robust $T^2$ test statistic {.allowframebreaks}
+
+  - To get a robust $T^2$ statistic, we can simply replace the sample estimates by the (reweighted) MCD estimates:
+  $$T^2_{MCD} = n(\mathbf{Y} - \bar{\mathbf{Y}}_{R})^TS_{R}^{-1}(\mathbf{Y} - \bar{\mathbf{Y}}_{R}).$$
+  - Unfortunately, the finite-sample properties of $(\bar{\mathbf{Y}}_{R}, S_{R})$ are unknown. BUT:
+    + There exists a constant $\kappa$ such that $\bar{\mathbf{Y}}_{R} \approx N_p\left(\mu, \frac{\kappa}{n}\Sigma\right)$.
+    + There exist constants $c,m$ such that $mc^{-1} S_{R} \approx W_p(m, \Sigma)$ and $E(S_{R}) = c\Sigma$.
+    + $\bar{\mathbf{Y}}_{R}$ and $S_{R}$ are independent.
+  - Putting all of these together, we can deduce that
+  $$ T^2_{MCD} \approx \kappa c^{-1}\frac{mp}{m - p + 1}F(p, m - p + 1).$$
+  - The constants $\kappa,m,c$ can be estimated (Hardin & Rocke, 2005). 
+  - Alternatively, the null distribution of $T^2_{MCD}$ can be estimated using resampling techniques (Willems *et al*, 2002).
+  
+### Algorithm (Willems *et al*, 2002)
+
+  1. Rewrite the approximation with only two parameters: $T^2_{MCD} \approx dF(p, q)$.
+  2. Compute the theoretical mean and variance of $dF(p, q)$ as a function of $d,q,p$.
+  3. For several values of $n,p$, generate multivariate normal variates $N_p(0, I_p)$ and compute $T^2_{MCD}$.
+  4. Compute the sample mean and variance of $T^2_{MCD}$, and use the method of moments to estimate $d,q$.
+  
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+n <- nrow(dataset); p <- ncol(dataset)
+
+# Classical T2
+mu_0 <- c(25, 70)
+test_statistic <- n * t(mu_hat - mu_0) %*% 
+  solve(cov(dataset)) %*% (mu_hat - mu_0)
+
+critical_val <- (n - 1)*p*qf(0.95, df1 = p,
+                             df2 = n - p)/(n-p)
+```
+
+
+```{r}
+c(drop(test_statistic), critical_val)
+drop(test_statistic) > critical_val
+```
+
+```{r}
+# Robust T2
+t2_robust <- T2.test(dataset, mu = mu_0, method = "mcd")
+t2_robust
+t2_robust$p.value
+```
+
+## Summary
+
+  - We looked at Hotelling's $T^2$ statistic for tests of one or two multivariate means.
+  - We described the link between $T^2$ and the LRT test statistic.
+  - We discussed confidence regions, simultaneous confidence intervals, and Bonferroni correction.
+  - We looked at a robust version of $T^2$ and how to estimate its null distribution.
