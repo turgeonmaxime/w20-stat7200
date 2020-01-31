@@ -1,8 +1,8 @@
-## ----setup, include=FALSE---------------------------------------
-knitr::opts_chunk$set(cache=TRUE)
+## ----setup, include=FALSE-----------------------------------------------------
+knitr::opts_chunk$set(cache=FALSE)
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 library(dslabs)
 library(tidyverse)
 
@@ -15,11 +15,11 @@ dataset <- dataset[,c("infant_mortality",
 dataset <- as.matrix(dataset)
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 dim(dataset)
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 # Assume we know Sigma
 Sigma <- matrix(c(555, -170, 30, -170, 65, -10, 
                   30, -10, 2), ncol = 3)
@@ -28,7 +28,7 @@ mu_hat <- colMeans(dataset)
 mu_hat
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 # Test mu = mu_0
 mu_0 <- c(25, 50, 3)
 test_statistic <- nrow(dataset) * t(mu_hat - mu_0) %*% 
@@ -39,7 +39,7 @@ c(drop(test_statistic), qchisq(0.95, df = 3))
 drop(test_statistic) > qchisq(0.95, df = 3)
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 n <- nrow(dataset); p <- ncol(dataset)
 
 # Test mu = mu_0
@@ -51,13 +51,13 @@ critical_val <- (n - 1)*p*qf(0.95, df1 = p,
                              df2 = n - p)/(n-p)
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 c(drop(test_statistic), critical_val)
 
 drop(test_statistic) > critical_val
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 n <- nrow(dataset); p <- ncol(dataset)
 
 critical_val <- (n - 1)*p*qf(0.95, df1 = p,
@@ -65,14 +65,14 @@ critical_val <- (n - 1)*p*qf(0.95, df1 = p,
 sample_cov <- diag(cov(dataset))
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 cbind(mu_hat - sqrt(critical_val*
                       sample_cov/n),
       mu_hat + sqrt(critical_val*
                       sample_cov/n))
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 U <- matrix(c(1, 0, 0,
               0, 1, 0), 
             ncol = 2)
@@ -80,7 +80,7 @@ R <- n*solve(t(U) %*% cov(dataset) %*% U)
 transf <- chol(R)
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # First create a circle of radius c
 theta_vect <- seq(0, 2*pi, length.out = 100)
 circle <- sqrt(critical_val) * cbind(cos(theta_vect), 
@@ -92,7 +92,7 @@ ellipse <- circle %*% t(solve(transf)) +
          byrow = TRUE)
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Eigendecomposition
 # To visualize the principal axes
 decomp <- eigen(t(U) %*% cov(dataset) %*% U)
@@ -102,7 +102,7 @@ second <- sqrt(decomp$values[2]) *
   decomp$vectors[,2] * sqrt(critical_val)
 
 
-## ---- echo = FALSE----------------------------------------------
+## ---- echo = FALSE------------------------------------------------------------
 plot(ellipse, type = 'l', asp = 1,
      xlab = colnames(dataset)[1],
      ylab = colnames(dataset)[2])
@@ -126,7 +126,7 @@ abline(v = axis_proj[1,], lty = 2)
 abline(h = axis_proj[2,], lty = 2)
 
 
-## ---- message=FALSE---------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 # Let's focus on only two variables
 dataset <- dataset[,c("infant_mortality",
                       "life_expectancy")]
@@ -134,7 +134,7 @@ dataset <- dataset[,c("infant_mortality",
 n <- nrow(dataset); p <- ncol(dataset)
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 alpha <- 0.05
 mu_hat <- colMeans(dataset) 
 sample_cov <- diag(cov(dataset))
@@ -149,7 +149,7 @@ simul_ci <- cbind(mu_hat - sqrt(critical_val*
                                   sample_cov/n))
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Univariate without correction
 univ_ci <- cbind(mu_hat - qt(1-0.5*alpha, n - 1) *
                    sqrt(sample_cov/n),
@@ -157,7 +157,7 @@ univ_ci <- cbind(mu_hat - qt(1-0.5*alpha, n - 1) *
                    sqrt(sample_cov/n))
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Bonferroni adjustment
 bonf_ci <- cbind(mu_hat - qt(1-0.5*alpha/p, n - 1) *
                    sqrt(sample_cov/n),
@@ -165,13 +165,13 @@ bonf_ci <- cbind(mu_hat - qt(1-0.5*alpha/p, n - 1) *
                    sqrt(sample_cov/n))
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 simul_ci
 univ_ci
 bonf_ci
 
 
-## ---- echo = FALSE----------------------------------------------
+## ---- echo = FALSE------------------------------------------------------------
 transf_mat <- solve(chol(solve(cov(dataset)/n)))
 # First create a circle of radius c
 theta_vect <- seq(0, 2*pi, length.out = 100)
@@ -209,7 +209,7 @@ bind_rows(
   coord_fixed()
 
 
-## ----message = FALSE--------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 dataset1 <- filter(gapminder, year == 2012, 
                    continent == "Africa",
                    !is.na(infant_mortality))
@@ -232,7 +232,7 @@ n1 <- nrow(dataset1); n2 <- nrow(dataset2)
 p <- ncol(dataset1)
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (mu_hat1 <- colMeans(dataset1))
 (mu_hat2 <- colMeans(dataset2))
 
@@ -243,7 +243,7 @@ p <- ncol(dataset1)
 # We will assume equal covariance for now
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 mu_hat_diff <- mu_hat1 - mu_hat2
 
 S_pool <- ((n1 - 1)*S1 + (n2 - 1)*S2)/(n1+n2-2)
@@ -256,13 +256,13 @@ critical_val <- const * qf(0.95, df1 = p,
                            df2 = n1 + n2 - p - 2)
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 c(drop(test_statistic), critical_val)
 
 drop(test_statistic) > critical_val
 
 
-## ----echo = FALSE-----------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 R <- solve((n1^-1 + n2^-1)*S_pool)
 transf <- chol(R)
 
@@ -283,7 +283,7 @@ points(x = mu_hat_diff[1],
        y = mu_hat_diff[2])
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 test_statistic <- t(mu_hat_diff) %*% 
   solve(n1^-1*S1 + n2^-1*S2) %*% mu_hat_diff
 
@@ -293,7 +293,7 @@ c(drop(test_statistic), critical_val)
 drop(test_statistic) > critical_val
 
 
-## ----echo = FALSE-----------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 R <- solve(n1^-1*S1 + n2^-1*S2)
 transf <- chol(R)
 
@@ -307,7 +307,7 @@ ellipse2 <- circle %*% t(solve(transf)) +
          byrow = TRUE)
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 W1 <- S1 %*% solve(n1^-1*S1 + n2^-1*S2)/n1
 W2 <- S2 %*% solve(n1^-1*S1 + n2^-1*S2)/n2
 
@@ -319,7 +319,7 @@ square_trace <- sum(diag(W1))^2/n1 +
 (nu <- (p + p^2)/(trace_square + square_trace))
 
 
-## ---------------------------------------------------------------
+## -----------------------------------------------------------------------------
 const <- nu*p/(nu - p - 1)
 critical_val <- const * qf(0.95, df1 = p,
                            df2 = nu - p - 1)
@@ -328,7 +328,7 @@ c(drop(test_statistic), critical_val)
 drop(test_statistic) > critical_val
 
 
-## ----echo = FALSE-----------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 # First create a circle of radius c
 theta_vect <- seq(0, 2*pi, length.out = 100)
 circle <- sqrt(critical_val) * cbind(cos(theta_vect), sin(theta_vect))
@@ -355,4 +355,220 @@ points(x = mu_hat_diff[1],
 lines(ellipse1, lty = 2)
 lines(ellipse3, lty = 3)
 legend('topright', legend = c("Unequal", "Equal", "Nel-VDM"), lty = 1:3)
+
+
+## -----------------------------------------------------------------------------
+library(mvtnorm)
+set.seed(7200)
+
+n <- 50; p <- 10
+B <- 1000
+
+# Simulate under the null
+mu <- mu_0 <- rep(0, p)
+# Cov: diag = 1; off-diag = 0.5
+Sigma <- matrix(0.5, ncol = p, nrow = p)
+diag(Sigma) <- 1
+
+
+## -----------------------------------------------------------------------------
+critical_val <- (n - 1)*p*qf(0.95, df1 = p,
+                             df2 = n - p)/(n-p)
+
+null_dist <- replicate(B, {
+  Y_norm <- rmvnorm(n, mean = mu, sigma = Sigma)
+  mu_hat <- colMeans(Y_norm)
+  # Test mu = mu_0
+  test_statistic <- n * t(mu_hat - mu_0) %*% 
+    solve(cov(Y_norm)) %*% (mu_hat - mu_0)
+})
+
+
+## -----------------------------------------------------------------------------
+# Type I error
+mean(null_dist > critical_val)
+
+
+## ----echo = FALSE-------------------------------------------------------------
+# Actual density
+x_vect <- 35*ppoints(B)
+d_vect <- df(x_vect*(n-p)/((n - 1)*p), df1 = p,
+             df2 = n - p)*(n-p)/((n - 1)*p)
+
+hist(null_dist, 20, freq = FALSE,
+     xlab = "Simulated data",
+     main = "Black is smoothed density; Blue is theoretical density")
+lines(density(null_dist), col = 'black')
+lines(x_vect, d_vect, col = 'blue')
+
+
+## -----------------------------------------------------------------------------
+# Now the t distribution
+nu <- 3
+
+null_dist_t <- replicate(B, {
+  Y_t <- rmvt(n, sigma = Sigma, df = nu, delta = mu)
+  mu_hat <- colMeans(Y_t)
+  # Test mu = mu_0
+  test_statistic <- n * t(mu_hat - mu_0) %*% 
+    solve(cov(Y_t)) %*% (mu_hat - mu_0)
+})
+
+
+## -----------------------------------------------------------------------------
+# Type I error
+mean(null_dist_t > critical_val)
+
+
+## ----echo = FALSE-------------------------------------------------------------
+# Actual density
+hist(null_dist_t, 20, freq = FALSE,
+     xlab = "Simulated data",
+     main = "Black is smoothed density; Blue is theoretical density")
+lines(density(null_dist_t), col = 'black')
+lines(x_vect, d_vect, col = 'blue')
+
+
+## -----------------------------------------------------------------------------
+# Now a contaminated normal
+sigma <- 3; epsilon <- 0.25
+null_dist_cont <- replicate(B, {
+  Z <- rmvnorm(n, sigma = diag(p))
+  Y <- sample(c(sigma, 1), size = n, replace = TRUE,
+              prob = c(epsilon, 1 - epsilon))*Z
+  mu_hat <- colMeans(Y)
+  # Test mu = mu_0
+  test_statistic <- n * t(mu_hat - mu_0) %*% 
+    solve(cov(Y)) %*% (mu_hat - mu_0)
+})
+
+
+## -----------------------------------------------------------------------------
+# Type I error
+mean(null_dist_cont > critical_val)
+
+
+## ----echo = FALSE-------------------------------------------------------------
+# Actual density
+hist(null_dist_cont, 20, freq = FALSE,
+     xlab = "Simulated data",
+     main = "Black is smoothed density; Blue is theoretical density")
+lines(density(null_dist_cont), col = 'black')
+lines(x_vect, d_vect, col = 'blue')
+
+
+## ----echo = FALSE, cache = TRUE-----------------------------------------------
+library(tidyverse)
+B <- 10000
+
+# Simulate for several values of n
+results <- purrr::map_df(seq(50, 300, by = 50),
+                         function(n) {
+  # First normal
+  null_dist <- replicate(B, {
+    Y_norm <- rmvnorm(n, mean = mu, sigma = Sigma)
+    mu_hat <- colMeans(Y_norm)
+    # Test mu = mu_0
+    test_statistic <- n * t(mu_hat - mu_0) %*% 
+      solve(cov(Y_norm)) %*% (mu_hat - mu_0)
+  })
+  
+  # Second t distribution
+  null_dist_t <- replicate(B, {
+    Y_t <- rmvt(n, sigma = Sigma, df = nu, delta = mu)
+    mu_hat <- colMeans(Y_t)
+    # Test mu = mu_0
+    test_statistic <- n * t(mu_hat - mu_0) %*% 
+      solve(cov(Y_t)) %*% (mu_hat - mu_0)
+  })
+  
+  # Third a contaminated normal
+  null_dist_cont <- replicate(B, {
+    Z <- rmvnorm(n, sigma = diag(p))
+    Y <- sample(c(sigma, 1), size = n, replace = TRUE,
+                prob = c(epsilon, 1 - epsilon))*Z
+    mu_hat <- colMeans(Y)
+    # Test mu = mu_0
+    test_statistic <- n * t(mu_hat - mu_0) %*% 
+      solve(cov(Y)) %*% (mu_hat - mu_0)
+  })
+  
+  # Return in a data.frame
+  bind_rows(
+    mutate(tibble(statistics = null_dist), model = "Normal"),
+    mutate(tibble(statistics = null_dist_t), model = "t-dist"),
+    mutate(tibble(statistics = null_dist_cont), model = "Contaminated")
+  ) %>% 
+    mutate(n = n)
+})
+
+
+## ----echo = FALSE-------------------------------------------------------------
+# Compute Type I error rate and plot as function of n
+results %>% 
+  group_by(model, n) %>% 
+  # summarise(TypeI_fdist = mean(statistics > (n - 1)*p*qf(0.95, df1 = p,
+  #                                                        df2 = n - p)/(n-p)),
+  #           TypeI_chisq = mean(statistics > qchisq(0.95, df = p))) %>% 
+  # gather(Test, TypeI, TypeI_fdist, TypeI_chisq) %>% 
+  # mutate(Test = str_replace(Test, "TypeI_", "")) %>% 
+  summarise(TypeI = mean(statistics > (n - 1)*p*qf(0.95, df1 = p,
+                                                   df2 = n - p)/(n-p))) %>%
+  ggplot(aes(n, TypeI, colour = model)) +
+  geom_line() + geom_point() +
+  # facet_grid(. ~ Test) %>% 
+  theme_minimal() +
+  theme(legend.position = 'top') +
+  geom_hline(yintercept = 0.05, linetype = 'dashed') +
+  expand_limits(y = 0) +
+  scale_y_continuous(breaks = seq(0, 0.05, by = 0.01))
+
+
+## ---- cache = FALSE-----------------------------------------------------------
+# Recall our dataset
+dataset <- filter(gapminder, year == 2012, 
+                  !is.na(infant_mortality))
+
+dataset <- dataset[,c("infant_mortality",
+                      "life_expectancy")]
+dataset <- as.matrix(dataset)
+
+
+## -----------------------------------------------------------------------------
+# The sample estimators
+colMeans(dataset)
+cov(dataset)
+
+
+## ---- message = FALSE---------------------------------------------------------
+# The MCD estimators
+library(rrcov)
+
+mcd <- CovMcd(dataset)
+getCenter(mcd)
+getCov(mcd)
+
+
+## -----------------------------------------------------------------------------
+n <- nrow(dataset); p <- ncol(dataset)
+
+# Classical T2
+mu_0 <- c(25, 70)
+test_statistic <- n * t(mu_hat - mu_0) %*% 
+  solve(cov(dataset)) %*% (mu_hat - mu_0)
+
+critical_val <- (n - 1)*p*qf(0.95, df1 = p,
+                             df2 = n - p)/(n-p)
+
+
+## -----------------------------------------------------------------------------
+c(drop(test_statistic), critical_val)
+drop(test_statistic) > critical_val
+
+
+## -----------------------------------------------------------------------------
+# Robust T2
+t2_robust <- T2.test(dataset, mu = mu_0, method = "mcd")
+t2_robust
+t2_robust$p.value
 
