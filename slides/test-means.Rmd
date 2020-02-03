@@ -872,7 +872,7 @@ results %>%
     + Let $S_{MCD}$ be the corresponding sample covariance scaled by a constant $C$.
   - It can be shown that the smaller $h$, the more robust $(\bar{\mathbf{Y}}_{MCD}, S_{MCD})$.
   - However, there is cost in efficiency. This is can be counterbalanced by *reweighting* the estimators:
-    + Let $d_i^2 = (\mathbf{Y} - \bar{\mathbf{Y}}_{MCD})^TS_{MCD}^{-1}(\mathbf{Y} - \bar{\mathbf{Y}}_{MCD})$ be the Mahalanobis distances under the original MCD estimate.
+    + Let $d_i^2 = (\mathbf{Y}_i - \bar{\mathbf{Y}}_{MCD})^TS_{MCD}^{-1}(\mathbf{Y}_i - \bar{\mathbf{Y}}_{MCD})$ be the Mahalanobis distances under the original MCD estimate.
     + Define a weighting function $W(d^2) = I(d^2 \leq \chi^2_{0.975}(p))$.
     + Compute the reweighted MCD estimates:
     \begin{align*}
@@ -912,7 +912,7 @@ getCov(mcd)
 ## Robust $T^2$ test statistic {.allowframebreaks}
 
   - To get a robust $T^2$ statistic, we can simply replace the sample estimates by the (reweighted) MCD estimates:
-  $$T^2_{MCD} = n(\mathbf{Y} - \bar{\mathbf{Y}}_{R})^TS_{R}^{-1}(\mathbf{Y} - \bar{\mathbf{Y}}_{R}).$$
+  $$T^2_{MCD} = n(\mathbf{Y}_i - \bar{\mathbf{Y}}_{R})^TS_{R}^{-1}(\mathbf{Y}_i - \bar{\mathbf{Y}}_{R}).$$
   - Unfortunately, the finite-sample properties of $(\bar{\mathbf{Y}}_{R}, S_{R})$ are unknown. BUT:
     + There exists a constant $\kappa$ such that $\bar{\mathbf{Y}}_{R} \approx N_p\left(\mu, \frac{\kappa}{n}\Sigma\right)$.
     + There exist constants $c,m$ such that $mc^{-1} S_{R} \approx W_p(m, \Sigma)$ and $E(S_{R}) = c\Sigma$.
