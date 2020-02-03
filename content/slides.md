@@ -20,4 +20,6 @@ type: docs
     + [Blog post](http://djalil.chafai.net/blog/2015/10/20/bartlett-decomposition-and-other-factorizations/) on different decompositions for random matrices
   - [Test for multivariate means](test-means.pdf)
     + [R code](test-means.R)
-  - Test for covariance matrices
+  - [Test for covariance matrices](test-covariances.pdf)
+    + [R code](test-covariances.R)
+    + [R code](../download_winnipeg_temp_data.R) for downloading Winnipeg weather data
