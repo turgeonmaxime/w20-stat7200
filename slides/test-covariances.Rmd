@@ -1,6 +1,6 @@
 ---
 title: "Test for Covariances"
-draft: true
+draft: false
 source: true
 output: binb::metropolis
 fontsize: 12pt
@@ -74,6 +74,48 @@ where $k$ is the difference in the number of free parameters between the null mo
   - In particular, if $\Sigma_0 = I_p$, we get
   $$\Lambda = \left(\frac{e}{n}\right)^{np/2}\lvert V\rvert^{n/2}\exp\left(-\frac{1}{2}\mathrm{tr}(V)\right).$$
 
+## Example {.allowframebreaks}
+
+```{r, message = FALSE}
+library(tidyverse)
+# Winnipeg avg temperature
+url <- paste0("https://maxturgeon.ca/w20-stat7200/",
+              "winnipeg_temp.csv")
+dataset <- read.csv(url)
+dataset[1:3,1:3]
+```
+
+```{r}
+n <- nrow(dataset)
+p <- ncol(dataset)
+
+V <- (n - 1)*cov(dataset)
+```
+
+
+```{r}
+# Diag = 14^2
+# Corr = 0.8
+Sigma0 <- diag(0.8, nrow = p)
+diag(Sigma0) <- 1
+Sigma0 <- 14^2*Sigma0
+Sigma0_invXV <- solve(Sigma0, V)
+```
+
+```{r}
+lrt <- 0.5*n*p*(1 - log(n))
+lrt <- lrt + 0.5*n*log(det(Sigma0_invXV))
+lrt <- lrt - 0.5*sum(diag(Sigma0_invXV))
+lrt <- -2*lrt
+```
+
+
+```{r}
+df <- choose(p, 2)
+c(lrt, qchisq(0.95, df))
+```
+
+
 ## Test for sphericity {.allowframebreaks}
 
   - *Sphericity* means the different components of $\mathbf{Y}$ are **uncorrelated** and have the **same variance**.
@@ -98,6 +140,55 @@ where $k$ is the difference in the number of free parameters between the null mo
     &= \frac{\left(\frac{\mathrm{tr} V}{np}\right)^{-np/2}}{\lvert n^{-1}V\rvert^{-n/2}}\\
     &= \left(\frac{\lvert V\rvert}{(\mathrm{tr} V/p)^p}\right)^{n/2}.
   \end{align*}
+  
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+lrt <- -2*0.5*n*(log(det(V)) - p*log(mean(diag(V))))
+df <- choose(p, 2) - 1
+
+c(lrt, qchisq(0.95, df))
+```
+
+## Test for sphericity (cont'd) {.allowframebreaks}
+
+  - Recall that we have
+  $$ \Lambda = \left(\frac{\lvert V\rvert}{(\mathrm{tr} V/p)^p}\right)^{n/2}.$$
+  - We can rewrite this as follows: let $l_1 \geq \cdots \geq l_p$ be the eigenvalues of $V$. We have
+  \begin{align*}
+  \Lambda^{2/n} &= \frac{\lvert V\rvert}{(\mathrm{tr} V/p)^p}\\
+    &= \frac{\prod_{j=1}^p l_j}{(\frac{1}{p}\sum_{j=1}^p l_j)^p}\\
+    &= \left(\frac{\prod_{j=1}^p l_j^{1/p}}{\frac{1}{p}\sum_{j=1}^p l_j}\right)^p.
+  \end{align*}
+  - In other words, the modified LRT $\tilde{\Lambda} = \Lambda^{2/n}$ is the ratio of the geometric to the arithmetic mean of the eigenvalues of $V$ (all raised to the power $p$).
+  - A result of Srivastava and Khatri gives the *exact* distribution of $\tilde{\Lambda}$:
+  $$\tilde{\Lambda} = \prod_{j=1}^{p-1} \mathcal{B}\left(\frac{1}{2}(n - j - 1), j\left(\frac{1}{2} + \frac{1}{p}\right)\right).$$
+  
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+B <- 1000
+df1 <- 0.5*(n - seq_len(p-1) - 1)
+df2 <- seq_len(p-1)*(0.5 + 1/p)
+
+# Critical values
+dist <- replicate(B, {
+  prod(rbeta(p-1, df1, df2))
+  })
+```
+
+
+```{r}
+# Test statistic
+decomp <- eigen(V, symmetric = TRUE, only.values = TRUE)
+ar_mean <- mean(decomp$values)
+geo_mean <- exp(mean(log(decomp$values)))
+
+lrt_mod <- (geo_mean/ar_mean)^p
+
+c(lrt_mod, quantile(dist, 0.95))
+```
+
 
 ## Test for independence {.allowframebreaks}
 
