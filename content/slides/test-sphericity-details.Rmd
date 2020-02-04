@@ -208,7 +208,7 @@ f &= \frac{1}{2}(p + 2)(p-1),\\
 \end{align*}
 
 In other words, if we let $\Lambda$ be the likelihood ratio for the test of sphericity, we have
-$$ -2\left(\frac{6p(n-1) - (2p^2 + p + 2)}{6pn}\right)\log \Lambda \approx \chi^2\left(\frac{1}{2}p(p + 1) - \frac{1}{2}\right).$$ 
+$$ -2\left(\frac{6p(n-1) - (2p^2 + p + 2)}{6pn}\right)\log \Lambda \approx \chi^2\left(\frac{1}{2}p(p + 1) - 1\right).$$ 
 Compared to the general theory, we are multiplying $-2\log\Lambda$ by a constant and correcting the degrees of freedom. This is known as a *Bartlett correction*.
 
 ## Simulation

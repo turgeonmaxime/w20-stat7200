@@ -47,7 +47,7 @@ where $k$ is the difference in the number of free parameters between the null mo
 ## Tests for structured covariance matrices {.allowframebreaks}
 
   - We are going to look at several tests for structured covariance matrix.
-  - Throughtout, we assume $\mathbf{Y}_1, \ldots, \mathbf{Y}_n \sim N_p(\mu, \Sigma)$ with $\Sigma$ positive definite.
+  - Throughout, we assume $\mathbf{Y}_1, \ldots, \mathbf{Y}_n \sim N_p(\mu, \Sigma)$ with $\Sigma$ positive definite.
     + Like other exponential families, the multivariate normal distribution satisfies the regularity conditions of the theorem above.
     + Being positive definite implies that the unrestricted parameter space is *locally linear*, i.e. we are staying away from the boundary where $\Sigma$ is singular.
     \vspace{1cm}
@@ -61,7 +61,7 @@ where $k$ is the difference in the number of free parameters between the null mo
 ## Specified covariance structure {.allowframebreaks}
 
   - We will start with the simplest hypothesis test:
-  $$ H_0: \Sigma_0.$$
+  $$ H_0: \Sigma = \Sigma_0.$$
   - Note that there is no free parameter in the null model.
   - Write $V = n\hat{\Sigma}$. Recall that we have 
   $$L(\hat{\mathbf{Y}}, \Sigma) = (2\pi)^{-np/2}\lvert\Sigma\rvert^{-n/2}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}V)\right).$$
@@ -111,7 +111,7 @@ lrt <- -2*lrt
 
 
 ```{r}
-df <- choose(p, 2)
+df <- choose(p + 1, 2)
 c(lrt, qchisq(0.95, df))
 ```
 
@@ -145,7 +145,7 @@ c(lrt, qchisq(0.95, df))
 
 ```{r}
 lrt <- -2*0.5*n*(log(det(V)) - p*log(mean(diag(V))))
-df <- choose(p, 2) - 1
+df <- choose(p + 1, 2) - 1
 
 c(lrt, qchisq(0.95, df))
 ```
@@ -194,7 +194,7 @@ c(lrt_mod, quantile(dist, 0.95))
 
   - Decompose $\mathbf{Y}_i$ into $k$ blocks:
   $$ \mathbf{Y}_i = (\mathbf{Y}_{1i}, \ldots, \mathbf{Y}_{ki}),$$
-  where $\mathbf{Y}_{1i} \sim N_{p_k}(\mu_k, \Sigma_{kk})$ and $\sum_{j=1}^k p_j = p$.
+  where $\mathbf{Y}_{ji} \sim N_{p_j}(\mu_j, \Sigma_{jj})$ and $\sum_{j=1}^k p_j = p$.
   - This induces a decomposition on $\Sigma$ and $V$:
   $$ \Sigma = \begin{pmatrix}\Sigma_{11} &\cdots& \Sigma_{1k}\\
   \vdots &\ddots& \vdots\\
@@ -214,5 +214,250 @@ c(lrt_mod, quantile(dist, 0.95))
   - Putting this together, we conclude that
   $$ \Lambda = \left(\frac{\lvert V \rvert}{\prod_{j=1}^k\lvert V_{jj}\rvert}\right)^{n/2}.$$
 
-<!-- ## Summary  -->
+## Example {.allowframebreaks}
 
+```{r}
+url <- paste0("https://maxturgeon.ca/w20-stat7200/",
+              "blue_data.csv")
+blue_data <- read.csv(url)
+names(blue_data)
+dim(blue_data)
+```
+
+```{r}
+# Let's test for independence between 
+# all four variables
+n <- nrow(blue_data)
+p <- ncol(blue_data)
+
+V <- (n-1)*cov(blue_data)
+lrt <- -2*(log(det(V)) - sum(log(diag(V))))
+```
+
+```{r}
+df <- choose(p + 1, 2) - p
+c(lrt, qchisq(0.95, df))
+lrt > qchisq(0.95, df)
+```
+
+## Test for equality of covariances {.allowframebreaks}
+
+  - We now look at a different setting: assume that we collected $K$ independent random samples from (potentially) different $p$-dimensional multivariate normal distributions:
+  $$ \mathbf{Y}_{1k}, \ldots, \mathbf{Y}_{n_k k} \sim N_p(\mu_k, \Sigma_k), \quad k = 1, \ldots, K.$$
+  - We are interested in the null hypothesis that all $\Sigma_k$ are equal to some unknown $\Sigma$:
+  $$ H_0: \Sigma_k = \Sigma, \quad\mbox{for all } k = 1, \ldots, K.$$
+  - First, note that since the samples are independent, the full likelihood is the product of the likelihoods for each sample:
+  $$ L(\mu_1, \ldots, \mu_K, \Sigma_1, \ldots, \Sigma_K) = \prod_{k=1}^K L(\mu_k, \Sigma_k).$$
+  - Therefore, over the unrestricted model, the maximum likelihood estimators are
+  $$ (\bar{\mathbf{Y}}_k, \hat{\Sigma}_k).$$
+    + Note that the number of free parameters over the unrestricted model is $kp(p+1)/2$.
+  - Now, over the null model, the full likelihood is still maximised when $\mu_k = \bar{\mathbf{Y}}_k$. Hence, we get
+  \begin{align*}
+  &\. L(\bar{\mathbf{Y}}_1, \ldots, \bar{\mathbf{Y}}_K, \Sigma, \ldots, \Sigma) = \prod_{k=1}^K L(\bar{\mathbf{Y}}_K, \Sigma)\\
+  &\quad = \prod_{k=1}^K(2\pi)^{-n_kp/2}\lvert\Sigma\rvert^{-n_k/2}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}V_k)\right),
+  \end{align*}
+  where $V_k = n_k\hat{\Sigma}_k$.
+  - Writing $n = \sum_{k=1}^K n_k$ and $V = \sum_{k=1}^K V_k$, we get
+  \begin{align*}
+  &\. L(\bar{\mathbf{Y}}_1, \ldots, \bar{\mathbf{Y}}_K, \Sigma, \ldots, \Sigma) =\\
+  &\quad = (2\pi)^{-np/2}\lvert\Sigma\rvert^{-n/2}\exp\left(-\frac{1}{2}\mathrm{tr}(\Sigma^{-1}V)\right).
+  \end{align*}
+  - This is the same expression as the one we would get by pooling all the samples together. Therefore, the maximum likelihood estimate is 
+  $$ \hat{\Sigma} = \frac{1}{n}V.$$
+    + Note that under the null model, there are $p(p+1)/2$ free parameters.
+  - We can now compute the likelihood ratio:
+  \begin{align*}
+  \Lambda &= \frac{L(\bar{\mathbf{Y}}_1, \ldots, \bar{\mathbf{Y}}_K, \hat{\Sigma}, \ldots, \hat{\Sigma})}{L(\bar{\mathbf{Y}}_1, \ldots, \bar{\mathbf{Y}}_K, \hat{\Sigma}_1, \ldots, \hat{\Sigma}_K)}\\
+    &= \frac{(2\pi)^{-np/2}\exp(-np/2)\lvert\hat{\Sigma}\rvert^{-n/2}}{\prod_{k=1}^K (2\pi)^{-n_kp/2}\exp(-n_kp/2)\lvert\hat{\Sigma}_k\rvert^{-n_k/2}}\\
+    &= \frac{(2\pi)^{-np/2}\exp(-np/2)\lvert\hat{\Sigma}\rvert^{-n/2}}{ (2\pi)^{-np/2}\exp(-np/2)\prod_{k=1}^K\lvert\hat{\Sigma}_k\rvert^{-n_k/2}}\\
+    &= \frac{\lvert\hat{\Sigma}\rvert^{-n/2}}{\prod_{k=1}^K \lvert\hat{\Sigma}_k\rvert^{-n_k/2}}.
+  \end{align*}
+  - In other words, the likelihood ratio test compares the generalized variance of the *pooled covariance* with the product of the generalized variances of the *individuals covariances*.
+  - From the general theory of LRTs, we get
+  $$ -2\log\Lambda \approx \chi^2\left(\frac{(K-1)p(p+1)}{2}\right).$$
+
+```{r}
+## Example on producing plastic film 
+## from Krzanowski (1998, p. 381)
+tear <- c(6.5, 6.2, 5.8, 6.5, 6.5, 6.9, 7.2, 
+          6.9, 6.1, 6.3, 6.7, 6.6, 7.2, 7.1, 
+          6.8, 7.1, 7.0, 7.2, 7.5, 7.6)
+gloss <- c(9.5, 9.9, 9.6, 9.6, 9.2, 9.1, 10.0, 
+           9.9, 9.5, 9.4, 9.1, 9.3, 8.3, 8.4, 
+           8.5, 9.2, 8.8, 9.7, 10.1, 9.2)
+opacity <- c(4.4, 6.4, 3.0, 4.1, 0.8, 5.7, 2.0, 
+             3.9, 1.9, 5.7, 2.8, 4.1, 3.8, 1.6, 
+             3.4, 8.4, 5.2, 6.9, 2.7, 1.9)
+```
+
+
+```{r}
+Y <- cbind(tear, gloss, opacity)
+Y_low <- Y[1:10,]
+Y_high <- Y[11:20,]
+n <- nrow(Y); p <- ncol(Y); K <- 2
+n1 <- n2 <- nrow(Y_low)
+```
+
+```{r}
+Sig_low <- (n1 - 1)*cov(Y_low)/n1
+Sig_high <- (n2 - 1)*cov(Y_high)/n2
+Sig_pool <- (n1*Sig_low + n2*Sig_high)/n
+
+c("pool" = log(det(Sig_pool)),
+  "low" = log(det(Sig_low)),
+  "high" = log(det(Sig_high)))
+```
+
+```{r}
+lrt <- n*log(det(Sig_pool)) - 
+  n1*log(det(Sig_low)) - 
+  n2*log(det(Sig_high))
+df <- (K - 1)*choose(p + 1, 2)
+c(lrt, qchisq(0.95, df))
+```
+
+## Box's M test {.allowframebreaks}
+
+  - There are a few ways to get a better approximation of the null distribution of $\Lambda$. First, note that we can rewrite it as
+  $$\Lambda = \frac{\prod_{k=1}^K \lvert V_k\rvert^{n_k/2}}{\lvert V\rvert^{n/2}}\frac{n^{pn/2}}{\prod_{k=1}^K n_k^{pn_k/2}}.$$
+  - We can create an *unbiased* test (i.e. it has the correct asymptotic expectation) by replacing $n_k$ by $n_k - 1$ and $n$ with $n - K$:
+  $$\Lambda^* = \frac{\prod_{k=1}^K \lvert V_k\rvert^{(n_k - 1)/2}}{\lvert V\rvert^{(n - K)/2}}\frac{(n - K)^{p(n - K)/2}}{\prod_{k=1}^K (n_k - 1)^{p(n_k - 1)/2}}.$$
+    + This is equivalent to replacing $\hat{\Sigma}_k$ by the sample covariances $S_k$.
+  - Note that we still have the same asymptotic result:
+  $$  -2\log\Lambda^* \approx \chi^2\left(\frac{(K-1)p(p+1)}{2}\right).$$
+  - Box showed that you can further improve the approximation by multiplying the test statistic by a constant. Set
+  $$u = \left(\sum_{k = 1}^K \frac{1}{n_k - 1} - \frac{1}{n - K}\right)\left(\frac{2p^2 + 3p - 1}{6(p+1)(K-1)}\right).$$
+  - Then we have
+  $$-2(1 - u)\log\Lambda^* \approx \chi^2\left(\frac{(K-1)p(p+1)}{2}\right).$$
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+S_low <- cov(Y_low)
+S_high <- cov(Y_high)
+S_pool <- ((n1 - 1)*S_low + (n2 - 1)*S_high)/(n - K)
+
+lrt2 <- (n - K)*log(det(S_pool)) - 
+  (n1 - 1)*log(det(S_low)) - 
+  (n2 - 1)*log(det(S_high))
+
+c(lrt, lrt2, qchisq(0.95, df))
+```
+
+```{r}
+u <- (2*p^2 + 3*p - 1)/(6*(p + 1)*(K - 1))
+u <- u * ((n1 - 1)^{-1} + (n2 - 1)^{-1} - (n - K)^{-1})
+lrt3 <- lrt2*(1 - u)
+
+c(lrt, lrt2, lrt3, qchisq(0.95, df))
+```
+
+## Visualization {.allowframebreaks}
+
+```{r message = FALSE}
+# You can also visualize the covariances----
+library(heplots)
+rate <- gl(K, 10, labels = c("Low", "High"))
+boxm_res <- boxM(Y, rate)
+
+# You can plot the log generalized variances
+# The plot function adds 95% CI
+plot(boxm_res)
+```
+
+```{r}
+# Finally you can also plot the ellipses
+# as a way to compare the covariances
+covEllipses(Y, rate, center = TRUE, 
+            label.pos = 'bottom')
+```
+
+```{r}
+# Or all pairwise comparisons together
+covEllipses(Y, rate, center = TRUE, 
+            label.pos = 'bottom', 
+            variables = 1:3)
+```
+
+## Asymptotic expansions for likelihood ratio tests {.allowframebreaks}
+
+  - Box's correction of the LRT for equality of covariances is part of a general theory of *asymptotic expansions* for LRTs. 
+    + The frameword allows for approximations of the null distribution of some LRTs to any degrees of accuracy.
+  - We won't go into the details of such expansions, but we will look at one example.
+    + If you want more details, see this: https://maxturgeon.ca/w20-stat7200/test-sphericity-details.pdf
+  - In the context of the test for sphericity, the approximation result looks like this:
+  $$ -2\left(\frac{6p(n-1) - (2p^2 + p + 2)}{6pn}\right)\log \Lambda \approx \chi^2\left(\frac{1}{2}p(p + 1) - 1\right),$$
+  where $\Lambda$ is the likelihood ratio.
+  - This is known also known as *Bartlett's correction*.
+    + Note that we are correcting both the test statistic (by multiplying by a positive constant) and the degrees of freedom (we lose one degree of freedom).
+  
+## Simulation {.allowframebreaks}
+
+```{r}
+set.seed(7200)
+
+# Simulation parameters
+n <- 10
+p <- 2
+B <- 1000
+```
+
+
+```{r}
+# Generate data
+lrt_dist <- replicate(B, {
+  Y <- matrix(rnorm(n*p), ncol = p)
+  V <- crossprod(Y)
+  # log Lambda
+  0.5*n*(log(det(V)) - p*log(mean(diag(V))))
+})
+```
+
+
+```{r}
+# General asymptotic result
+df <- choose(p + 1, 2)
+general_chisq <- rchisq(B, df = df)
+```
+
+
+```{r}
+# Bartlett's correction
+df <- choose(p + 1, 2) - 1
+const <- (6*p*(n-1) - (2*p^2 + p + 2))/(6*p*n)
+bartlett_chisq <- rchisq(B, df = df)/const
+```
+
+```{r}
+# Plot empirical CDFs
+plot(ecdf(-2*lrt_dist), main = "-2 log Lambda")
+lines(ecdf(general_chisq), col = 'blue')
+lines(ecdf(bartlett_chisq), col = 'red')
+legend('bottomright', 
+       legend = c("-2log Lambda", "General approx.", 
+                  "Bartlett"),
+       lty = 1, col = c('black', 'blue', 'red'))
+```
+
+## Sketch of a proof {.allowframebreaks}
+
+  - Here is an outline of how you could get such an approximation:
+  - First, we can compute the moments of the likelihood ratio: given $h$, we have
+  $$ E\left(\Lambda^{2h/n}\right) = p^{ph}\frac{\Gamma\left(\frac{1}{2}(n - 1)p\right)}{\Gamma\left(\frac{1}{2}(n - 1)p + ph\right)}\frac{\Gamma_p\left(\frac{1}{2}(n - 1) + h\right)}{\Gamma_p\left(\frac{1}{2}(n - 1)\right)}.$$
+  - Next, we can use this expression to get an expression for the characteristic function of $\rho M = -2\rho\log \Lambda^{(n-1)/n}$:
+  $$\varphi_{\rho M}(t) = E(\exp(it\rho M)) = E\left( \Lambda^{-2it\rho(n-1)/n}\right).$$
+  - Therefore, if we take $h = -it\rho(n-1)$, we can see that the characteristic function $\varphi_{\rho M}(t)$ is a product of gamma functions.
+  - The *cumulant function*, which is the logarithm of the characteristic function, is therefore a sum of logarithms of gamma functions.
+  - **Why do we care?** We can use Stirling's approximation to approximate the logarithm of gamma functions to any degree of precision.
+  - This approximation of the cumulant function gives rise to an approximation of the characteristic function. For order 2, we get:
+  $$ \varphi_{\rho M}(t) \approx (1 - 2it)^{-f/2} + \omega_1\left((1 - 2it)^{-(f+2)/2} - (1 - 2it)^{-f/2}\right).$$
+  - Recall that the characteristic function of $\chi^2(d)$ is $(1 - 2it)^{-d/2}$. Therefore, we can "invert" our approximation of $\varphi_{\rho M}(t)$ to get an approximation of the density and the distribution of $\rho M$.
+  - Moreover, we can choose $\rho$ in such a way that $\omega_1 = 0$, which gives a chi-square approximation that is **more** accurate than the general asymptotic theory. 
+
+## Summary
+
+  - We built tests for structured covariance matrices using likelihood ratio tests.
+  - We also built a test for equality of covariance, when we have multiple samples.
+  - We briefly discussed asymptotic expansions and how they can give rise to better approximations of the likelihood ratio test statistics.
+  
