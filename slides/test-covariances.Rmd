@@ -111,7 +111,7 @@ lrt <- -2*lrt
 
 
 ```{r}
-df <- choose(p, 2)
+df <- choose(p + 1, 2)
 c(lrt, qchisq(0.95, df))
 ```
 
@@ -145,7 +145,7 @@ c(lrt, qchisq(0.95, df))
 
 ```{r}
 lrt <- -2*0.5*n*(log(det(V)) - p*log(mean(diag(V))))
-df <- choose(p, 2) - 1
+df <- choose(p + 1, 2) - 1
 
 c(lrt, qchisq(0.95, df))
 ```
@@ -213,6 +213,31 @@ c(lrt_mod, quantile(dist, 0.95))
   \end{align*}
   - Putting this together, we conclude that
   $$ \Lambda = \left(\frac{\lvert V \rvert}{\prod_{j=1}^k\lvert V_{jj}\rvert}\right)^{n/2}.$$
+
+## Example {.allowframebreaks}
+
+```{r}
+url <- paste0("https://maxturgeon.ca/",
+              "blue_data.csv")
+blue_data <- read.csv(url)
+dim(blue_data)
+```
+
+```{r}
+# Let's test for independence between 
+# all four variables
+n <- nrow(blue_data)
+p <- ncol(blue_data)
+
+V <- (n-1)*cov(blue_data)
+lrt <- -2*(log(det(V)) - sum(log(diag(V))))
+```
+
+```{r}
+df <- choose(p + 1, 2) - p
+c(lrt, qchisq(0.95, df))
+lrt > qchisq(0.95, df)
+```
 
 <!-- ## Summary  -->
 
