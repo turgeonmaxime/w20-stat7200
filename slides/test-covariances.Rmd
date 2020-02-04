@@ -380,12 +380,84 @@ covEllipses(Y, rate, center = TRUE,
             variables = 1:3)
 ```
 
-## Asymptotic expansions for likelihood ratio tests
+## Asymptotic expansions for likelihood ratio tests {.allowframebreaks}
 
   - Box's correction of the LRT for equality of covariances is part of a general theory of *asymptotic expansions* for LRTs. 
     + The frameword allows for approximations of the null distribution of some LRTs to any degrees of accuracy.
   - We won't go into the details of such expansions, but we will look at one example.
     + If you want more details, see this: https://maxturgeon.ca/w20-stat7200/test-sphericity-details.pdf
+  - In the context of the test for sphericity, the approximation result looks like this:
+  $$ -2\left(\frac{6p(n-1) - (2p^2 + p + 2)}{6pn}\right)\log \Lambda \approx \chi^2\left(\frac{1}{2}p(p + 1) - 1\right),$$
+  where $\Lambda$ is the likelihood ratio.
+  - This is known also known as *Bartlett's correction*.
+    + Note that we are correcting both the test statistic (by multiplying by a positive constant) and the degrees of freedom (we lose one degree of freedom).
+  
+## Simulation {.allowframebreaks}
 
-<!-- ## Summary  -->
+```{r}
+set.seed(7200)
 
+# Simulation parameters
+n <- 10
+p <- 2
+B <- 1000
+```
+
+
+```{r}
+# Generate data
+lrt_dist <- replicate(B, {
+  Y <- matrix(rnorm(n*p), ncol = p)
+  V <- crossprod(Y)
+  # log Lambda
+  0.5*n*(log(det(V)) - p*log(mean(diag(V))))
+})
+```
+
+
+```{r}
+# General asymptotic result
+df <- choose(p + 1, 2)
+general_chisq <- rchisq(B, df = df)
+```
+
+
+```{r}
+# Bartlett's correction
+df <- choose(p + 1, 2) - 1
+const <- (6*p*(n-1) - (2*p^2 + p + 2))/(6*p*n)
+bartlett_chisq <- rchisq(B, df = df)/const
+```
+
+```{r}
+# Plot empirical CDFs
+plot(ecdf(-2*lrt_dist), main = "-2 log Lambda")
+lines(ecdf(general_chisq), col = 'blue')
+lines(ecdf(bartlett_chisq), col = 'red')
+legend('bottomright', 
+       legend = c("-2log Lambda", "General approx.", 
+                  "Bartlett"),
+       lty = 1, col = c('black', 'blue', 'red'))
+```
+
+## Sketch of a proof {.allowframebreaks}
+
+  - Here is an outline of how you could get such an approximation:
+  - First, we can compute the moments of the likelihood ratio: given $h$, we have
+  $$ E\left(\Lambda^{2h/n}\right) = p^{ph}\frac{\Gamma\left(\frac{1}{2}(n - 1)p\right)}{\Gamma\left(\frac{1}{2}(n - 1)p + ph\right)}\frac{\Gamma_p\left(\frac{1}{2}(n - 1) + h\right)}{\Gamma_p\left(\frac{1}{2}(n - 1)\right)}.$$
+  - Next, we can use this expression to get an expression for the characteristic function of $\rho M = -2\rho\log \Lambda^{(n-1)/n}$:
+  $$\varphi_{\rho M}(t) = E(\exp(it\rho M)) = E\left( \Lambda^{-2it\rho(n-1)/n}\right).$$
+  - Therefore, if we take $h = -it\rho(n-1)$, we can see that the characteristic function $\varphi_{\rho M}(t)$ is a product of gamma functions.
+  - The *cumulant function*, which is the logarithm of the characteristic function, is therefore a sum of logarithms of gamma functions.
+  - **Why do we care?** We can use Stirling's approximation to approximate the logarithm of gamma functions to any degree of precision.
+  - This approximation of the cumulant function gives rise to an approximation of the characteristic function. For order 2, we get:
+  $$ \varphi_{\rho M}(t) \approx (1 - 2it)^{-f/2} + \omega_1\left((1 - 2it)^{-(f+2)/2} - (1 - 2it)^{-f/2}\right).$$
+  - Recall that the characteristic function of $\chi^2(d)$ is $(1 - 2it)^{-d/2}$. Therefore, we can "invert" our approximation of $\varphi_{\rho M}(t)$ to get an approximation of the density and the distribution of $\rho M$.
+  - Moreover, we can choose $\rho$ in such a way that $\omega_1 = 0$, which gives a chi-square approximation that is **more** accurate than the general asymptotic theory. 
+
+## Summary
+
+  - We built tests for structured covariance matrices using likelihood ratio tests.
+  - We also built a test for equality of covariance, when we have multiple samples.
+  - We briefly discussed asymptotic expansions and how they can give rise to better approximations of the likelihood ratio test statistics.
+  
