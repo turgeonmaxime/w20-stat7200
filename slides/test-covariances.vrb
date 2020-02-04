@@ -1,0 +1,38 @@
+\frametitle{Visualization}
+\protect\hypertarget{visualization}{}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# You can also visualize the covariances{-}{-}{-}{-}}
+\KeywordTok{library}\NormalTok{(heplots)}
+\NormalTok{rate <{-}}\StringTok{ }\KeywordTok{gl}\NormalTok{(K, }\DecValTok{10}\NormalTok{, }\DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Low"}\NormalTok{, }\StringTok{"High"}\NormalTok{))}
+\NormalTok{boxm\_res <{-}}\StringTok{ }\KeywordTok{boxM}\NormalTok{(Y, rate)}
+
+\CommentTok{\# You can plot the log generalized variances}
+\CommentTok{\# The plot function adds 95\% CI}
+\KeywordTok{plot}\NormalTok{(boxm\_res)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{test-covariances_files/figure-beamer/unnamed-chunk-18-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Finally you can also plot the ellipses}
+\CommentTok{\# as a way to compare the covariances}
+\KeywordTok{covEllipses}\NormalTok{(Y, rate, }\DataTypeTok{center =} \OtherTok{TRUE}\NormalTok{, }
+            \DataTypeTok{label.pos =} \StringTok{\textquotesingle{}bottom\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{test-covariances_files/figure-beamer/unnamed-chunk-19-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Or all pairwise comparisons together}
+\KeywordTok{covEllipses}\NormalTok{(Y, rate, }\DataTypeTok{center =} \OtherTok{TRUE}\NormalTok{, }
+            \DataTypeTok{label.pos =} \StringTok{\textquotesingle{}bottom\textquotesingle{}}\NormalTok{, }
+            \DataTypeTok{variables =} \DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{test-covariances_files/figure-beamer/unnamed-chunk-20-1.pdf}
