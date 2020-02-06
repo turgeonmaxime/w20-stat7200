@@ -17,3 +17,5 @@ content/practice/*
 static/practice/*
 !static/practice/*.pdf
 
+*.Rhistory
+*.DS_Store

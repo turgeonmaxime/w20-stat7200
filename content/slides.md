@@ -24,3 +24,5 @@ type: docs
     + [R code](test-covariances.R)
     + [R code](../download_winnipeg_temp_data.R) for downloading Winnipeg weather data
     + [Notes](../test-sphericity-details.pdf) on asymptotic expansions for the test of sphericity
+  - [Multivariate Analysis of Variance](manova.pdf)
+    + [R code](manova.R)
