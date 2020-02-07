@@ -1,0 +1,113 @@
+\frametitle{Example}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Recall our covariance matrix for the Ramus dataset}
+\KeywordTok{round}\NormalTok{(Sn, }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        Age8 Age8.5 Age9 Age9.5
+## Age8   6.33   6.19 5.78   5.55
+## Age8.5 6.19   6.45 6.15   5.92
+## Age9   5.78   6.15 6.92   6.95
+## Age9.5 5.55   5.92 6.95   7.46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Visually we get}
+\NormalTok{lattice}\OperatorTok{::}\KeywordTok{levelplot}\NormalTok{(Sn, }\DataTypeTok{xlab =} \StringTok{""}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-distribution_files/figure-beamer/unnamed-chunk-16-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Perhaps easier to interpret as correlations}
+\CommentTok{# But be careful with the scale!}
+\NormalTok{lattice}\OperatorTok{::}\KeywordTok{levelplot}\NormalTok{(}\KeywordTok{cov2cor}\NormalTok{(Sn), }
+                   \DataTypeTok{xlab =} \StringTok{""}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-distribution_files/figure-beamer/unnamed-chunk-17-1.pdf}
+
+Next, we will visualize the distribution of \(S_n\) using bootstrap.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{B <-}\StringTok{ }\DecValTok{1000}
+\NormalTok{n <-}\StringTok{ }\KeywordTok{nrow}\NormalTok{(dataset)}
+
+\NormalTok{boot_covs <-}\StringTok{ }\KeywordTok{lapply}\NormalTok{(}\KeywordTok{seq_len}\NormalTok{(B), }\ControlFlowTok{function}\NormalTok{(b) \{}
+\NormalTok{  data_boot <-}\StringTok{ }\NormalTok{dataset[}\KeywordTok{sample}\NormalTok{(n, n, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{),]}
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{cov}\NormalTok{(data_boot))}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Extract the diagonal entries}
+\NormalTok{diagonal <-}\StringTok{ }\NormalTok{purrr}\OperatorTok{::}\KeywordTok{map_df}\NormalTok{(boot_covs, }\ControlFlowTok{function}\NormalTok{(Sn) \{}
+\NormalTok{  tmp <-}\StringTok{ }\KeywordTok{diag}\NormalTok{(Sn)}
+  \KeywordTok{data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(tmp, }\DataTypeTok{nrow =} \DecValTok{1}\NormalTok{))}
+\NormalTok{  \})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Put into long format}
+\NormalTok{diag_plot <-}\StringTok{ }\KeywordTok{gather}\NormalTok{(diagonal, Entry, Value)}
+
+\KeywordTok{ggplot}\NormalTok{(diag_plot, }\KeywordTok{aes}\NormalTok{(Value, }\DataTypeTok{fill =}\NormalTok{ Entry)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.2}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-distribution_files/figure-beamer/unnamed-chunk-20-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Multivariate normal theory predicts}
+\CommentTok{# the diagonal entry should be scaled chi-square}
+\KeywordTok{ggplot}\NormalTok{(diag_plot, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{sample =}\NormalTok{ Value)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_qq}\NormalTok{(}\DataTypeTok{distribution =}\NormalTok{ qchisq, }
+          \DataTypeTok{dparams =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{df =}\NormalTok{ n }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme_minimal}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{facet_wrap}\NormalTok{(}\OperatorTok{~}\StringTok{ }\NormalTok{Entry) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_qq_line}\NormalTok{(}\DataTypeTok{distribution =}\NormalTok{ qchisq, }
+               \DataTypeTok{dparams =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{df =}\NormalTok{ n }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-distribution_files/figure-beamer/unnamed-chunk-21-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Finally, let's look at pairwise scatterplots }
+\CommentTok{# for off-diagonal entries}
+\NormalTok{off_diag <-}\StringTok{ }\NormalTok{purrr}\OperatorTok{::}\KeywordTok{map_df}\NormalTok{(boot_covs, }\ControlFlowTok{function}\NormalTok{(Sn) \{}
+\NormalTok{  tmp <-}\StringTok{ }\NormalTok{Sn[}\KeywordTok{upper.tri}\NormalTok{(Sn)]}
+  \KeywordTok{data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(tmp, }\DataTypeTok{nrow =} \DecValTok{1}\NormalTok{))}
+\NormalTok{  \})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Add column names}
+\KeywordTok{names}\NormalTok{(off_diag) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"8:"}\NormalTok{,}\KeywordTok{c}\NormalTok{(}\StringTok{"8.5"}\NormalTok{,}\StringTok{"9"}\NormalTok{,}\StringTok{"9.5"}\NormalTok{)),}
+                     \KeywordTok{paste0}\NormalTok{(}\StringTok{"8.5:"}\NormalTok{,}\KeywordTok{c}\NormalTok{(}\StringTok{"9"}\NormalTok{,}\StringTok{"9.5"}\NormalTok{)), }
+                     \StringTok{"9:9.5"}\NormalTok{)}
+
+\NormalTok{GGally}\OperatorTok{::}\KeywordTok{ggpairs}\NormalTok{(off_diag)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/wishart-distribution_files/figure-beamer/unnamed-chunk-23-1.pdf}
+

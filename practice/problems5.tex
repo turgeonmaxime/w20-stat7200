@@ -1,0 +1,123 @@
+\documentclass[12pt]{paper} 
+\usepackage{amsmath, amsfonts, amsthm} % Math packages
+\usepackage{listings} % Code listings, with syntax highlighting
+\usepackage[english]{babel} % English language hyphenation
+\usepackage{graphicx} % Required for inserting images
+\usepackage{booktabs} % Required for better horizontal rules in tables
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage{enumitem} % Required for list customisation
+\setlist{noitemsep} % No spacing between list items
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT MARGINS
+%----------------------------------------------------------------------------------------
+
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+
+\geometry{
+	paper=letterpaper, % Paper size, change to letterpaper for US letter size
+	top=2.5cm, % Top margin
+	bottom=3cm, % Bottom margin
+	left=3cm, % Left margin
+	right=3cm, % Right margin
+	headheight=0.75cm, % Header height
+	footskip=1.5cm, % Space from the bottom margin to the baseline of the footer
+	headsep=0.75cm, % Space from the top margin to the baseline of the header
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Use 8-bit encoding
+
+\usepackage{fourier} % Use the Adobe Utopia font for the document
+
+%----------------------------------------------------------------------------------------
+%	HEADERS AND FOOTERS
+%----------------------------------------------------------------------------------------
+
+\usepackage{scrlayer-scrpage} % Required for customising headers and footers
+
+\ohead*{} % Right header
+\ihead*{} % Left header
+\chead*{} % Centre header
+
+\ofoot*{} % Right footer
+\ifoot*{} % Left footer
+\cfoot*{\pagemark} % Centre footer
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+Problem Set 5--STAT 7200
+}
+
+\author{} % Your name
+\date{} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+
+\begin{enumerate}
+	\item\label{prob:anova} Consider the following mixed-effect ANOVA model:
+	$$ Y_{ij} = \mu + \delta_i + \tau_j + \epsilon_{ij}, \quad i=1, \ldots, n, \quad j = 1, \ldots, p,$$
+	where $\delta_i \sim N(0, \sigma^2_\delta)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$ are all mutually independent. The parameters $\mu$ and $\tau_j$ are unknown, and they satisfy the constraint $\sum_{j=1}^p \tau_j = 0$. Let $\mathbf{Y}_i = (Y_{i1}, \ldots, Y_{ip})$ and show that
+	\begin{align*}
+	E(\mathbf{Y}_i) &= (\mu + \beta_1, \mu + \beta_p),\\
+	\mathrm{Cov}(\mathbf{Y}_i) &= \sigma^2_\delta \mathbf{1}_p\mathbf{1}_p^T + \sigma^2 I_p.
+	\end{align*}
+	Moreover, show that $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ are independent and identically distributed $N_p(\boldsymbol{\eta}, \Sigma_s)$, where
+	\begin{align*}
+	\boldsymbol{\eta} &= (\mu + \beta_1, \mu + \beta_p),\\
+	\Sigma_s &= \sigma^2_\delta \mathbf{1}_p\mathbf{1}_p^T + \sigma^2 I_p.
+	\end{align*} 
+	
+	\vspace{1.5cm}\item Using the same notation as Problem~\ref{prob:anova}: let $H = (h_1, H_2)$ be a $p\times p$ matrix whose first column is $h_1$ is $\frac{1}{\sqrt{p}}\mathbf{1}_p$. Consider the transformation
+	$$ \mathbf{X}_i = H^T_2 \mathbf{Y}_i, \quad i=1,\ldots, n.$$
+	Show that $\mathbf{X}_1, \ldots,\mathbf{X}_n$ are independent and normally distributed $N_p(0, \boldsymbol{\xi}, \sigma^2I_{p-1})$, where $\boldsymbol{\xi} = H^T_2\boldsymbol{\eta}$. Use this property to construct a test for $H_0: \Sigma = \Sigma_s$.
+	
+	\vspace{1.5cm}\item Given a random sample $\mathbf{Y}_i\sim N_p(\mu, \Sigma)$, $i=1,\ldots, n$, with $\Sigma$ positive definite, show that the likelihood ratio test for
+	$$ H_0 : \Sigma = \gamma \Sigma_0,$$
+	where $\Sigma_0$ is known, is given by
+	$$\Lambda^{2/n} = \frac{\lvert \Sigma_0^{-1}V \rvert}{\left(\frac{1}{p} \mathrm{tr} \Sigma_0^{-1}V \right)^p}.$$
+	Give an approximation to its distribution under $H_0$.
+	
+	\vspace{1.5cm}\item Let $\mathbf{Y}_{\ell 1}, \ldots, \mathbf{Y}_{\ell n_\ell} \sim N_p(\mu_\ell, \Sigma)$, with $\ell = 1, \ldots, g$. Suppose that we decompose $\mathbf{Y}_{\ell i} = (\mathbf{Y}_{\ell i}^1, \mathbf{Y}_{\ell i}^2)$. Accordingly, we can decompose
+	$$\mu_\ell = (\mu_{1\ell}, \mu_{2\ell}), \quad W = \begin{pmatrix}
+	W_{11} & W_{12}\\ W_{21} & W_{22}\end{pmatrix}, \quad T = \begin{pmatrix}
+	T_{11} & T_{12}\\ T_{21} & T_{22}\end{pmatrix},$$  
+	where $T = W + B$.
+	
+	Assume that the second components of the means are equal, i.e.\ $\mu_{21} = \cdots = \mu_{2g}$. Consider the hypothesis test where $H_0$ is that the \emph{first} components of the means are equal, i.e.\ $H_0: \mu_{11} = \cdots = \mu_{1g}$.\footnote{This is called the \emph{multivariate analysis of covariance}.} Show that the likelihood ratio $\Lambda$ is given by 
+	$$ \Lambda^{2/n} = \frac{\lvert W_{11\mid 2}\rvert}{\lvert T_{11\mid 2}\rvert} = \frac{\lvert W \rvert}{\lvert T \rvert} \left(\frac{\lvert W_{11} \rvert}{\lvert T_{11} \rvert}\right)^{-1},$$ 
+	where $W_{11\mid 2} = W_{11} - W_{12}W_{22}^{-1}W_{21}$ and similarly for $T_{11\mid 2}$.
+	
+	\vspace{1.5cm}\item\label{prob:testStat} Let $\lambda_1, \ldots, \lambda_s$ be the eigenvalues of the matrix $W^{-1}B$, where $s = \min(p, g-1)$ and where $W,B$ are the within (and between) sum of squares and cross-products from MANOVA. Show that the following equalities hold:
+	\begin{align*}
+	 \frac{\lvert W \rvert}{\lvert B + W \rvert} &= \prod_{i=1}^s\frac{1}{1 + \lambda_i} \\
+	 \mathrm{tr}\left( B(B+W)^{-1}\right)&= \sum_{i=1}^s\frac{\lambda_i}{1 + \lambda_i} \\
+	 \mathrm{tr}\left( W^{-1}B\right) &= \sum_{i=1}^s\lambda_i.
+	\end{align*}
+	
+	\vspace{1.5cm}\item Using the same notation as Problem~\ref{prob:testStat}, show that
+	\begin{enumerate}
+		\item $\mathrm{tr} B (W + B)^{-1} \leq -\log \frac{\lvert W \rvert}{\lvert W + B \rvert} \leq \mathrm{tr} BW^{-1}$;
+		\item $\sum_{i=1}^{s} \frac{\lambda_i}{1 + \lambda_i} \leq \log\prod_{i=1}^s (1 + \lambda_i)\leq \sum_{i=1}^s \lambda_i$.
+	\end{enumerate}
+	
+\end{enumerate}
+
+\end{document}
