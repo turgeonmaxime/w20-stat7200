@@ -56,6 +56,8 @@ for (source in practice_sources) {
   if (require_rebuild(problem_pdf, source)) {
     system2("pdflatex", c("-output-directory=static/practice", source), 
             stdout = FALSE)
+    system2("pdflatex", c("-output-directory=static/practice", source), 
+            stdout = FALSE)
   }
 }
 
