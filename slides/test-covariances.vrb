@@ -1,0 +1,56 @@
+\frametitle{Simulation}
+\protect\hypertarget{simulation}{}
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{7200}\NormalTok{)}
+
+\CommentTok{\# Simulation parameters}
+\NormalTok{n <{-}}\StringTok{ }\DecValTok{10}
+\NormalTok{p <{-}}\StringTok{ }\DecValTok{2}
+\NormalTok{B <{-}}\StringTok{ }\DecValTok{1000}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generate data}
+\NormalTok{lrt\_dist <{-}}\StringTok{ }\KeywordTok{replicate}\NormalTok{(B, \{}
+\NormalTok{  Y <{-}}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(n}\OperatorTok{*}\NormalTok{p), }\DataTypeTok{ncol =}\NormalTok{ p)}
+\NormalTok{  V <{-}}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(Y)}
+  \CommentTok{\# log Lambda}
+  \FloatTok{0.5}\OperatorTok{*}\NormalTok{n}\OperatorTok{*}\NormalTok{(}\KeywordTok{log}\NormalTok{(}\KeywordTok{det}\NormalTok{(V)) }\OperatorTok{{-}}\StringTok{ }\NormalTok{p}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{diag}\NormalTok{(V))))}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# General asymptotic result}
+\NormalTok{df <{-}}\StringTok{ }\KeywordTok{choose}\NormalTok{(p }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{general\_chisq <{-}}\StringTok{ }\KeywordTok{rchisq}\NormalTok{(B, }\DataTypeTok{df =}\NormalTok{ df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bartlett\textquotesingle{}s correction}
+\NormalTok{df <{-}}\StringTok{ }\KeywordTok{choose}\NormalTok{(p }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{) }\OperatorTok{{-}}\StringTok{ }\DecValTok{1}
+\NormalTok{const <{-}}\StringTok{ }\NormalTok{(}\DecValTok{6}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(n}\DecValTok{{-}1}\NormalTok{) }\OperatorTok{{-}}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{\^{}}\DecValTok{2} \OperatorTok{+}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\DecValTok{2}\NormalTok{))}\OperatorTok{/}\NormalTok{(}\DecValTok{6}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{n)}
+\NormalTok{bartlett\_chisq <{-}}\StringTok{ }\KeywordTok{rchisq}\NormalTok{(B, }\DataTypeTok{df =}\NormalTok{ df)}\OperatorTok{/}\NormalTok{const}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot empirical CDFs}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{ecdf}\NormalTok{(}\OperatorTok{{-}}\DecValTok{2}\OperatorTok{*}\NormalTok{lrt\_dist), }\DataTypeTok{main =} \StringTok{"{-}2 log Lambda"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(}\KeywordTok{ecdf}\NormalTok{(general\_chisq), }\DataTypeTok{col =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(}\KeywordTok{ecdf}\NormalTok{(bartlett\_chisq), }\DataTypeTok{col =} \StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{\textquotesingle{}bottomright\textquotesingle{}}\NormalTok{, }
+       \DataTypeTok{legend =} \KeywordTok{c}\NormalTok{(}\StringTok{"{-}2log Lambda"}\NormalTok{, }\StringTok{"General approx."}\NormalTok{, }
+                  \StringTok{"Bartlett"}\NormalTok{),}
+       \DataTypeTok{lty =} \DecValTok{1}\NormalTok{, }\DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{\textquotesingle{}black\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/Users/maxturgeon/Documents/git_repos/w20-stat7200/static/slides/test-covariances_files/figure-beamer/unnamed-chunk-25-1.pdf}
