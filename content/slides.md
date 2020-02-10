@@ -26,3 +26,6 @@ type: docs
     + [Notes](../test-sphericity-details.pdf) on asymptotic expansions for the test of sphericity
   - [Multivariate Analysis of Variance](manova.pdf)
     + [R code](manova.R)
+  - [Multivariate Linear Regression](multivariate-linear-regression.pdf)
+    + [R code](multivariate-linear-regression.R)
+    
