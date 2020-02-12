@@ -17,6 +17,12 @@ header-includes:
 ```{r,setup, include=FALSE}
 knitr::opts_chunk$set(cache=FALSE)
 options(knitr.kable.NA = '-')
+library(pander)
+
+panderOptions('round', 2)
+panderOptions('keep.trailing.zeros', TRUE)
+# No caption
+set.caption("", permanent = TRUE)
 ```
 
 ## Objectives
@@ -24,6 +30,7 @@ options(knitr.kable.NA = '-')
   - Introduce the linear regression model for a multivariate outcome
   - Discuss inference for the regression parameters
   - Discuss model selection
+  - Discuss influence measures
 
 ## Multivariate Linear Regression model
 
@@ -166,7 +173,7 @@ isZero(crossprod(X, residuals))
   - **Theorem**: Suppose $\mathbb{X}$ has full rank $q+1$, and assume that $n \geq q + p +1$. Then the least-squares estimator $\hat{B} = (\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}$ of $B$ is also the *maximum likelihood estimator*. Moreover, we have
     1. $\hat{B}$ is normally distributed.
     2. The maximum likelihood estimator for $\Sigma$ is $\hat{\Sigma} = \frac{1}{n}\hat{\mathbb{E}}^T\hat{\mathbb{E}}$.
-    3. $n\hat{\Sigma}$ follows a Wishart distribution $W_{n-q-1}(\Sigma)$ on $n-q-1$ degrees of freedom.
+    3. $n\hat{\Sigma}$ follows a Wishart distribution $W_{p}(n-q-1, \Sigma)$ on $n-q-1$ degrees of freedom.
     4. The maximised likelihood is $L(\hat{B}, \hat{\Sigma}) = (2\pi)^{-np/2}\lvert\hat{\Sigma}\rvert^{-n/2}\exp(-pn/2)$.
   - **Note**: Looking at the degrees of freedom of the Wishart distribution, we can infer that $\hat{\Sigma}$ is a biased estimator of $\Sigma$. An *unbiased* estimator is 
   $$S = \frac{1}{n-q-1}\hat{\mathbb{E}}^T\hat{\mathbb{E}}.$$
@@ -181,6 +188,27 @@ isZero(crossprod(X, residuals))
 <!--   - If we take the (natural) logarithm of $L$ and drop any term that does not depend on $(B,\Sigma)$, we get -->
 <!--   $$\ell = -\frac{n}{2}\log\lvert\Sigma\rvert - \frac{1}{2}\sum_{i=1}^n(\mathbf{Y}_i - B^T\mathbf{X}_i)^T\Sigma^{-1}(\mathbf{Y}_i - B^T\mathbf{X}_i).$$ -->
 <!--   - Just as with the multivariate normal model, we can maximise for $B$ and $\Sigma$ independently: -->
+
+## Example {.allowframebreaks}
+
+```{r, message = FALSE}
+library(heplots)
+
+head(NLSY)
+```
+
+```{r}
+# Fit model and look at coefficients
+fit <- lm(cbind(math, read) ~ income + educ, 
+          data = NLSY)
+
+coef(fit)
+```
+
+```{r}
+range(NLSY$income)
+range(NLSY$educ)
+```
 
 ## Confidence and Prediction Regions {.allowframebreaks}
 
@@ -212,7 +240,7 @@ isZero(crossprod(X, residuals))
 ## Example {.allowframebreaks}
 
 ```{r}
-# Recall our model
+# Recall our model for Plastic
 fit <- lm(cbind(tear, gloss, opacity) ~ rate, 
           data = Plastic)
 
@@ -281,7 +309,7 @@ cbind(drop(prediction) - 1.96*sqrt(diag(fct_cov)),
   - Under our assumptions about the rank of $\mathbb{X}$ and the sample size, $E$ is (almost surely) invertible, and therefore we can look at the nonzero eigenvalues of $HE^{-1}$:
     + Let $\eta_1 \geq \cdots \geq \eta_s$ be those nonzero eigenvalues, where $s = \min(p, q - r)$.
     + Equivalently, these eigenvalues are the nonzero roots of the determinantal equation $\det\left((\hat{\Sigma}_1 - \hat{\Sigma}) - \eta\hat{\Sigma}\right) = 0$.
-  - The four classical multivariate test statistics are:
+  - Recall the four classical multivariate test statistics:
   \begin{align*}
   \mbox{Wilks' lambda} &: \prod_{i=1}^s\frac{1}{1 + \eta_i} = \frac{\lvert E \rvert}{\lvert E + H \rvert}\\
   \mbox{Pillai's trace} &: \sum_{i=1}^s\frac{\eta_i}{1 + \eta_i} = \mathrm{tr}\left( H(H+E)^{-1}\right)\\
@@ -294,45 +322,40 @@ cbind(drop(prediction) - 1.96*sqrt(diag(fct_cov)),
 
 ## Example {.allowframebreaks}
 
-```{r, warning = FALSE}
-# Going back to our example
-full_model <- lm(cbind(tear, gloss, 
-                       opacity) ~ rate*additive, 
-                 data = Plastic)
+```{r, warning = FALSE, digits = 2}
+# Going back to our NLSY example
+full_model <- lm(cbind(math, read) ~ income + educ + 
+                   antisoc + hyperact,
+                 data = NLSY)
 
-anova(full_model, test = "Wilks") %>% 
-  broom::tidy()  %>% 
-  knitr::kable(digits = 3)
+library(pander)
+pander(anova(full_model, test = "Wilks"))
 
-anova(full_model, test = "Roy") %>% 
-  broom::tidy()  %>% 
-  knitr::kable(digits = 3)
+pander(anova(full_model, test = "Roy"))
 ```
 
+```{r}
+# Visualize the error and hypothesis ellipses
+heplot(full_model)
+```
+
+
 ```{r, warning = FALSE}
-# Fit a model with only rate
-rate_model <- lm(cbind(tear, gloss, 
-                       opacity) ~ rate, 
-                 data = Plastic)
+# Fit a model with only income and educ
+rest_model <- lm(cbind(math, read) ~ income + educ,
+                 data = NLSY)
 
-# Removing the dfs from approx
-anova(full_model, rate_model,
-      test = "Wilks") %>% 
-  broom::tidy()  %>% 
-  dplyr::select(-num.Df, -den.Df) %>% 
-  knitr::kable(digits = 3)
+pander(anova(full_model, rest_model,
+             test = "Wilks"))
 
-anova(full_model, rate_model,
-      test = "Roy") %>% 
-  broom::tidy()  %>% 
-  dplyr::select(-num.Df, -den.Df) %>% 
-  knitr::kable(digits = 3)
+pander(anova(full_model, rest_model,
+             test = "Roy"))
 ```
 
 ```{r}
 # Let's look at the eigenvalues
 E <- crossprod(residuals(full_model))
-H <- crossprod(residuals(rate_model)) - E
+H <- crossprod(residuals(rest_model)) - E
 
 result <- eigen(H %*% solve(E),
                 only.values = TRUE)
@@ -375,10 +398,8 @@ class(full_model)
 logLik.mlm <- function(object, ...) {
   resids <- residuals(object)
   Sigma_ML <- crossprod(resids)/nrow(resids)
-  ans <- sum(mvtnorm::dmvnorm(resids, 
-                              sigma = Sigma_ML, 
-                              log = TRUE))
-  
+  ans <- sum(mvtnorm::dmvnorm(resids, log = TRUE,
+                              sigma = Sigma_ML))
   df <- prod(dim(coef(object))) + 
     choose(ncol(Sigma_ML) + 1, 2)
   attr(ans, "df") <- df
@@ -387,19 +408,18 @@ logLik.mlm <- function(object, ...) {
 }
 ```
 
----
 
 ```{r}
 logLik(full_model)
 
 AIC(full_model)
-AIC(rate_model)
+AIC(rest_model)
 ```
 
 ## Example of model selection {.allowframebreaks}
 
 ```{r}
-# Model selection
+# Model selection for Plastic data
 lhs <- "cbind(tear, gloss, opacity) ~"
 rhs_form <- c("1", "rate", "additive", 
               "rate+additive", "rate*additive")
@@ -410,6 +430,19 @@ purrr::map_df(rhs_form, function(rhs) {
   return(data.frame(model = rhs, aic = AIC(fit),
                     stringsAsFactors = FALSE))
 })
+```
+
+```{r, message = FALSE, echo = FALSE, eval = FALSE}
+# Full subset selection for NLSY data
+library(leaps)
+# DOESNT WORK
+out <- regsubsets(cbind(math, read) ~ income + educ + 
+                   antisoc + hyperact,
+                 data = NLSY,
+                 nbest = 1,
+                 nvmax = NULL,
+                 force.in = NULL, force.out = NULL,
+                 method = "exhaustive")
 ```
 
 ## Multivariate Influence Measures {.allowframebreaks}
