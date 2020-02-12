@@ -1,6 +1,12 @@
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(cache=FALSE)
 options(knitr.kable.NA = '-')
+library(pander)
+
+panderOptions('round', 2)
+panderOptions('keep.trailing.zeros', TRUE)
+# No caption
+set.caption("", permanent = TRUE)
 
 
 ## ---- message = FALSE---------------------------------------------------------
@@ -45,8 +51,27 @@ isZero(crossprod(Y_hat, residuals))
 isZero(crossprod(X, residuals))
 
 
+## ---- message = FALSE---------------------------------------------------------
+library(heplots)
+
+head(NLSY)
+
+
 ## -----------------------------------------------------------------------------
-# Recall our model
+# Fit model and look at coefficients
+fit <- lm(cbind(math, read) ~ income + educ, 
+          data = NLSY)
+
+coef(fit)
+
+
+## -----------------------------------------------------------------------------
+range(NLSY$income)
+range(NLSY$educ)
+
+
+## -----------------------------------------------------------------------------
+# Recall our model for Plastic
 fit <- lm(cbind(tear, gloss, opacity) ~ rate, 
           data = Plastic)
 
@@ -81,45 +106,39 @@ cbind(drop(prediction) - 1.96*sqrt(diag(fct_cov)),
       drop(prediction) + 1.96*sqrt(diag(fct_cov)))
 
 
+## ---- warning = FALSE, digits = 2---------------------------------------------
+# Going back to our NLSY example
+full_model <- lm(cbind(math, read) ~ income + educ + 
+                   antisoc + hyperact,
+                 data = NLSY)
+
+library(pander)
+pander(anova(full_model, test = "Wilks"))
+
+pander(anova(full_model, test = "Roy"))
+
+
+## -----------------------------------------------------------------------------
+# Visualize the error and hypothesis ellipses
+heplot(full_model)
+
+
 ## ---- warning = FALSE---------------------------------------------------------
-# Going back to our example
-full_model <- lm(cbind(tear, gloss, 
-                       opacity) ~ rate*additive, 
-                 data = Plastic)
+# Fit a model with only income and educ
+rest_model <- lm(cbind(math, read) ~ income + educ,
+                 data = NLSY)
 
-anova(full_model, test = "Wilks") %>% 
-  broom::tidy()  %>% 
-  knitr::kable(digits = 3)
+pander(anova(full_model, rest_model,
+             test = "Wilks"))
 
-anova(full_model, test = "Roy") %>% 
-  broom::tidy()  %>% 
-  knitr::kable(digits = 3)
-
-
-## ---- warning = FALSE---------------------------------------------------------
-# Fit a model with only rate
-rate_model <- lm(cbind(tear, gloss, 
-                       opacity) ~ rate, 
-                 data = Plastic)
-
-# Removing the dfs from approx
-anova(full_model, rate_model,
-      test = "Wilks") %>% 
-  broom::tidy()  %>% 
-  dplyr::select(-num.Df, -den.Df) %>% 
-  knitr::kable(digits = 3)
-
-anova(full_model, rate_model,
-      test = "Roy") %>% 
-  broom::tidy()  %>% 
-  dplyr::select(-num.Df, -den.Df) %>% 
-  knitr::kable(digits = 3)
+pander(anova(full_model, rest_model,
+             test = "Roy"))
 
 
 ## -----------------------------------------------------------------------------
 # Let's look at the eigenvalues
 E <- crossprod(residuals(full_model))
-H <- crossprod(residuals(rate_model)) - E
+H <- crossprod(residuals(rest_model)) - E
 
 result <- eigen(H %*% solve(E),
                 only.values = TRUE)
@@ -137,10 +156,8 @@ class(full_model)
 logLik.mlm <- function(object, ...) {
   resids <- residuals(object)
   Sigma_ML <- crossprod(resids)/nrow(resids)
-  ans <- sum(mvtnorm::dmvnorm(resids, 
-                              sigma = Sigma_ML, 
-                              log = TRUE))
-  
+  ans <- sum(mvtnorm::dmvnorm(resids, log = TRUE,
+                              sigma = Sigma_ML))
   df <- prod(dim(coef(object))) + 
     choose(ncol(Sigma_ML) + 1, 2)
   attr(ans, "df") <- df
@@ -153,11 +170,11 @@ logLik.mlm <- function(object, ...) {
 logLik(full_model)
 
 AIC(full_model)
-AIC(rate_model)
+AIC(rest_model)
 
 
 ## -----------------------------------------------------------------------------
-# Model selection
+# Model selection for Plastic data
 lhs <- "cbind(tear, gloss, opacity) ~"
 rhs_form <- c("1", "rate", "additive", 
               "rate+additive", "rate*additive")
@@ -168,6 +185,19 @@ purrr::map_df(rhs_form, function(rhs) {
   return(data.frame(model = rhs, aic = AIC(fit),
                     stringsAsFactors = FALSE))
 })
+
+
+## ---- message = FALSE, echo = FALSE, eval = FALSE-----------------------------
+## # Full subset selection for NLSY data
+## library(leaps)
+## # DOESNT WORK
+## out <- regsubsets(cbind(math, read) ~ income + educ +
+##                    antisoc + hyperact,
+##                  data = NLSY,
+##                  nbest = 1,
+##                  nvmax = NULL,
+##                  force.in = NULL, force.out = NULL,
+##                  method = "exhaustive")
 
 
 ## ---- message = FALSE---------------------------------------------------------
