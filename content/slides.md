@@ -28,4 +28,4 @@ type: docs
     + [R code](manova.R)
   - [Multivariate Linear Regression](multivariate-linear-regression.pdf)
     + [R code](multivariate-linear-regression.R)
-    
+    + [R code](../all_subset_selection.R) on all subset selection
