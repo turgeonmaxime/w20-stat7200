@@ -1,0 +1,73 @@
+\frametitle{Example}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(mvtnorm)}
+\NormalTok{n <-}\StringTok{ }\DecValTok{1000}
+\NormalTok{mu <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{Sigma <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{ncol =} \DecValTok{2}\NormalTok{)}
+\CommentTok{# Recall the multivariate case}
+\NormalTok{Y_norm <-}\StringTok{ }\KeywordTok{rmvnorm}\NormalTok{(n, }\DataTypeTok{mean =}\NormalTok{ mu, }\DataTypeTok{sigma =}\NormalTok{ Sigma)}
+
+\KeywordTok{colMeans}\NormalTok{(Y_norm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.010602 1.990707
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cov}\NormalTok{(Y_norm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           [,1]      [,2]
+## [1,] 0.9937129 0.5059292
+## [2,] 0.5059292 0.9983259
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Now the t distribution}
+\NormalTok{nu <-}\StringTok{ }\DecValTok{4}
+\NormalTok{Y_t <-}\StringTok{ }\KeywordTok{rmvt}\NormalTok{(n, }\DataTypeTok{sigma =}\NormalTok{ Sigma, }\DataTypeTok{df =}\NormalTok{ nu, }\DataTypeTok{delta =}\NormalTok{ mu)}
+
+\KeywordTok{colMeans}\NormalTok{(Y_t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.054561 2.041417
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cov}\NormalTok{(Y_t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           [,1]      [,2]
+## [1,] 1.8399561 0.9004441
+## [2,] 0.9004441 1.9164044
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data_plot <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(}
+  \KeywordTok{mutate}\NormalTok{(}\KeywordTok{data.frame}\NormalTok{(Y_norm), }\DataTypeTok{dist =} \StringTok{"normal"}\NormalTok{),}
+  \KeywordTok{mutate}\NormalTok{(}\KeywordTok{data.frame}\NormalTok{(Y_t), }\DataTypeTok{dist =} \StringTok{"t"}\NormalTok{)}
+\NormalTok{)}
+
+\KeywordTok{ggplot}\NormalTok{(data_plot, }\KeywordTok{aes}\NormalTok{(X1, X2)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.25}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_density_2d}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{facet_grid}\NormalTok{(}\OperatorTok{~}\StringTok{ }\NormalTok{dist, }\DataTypeTok{labeller =}\NormalTok{ label_both)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/home/turgeonm/Documents/git_repos/w20-stat7200/static/slides/elliptical-distributions_files/figure-beamer/unnamed-chunk-14-1.pdf}
+
