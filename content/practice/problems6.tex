@@ -1,0 +1,98 @@
+\documentclass[12pt]{paper} 
+\usepackage{amsmath, amsfonts, amsthm} % Math packages
+\usepackage{listings} % Code listings, with syntax highlighting
+\usepackage[english]{babel} % English language hyphenation
+\usepackage{graphicx} % Required for inserting images
+\usepackage{booktabs} % Required for better horizontal rules in tables
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage{enumitem} % Required for list customisation
+\setlist{noitemsep} % No spacing between list items
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT MARGINS
+%----------------------------------------------------------------------------------------
+
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+
+\geometry{
+	paper=letterpaper, % Paper size, change to letterpaper for US letter size
+	top=2.5cm, % Top margin
+	bottom=3cm, % Bottom margin
+	left=3cm, % Left margin
+	right=3cm, % Right margin
+	headheight=0.75cm, % Header height
+	footskip=1.5cm, % Space from the bottom margin to the baseline of the footer
+	headsep=0.75cm, % Space from the top margin to the baseline of the header
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Use 8-bit encoding
+
+\usepackage{fourier} % Use the Adobe Utopia font for the document
+
+%----------------------------------------------------------------------------------------
+%	HEADERS AND FOOTERS
+%----------------------------------------------------------------------------------------
+
+\usepackage{scrlayer-scrpage} % Required for customising headers and footers
+
+\ohead*{} % Right header
+\ihead*{} % Left header
+\chead*{} % Centre header
+
+\ofoot*{} % Right footer
+\ifoot*{} % Left footer
+\cfoot*{\pagemark} % Centre footer
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+Problem Set 6--STAT 7200
+}
+
+\author{} % Your name
+\date{} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+
+\begin{enumerate}
+	\item We discussed in class how $\hat{\mathbb{Y}} = P \mathbb{Y} = \mathbb{X}\hat{B}$ is the projection of $\mathbb{Y}$ on the column space $\mathcal{V}$ of $\mathbb{X}$:
+	$$\mathcal{V} = \left\{\mathbb{X}A \mid A\mbox{ is a }(q+1)\times p\mbox{ matrix} \right\}.$$
+	Use this fact to show that $\mathbb{X}\hat{B}$ is also the solution to the following least squares problem:
+	$$\min_{V \in \mathcal{V}}\mathrm{tr}\left(\Omega(\mathbb{Y} - V)^T(\mathbb{Y} - V)\right),$$ 
+	where $\Omega$ is an arbitrary $p\times p$ positive definite matrix.
+	
+	\vspace{1.5cm}\item For this question, we will use the \texttt{sheishu} dataset in the package \texttt{ACSWR}:
+	\begin{verbatim}
+	> library(ACSWR)
+	> data(sheishu)
+	\end{verbatim}
+	Answer the following questions:
+	\begin{enumerate}
+		\item Find the least squares estimate $\hat{B}$ for the regression of (\texttt{Taste}, \texttt{Odor}) on the other eight covariates, and test for overall significance.
+		\item Test the significance of (\texttt{Alcohol}, \texttt{Formyl\_nitrogen}) adjusted for the other covariates.
+		\item Test the significance of (\texttt{Sake\_meter}, \texttt{Direct\_reducing\_sugar}, \texttt{Total\_sugar}) adjusted for the other covariates.
+		\item Test the significance of (\texttt{pH}, \texttt{Acidity\_1}, \texttt{Acidity\_2}) adjusted for the other covariates.
+		\item Using all subset selection, find the model with the lowest AIC.
+	\end{enumerate}
+
+	
+\end{enumerate}
+
+\end{document}
