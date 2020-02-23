@@ -18,9 +18,9 @@ type: docs
   - [Wishart Distribution](wishart-distribution.pdf)
     + [R code](wishart-distribution.R)
     + [Blog post](http://djalil.chafai.net/blog/2015/10/20/bartlett-decomposition-and-other-factorizations/) on different decompositions for random matrices
-  - [Test for multivariate means](test-means.pdf)
+  - [Test for Multivariate Means](test-means.pdf)
     + [R code](test-means.R)
-  - [Test for covariance matrices](test-covariances.pdf)
+  - [Test for Covariance Matrices](test-covariances.pdf)
     + [R code](test-covariances.R)
     + [R code](../download_winnipeg_temp_data.R) for downloading Winnipeg weather data
     + [Notes](../test-sphericity-details.pdf) on asymptotic expansions for the test of sphericity
@@ -29,3 +29,7 @@ type: docs
   - [Multivariate Linear Regression](multivariate-linear-regression.pdf)
     + [R code](multivariate-linear-regression.R)
     + [R code](../all_subset_selection.R) on all subset selection
+  - [Penalized Regression](penalized-regression.pdf)
+    + [R code](penalized-regression.R)
+  - Principal Component Analysis
+    
