@@ -1,0 +1,322 @@
+---
+title: "Penalized Regression"
+draft: true
+source: true
+output: binb::metropolis
+fontsize: 12pt
+author: Max Turgeon
+institute: STAT 7200--Multivariate Statistics
+header-includes:
+  - \usefonttheme{professionalfonts}
+  - \usepackage{graphicx}
+  - \usepackage{tikzpagenodes}
+  - \usetikzlibrary{calc}
+  - \usepackage{caption}
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE)
+```
+
+## Objectives
+
+  - Introduce ridge regression and discuss the bias-variance trade-off
+  - Introduce Lasso regression and discuss variable selection
+  - Discuss cross-validation for parameter tuning
+
+## Recall: Least Squares Estimation {.allowframebreaks}
+
+  - Let $\mathbf{Y}_1\ldots,\mathbf{Y}_n$ be a random sample of size $n$, and let $\mathbf{X}_1, \ldots, \mathbf{X}_n$ be the corresponding sample of covariates.
+    + $\mathbf{Y}_i$ and $\mathbf{X}_i$ are of dimension $p$ and $q$, respectively.
+  - We will write $\mathbb{Y}$ and $\mathbb{X}$ for the matrices whose $i$-th row is $\mathbf{Y}_i$ and $\mathbf{X}_i$, respectively.
+  - From the linear model assumption, we can then write $E(\mathbb{Y}\mid \mathbb{X}) = \mathbb{X}B$.
+  - The least-squares criterion is given by
+    $$LS(B) = \mathrm{tr}\left[(\mathbb{Y} - \mathbb{X}B)^T(\mathbb{Y} - \mathbb{X}B)\right].$$
+  - The minimum is attained at at
+    $$\hat{B} = (\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}.$$
+  - The least-squares estimator is *unbiased*:
+   $$E(\hat{B}\mid\mathbb{X}) = B.$$
+   - If we let $\hat{\beta}_i$ be the $i$-th column of $\hat{B}$, we have
+   $$\mathrm{Cov}(\hat{\beta}_i, \hat{\beta}_j) = \sigma_{ij}(\mathbb{X}^T\mathbb{X})^{-1},$$
+   where $\sigma_{ij}$ is the $(i,j)$-th entry of $\Sigma = \mathrm{Cov}\left(\mathbf{Y}_i \mid \mathbf{X}_i\right)$.
+
+## Multicollinearity
+
+  - As we can see, the variance of the regression coefficients depend on the inverse of $\mathbb{X}^T\mathbb{X}$.
+  - **Multicollinearity** is when the columns of $\mathbb{X}$ are *almost* linearly dependent.
+    + Note: This can happen when a covariate is almost constant.
+  - As a consequence, $\mathbb{X}^T\mathbb{X}$ is nearly singular, and therefore the variance of the regression coefficients can blow up.
+
+## Ridge regression
+
+  - **Solution**: Add a small positive quantity along the diagonal of $\mathbb{X}^T\mathbb{X}$.
+    + $\mathbb{X}^T\mathbb{X} \to \mathbb{X}^T\mathbb{X} + \lambda I$
+  - The **Ridge estimator** of $B$ is given by
+  $$\hat{B}_{R} = (\mathbb{X}^T\mathbb{X} + \lambda I_q)^{-1}\mathbb{X}^T\mathbb{Y}.$$
+
+## Example {.allowframebreaks}
+
+```{r, message = FALSE}
+library(tidyverse)
+url <- "../../static/prostate.csv"
+prostate <- read_csv(url)
+
+# Separate into training and testing sets
+data_train <- filter(prostate, train == TRUE) %>% 
+  dplyr::select(-train)
+data_test <- filter(prostate, train == FALSE) %>% 
+  dplyr::select(-train)
+```
+
+```{r}
+# OLS
+model1 <- lm(lpsa ~ ., 
+             data = data_train)
+pred1 <- predict(model1, data_test)
+
+mean((data_test$lpsa - pred1)^2)
+```
+
+```{r}
+# Ridge regression
+X_train <- model.matrix(lpsa ~ ., 
+             data = data_train)
+Y_train <- data_train$lpsa
+
+B_ridge <- solve(crossprod(X_train) + diag(0.7, 9), 
+                 t(X_train)) %*% Y_train
+```
+
+```{r}
+X_test <- model.matrix(lpsa ~ ., 
+             data = data_test)
+
+pred2 <- X_test %*% B_ridge
+
+mean((data_test$lpsa - pred2)^2)
+```
+
+```{r}
+# Compare both estimates
+head(cbind(coef(model1), B_ridge))
+```
+
+## Bias-Variance tradeoff {.allowframebreaks}
+
+  - The ridge estimator is **biased**:
+  \begin{align*}
+  E(\hat{B}_R\mid\mathbb{X}) &= (\mathbb{X}^T\mathbb{X} + \lambda I_q)^{-1}\mathbb{X}E(\mathbb{Y}\mid\mathbb{X})\\
+    &= (\mathbb{X}^T\mathbb{X} + \lambda I_q)^{-1}\mathbb{X}^T\mathbb{X}B\\
+    &\neq B.
+  \end{align*}
+  - But the variance is potentially smaller:
+  $$\mathrm{Cov}(\hat{\beta}_i, \hat{\beta}_j) = \sigma_{ij}(\mathbb{X}^T\mathbb{X} + \lambda I_q)^{-1}\mathbb{X}^T\mathbb{X}(\mathbb{X}^T\mathbb{X} + \lambda I_q)^{-1}.$$
+  - This is an example of the classical **bias-variance tradeoff**:
+    + We increase bias and decrease variance.
+  - Ideally, this is done in such a way to reduce the **mean squared error**:
+  $$MSE = \frac{1}{n} \mathrm{tr}\left[(\mathbb{Y} - \hat{\mathbb{Y}})^T(\mathbb{Y} - \hat{\mathbb{Y}})\right].$$
+  - *Should we compute the MSE with the training of the test data?*
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+mse_df <- purrr::map_df(seq(0, 5, by = 0.1),
+                        function(lambda) {
+  B_ridge <- solve(crossprod(X_train) + diag(lambda, 9), 
+                 t(X_train)) %*% Y_train
+  pred2 <- X_test %*% B_ridge
+
+  mse <- mean((data_test$lpsa - pred2)^2)
+  return(data.frame(MSE = mse,
+                    lambda = lambda))
+  })
+```
+
+
+```{r}
+ols_mse <- mean((data_test$lpsa - pred1)^2)
+
+ggplot(mse_df, aes(lambda, MSE)) + 
+  geom_line() + theme_minimal() + 
+  geom_hline(yintercept = ols_mse)
+```
+
+## Regularized regression
+
+  - The ridge estimator can also be defined as a solution to a **regularized least squares problem**:
+  $$LS_R(B; \lambda) = \mathrm{tr}\left[(\mathbb{Y} - \mathbb{X}B)^T(\mathbb{Y} - \mathbb{X}B)\right] + \lambda \mathrm{tr}\left(B^TB\right).$$
+  - Yet another way to define the ridge estimator is as a solution to a **constrained least squares problem**:
+  $$\min_B\mathrm{tr}\left[(\mathbb{Y} - \mathbb{X}B)^T(\mathbb{Y} - \mathbb{X}B)\right],\qquad \mathrm{tr}\left(B^TB\right) \leq c.$$
+  
+## Solution path {.allowframebreaks}
+  
+```{r, message = FALSE}
+library(glmnet)
+
+# Fit for multiple values of lambda
+X_train <- model.matrix(lpsa ~ . - 1,
+                        data = data_train)
+ridge_fit <- glmnet(X_train, data_train$lpsa,
+                    alpha = 0,
+                    lambda = seq(0, 5, by = 0.1))
+```
+
+
+```{r, message = FALSE}
+# Plot the value of the coefficients
+# as a function of lambda
+plot(ridge_fit, xvar = "lambda")
+abline(h = 0, lty = 2)
+```
+
+## Constrained regression
+
+![](../../static/constrained_regression.png)
+  
+## Lasso regression
+
+  - **Lasso regression** puts a different constraint on the size of the regression coefficients $B$:
+    + Ridge regression: $\mathrm{tr}\left(B^TB\right) = \sum_{ij} B_{ij}^2 \leq c$
+    + Lasso regression: $\lVert B\rVert_1 = \sum_{ij} \lvert B_{ij}\rvert \leq c$
+  - Just as with ridge regression, this is also equivalent to a regularized least squares problem:
+  $$LS_L(B; \lambda) = \mathrm{tr}\left[(\mathbb{Y} - \mathbb{X}B)^T(\mathbb{Y} - \mathbb{X}B)\right] + \lambda \lVert B\rVert_1.$$
+  - **Major difference**: Lasso regression performs *variable selection*.
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+# Fit lasso regression along the same lambda sequence
+lasso_fit <- glmnet(X_train, data_train$lpsa, 
+                    alpha = 1, # For lasso regression
+                    lambda = seq(0, 5, by = 0.1))
+```
+
+
+```{r}
+X_test <- model.matrix(lpsa ~ . - 1,
+                       data = data_test)
+lasso_pred <- predict(lasso_fit, newx = X_test)
+lasso_mse <- apply(lasso_pred, 2, function(col) {
+  mean((data_test$lpsa - col)^2)
+})
+```
+
+```{r}
+lasso_mse_df <- data.frame(MSE = lasso_mse,
+                           lambda = seq(0, 5, by = 0.1))
+ggplot(mse_df, aes(lambda, MSE)) + 
+  geom_line() + theme_minimal() + 
+  geom_hline(yintercept = ols_mse) +
+  geom_line(data = lasso_mse_df, colour = 'red')
+```
+
+```{r}
+# Plot the value of the coefficients
+# as a function of lambda
+plot(lasso_fit, xvar = "lambda")
+abline(h = 0, lty = 2)
+```
+
+```{r}
+# Where is the min MSE?
+filter(lasso_mse_df, MSE == min(MSE))
+# What are the estimates?
+coef(lasso_fit, s = 4.9)
+```
+
+## Comments
+
+  - There are other forms of penalized regression:
+    + Elastic net, SCAD, adaptive lasso, group lasso, etc.
+  - They each have different *asymptotic* and *finite sample* properties.
+    + E.g. Lasso is asymptotically biased; Elastic net and SCAD are asymptotically unbiased.
+  - In general, how do we select $\lambda$ when we don't have a test set?
+    + **Answer**: Cross-validation.
+    
+## K-fold cross-validation
+
+  - Goal: Find the value of $\lambda$ that minimises the MSE on test data.
+  - $K$-fold cross-validation (CV) is a resampling technique that estimates the test error from the training data.
+  - It is also an efficient way to use all your data, as opposed to separating your data into a training and a testing subset.
+  
+## Algorithm
+
+Let $K > 1$ be a positive integer.
+
+  1. Separate your data into $K$ subsets of (approximately) equal size. 
+  2. For $k=1, \ldots, K$, put aside the $k$-th subset and use the remaining $K-1$ subsets to train your algorithm.
+  3. Using the trained algorithm, predict the values for the held out data.
+  4. Calculate $MSE_k$ as the Mean Squared Error for these predictions.
+  5. The overall MSE estimate is given by 
+  $$MSE = \frac{1}{K}\sum_{k=1}^K MSE_k.$$
+  
+## Example {.allowframebreaks}
+
+```{r}
+# Take all the data
+dataset <- dplyr::select(prostate, -train)
+dim(dataset)
+```
+
+```{r}
+set.seed(7200)
+library(caret)
+# 5-fold CV
+trainIndex <- createFolds(dataset$lpsa, k = 5)
+str(trainIndex)
+```
+
+```{r}
+# Define function to compute MSE
+compute_mse <- function(prediction, actual) {
+  # Recall: the prediction comes in an array
+  apply(prediction, 2, function(col) {
+    mean((actual - col)^2)
+    })
+}
+```
+
+
+```{r}
+MSEs <- sapply(trainIndex, function(indices){
+  X_train <- model.matrix(lpsa ~ . - 1,
+                          data = dataset[-indices,])
+  Y_train <- dataset$lpsa[-indices]
+  X_test <- model.matrix(lpsa ~ . - 1,
+                          data = dataset[indices,])
+  lasso_fit <- glmnet(X_train, Y_train, alpha = 1, 
+                      lambda = seq(0, 5, by = 0.1))
+  lasso_pred <- predict(lasso_fit, newx = X_test)
+  compute_mse(lasso_pred, dataset$lpsa[indices])
+  })
+```
+
+```{r}
+# Each column is for a different fold
+dim(MSEs)
+CV_MSE <- colMeans(MSEs)
+
+seq(0, 5, by = 0.1)[which.min(CV_MSE)]
+```
+
+```{r}
+# What are the estimates?
+coef(lasso_fit, s = 0.4)
+```
+
+```{r}
+# Conveniently, glmnet has a function for CV
+# It also chooses the lambda sequence for you
+X <- model.matrix(lpsa ~ . -1, data = dataset)
+lasso_cv_fit <- cv.glmnet(X, dataset$lpsa, alpha = 1,
+                          nfolds = 5)
+```
+
+
+```{r}
+# What are the estimates?
+coef(lasso_cv_fit, s = 'lambda.min')
+# 1 SE rule
+coef(lasso_cv_fit, s = 'lambda.1se')
+```
+
