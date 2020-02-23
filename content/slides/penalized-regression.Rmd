@@ -258,7 +258,7 @@ dataset <- dplyr::select(prostate, -train)
 dim(dataset)
 ```
 
-```{r}
+```{r, message = FALSE}
 set.seed(7200)
 library(caret)
 # 5-fold CV
