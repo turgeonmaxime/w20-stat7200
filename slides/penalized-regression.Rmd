@@ -1,6 +1,6 @@
 ---
 title: "Penalized Regression"
-draft: true
+draft: false
 source: true
 output: binb::metropolis
 fontsize: 12pt
@@ -58,7 +58,7 @@ knitr::opts_chunk$set(cache=FALSE)
 
 ```{r, message = FALSE}
 library(tidyverse)
-url <- "../../static/prostate.csv"
+url <- "https://maxturgeon.ca/w20-stat7200/prostate.csv"
 prostate <- read_csv(url)
 
 # Separate into training and testing sets
@@ -314,9 +314,20 @@ lasso_cv_fit <- cv.glmnet(X, dataset$lpsa, alpha = 1,
 
 
 ```{r}
+c("lambda.min" = lasso_cv_fit$lambda.min,
+  "lambda.1se" = lasso_cv_fit$lambda.1se)
+
 # What are the estimates?
 coef(lasso_cv_fit, s = 'lambda.min')
 # 1 SE rule
 coef(lasso_cv_fit, s = 'lambda.1se')
 ```
 
+## Summary
+
+  - Regularized regression can help reduce the mean-squared error, especially in the presence of multicollinearity
+    + **Ridge regression**: Penalizes the $L2$ norm of the coefficients
+    + **Lasso regression**: Penalizes the $L1$ norm of the coefficients
+  - Unlike ridge regression, lasso regression also performs variable selection.
+    + But this comes at a cost: **post-selection inference**.
+  - $K$-fold cross-validation can be used to find the best value of $\lambda$.

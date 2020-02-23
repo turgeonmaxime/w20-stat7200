@@ -26,7 +26,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://turgeonmaxime.github.io/w20-stat7200/slides/</guid>
-      <description>Slides  Course Overview Review of Linear Algebra  R code   Multivariate Distibutions  R code   Multivariate Normal Distribution  R code   Elliptical Distributions  R code Hofert, M. (2013). On sampling from the multivariate t distribution. The R Journal.   Wishart Distribution  R code Blog post on different decompositions for random matrices   Test for multivariate means  R code   Test for covariance matrices  R code R code for downloading Winnipeg weather data Notes on asymptotic expansions for the test of sphericity   Multivariate Analysis of Variance  R code   Multivariate Linear Regression  R code R code on all subset selection    </description>
+      <description>Slides  Course Overview Review of Linear Algebra  R code   Multivariate Distibutions  R code   Multivariate Normal Distribution  R code   Elliptical Distributions  R code Hofert, M. (2013). On sampling from the multivariate t distribution. The R Journal.   Wishart Distribution  R code Blog post on different decompositions for random matrices   Test for Multivariate Means  R code   Test for Covariance Matrices  R code R code for downloading Winnipeg weather data Notes on asymptotic expansions for the test of sphericity   Multivariate Analysis of Variance  R code   Multivariate Linear Regression  R code R code on all subset selection   Penalized Regression  R code   Principal Component Analysis  </description>
     </item>
     
     <item>
