@@ -31,5 +31,8 @@ type: docs
     + [R code](../all_subset_selection.R) on all subset selection
   - [Penalized Regression](penalized-regression.pdf)
     + [R code](penalized-regression.R)
-  - Principal Component Analysis
+  - [Principal Component Analysis](principal-component-analysis.pdf)
+    + [R code](principal-component-analysis.R)
+  - Canonical Correlation Analysis
+  - Factor Analysis
     
