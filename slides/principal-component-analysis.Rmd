@@ -70,7 +70,7 @@ Let $\lambda_1\geq\cdots\geq\lambda_p$ be the eigenvalues of $\Sigma$, with corr
   $$\sum_{i=1}^p \mathrm{Var}(w_i^T\mathbf{Y}) = \sum_{i=1}^p \lambda_i = \mathrm{tr}(\Lambda) = \mathrm{tr}(\Sigma) = \sum_{i=1}^p \mathrm{Var}(Y_i).$$
   - Therefore, each linear transformation $w_i^T\mathbf{Y}$ contributes $\lambda_i/\sum_j \lambda_j$ as percentage of the overall variance.
   - **Selecting $k$**: One common strategy is to select a threshold (e.g. $c = 0.9$) such that
-  $$\frac{\sum_{i=1}^{{\color{blue}k}} \lambda_i}{\sum_{i=1}^p \lambda_i} \geq c.$$
+  $$\frac{\sum_{i=1}^{k} \lambda_i}{\sum_{i=1}^p \lambda_i} \geq c.$$
   
 ## Scree plot
 
