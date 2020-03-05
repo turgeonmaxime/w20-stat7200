@@ -409,3 +409,75 @@ biplot(decomp)
 # With scaled data
 biplot(prcomp(dataset, scale = TRUE))
 
+
+## ----message = FALSE----------------------------------------------------------
+library(tidyverse)
+url <- "https://maxturgeon.ca/w20-stat7200/prostate.csv"
+prostate <- read_csv(url)
+
+# Separate into training and testing sets
+data_train <- filter(prostate, train == TRUE) %>%
+  dplyr::select(-train)
+data_test <- filter(prostate, train == FALSE) %>%
+  dplyr::select(-train)
+
+# First model: Linear regression
+lr_model <- lm(lpsa ~ ., data = data_train)
+lr_pred <- predict(lr_model, newdata = data_test)
+(lr_mse <- mean((data_test$lpsa - lr_pred)^2))
+
+# PCA
+decomp <- data_train %>%
+  subset(select = -lpsa) %>%
+  as.matrix() %>%
+  prcomp
+summary(decomp)$importance[,1:3]
+
+screeplot(decomp, type = 'lines')
+
+
+## -----------------------------------------------------------------------------
+# Second model: PCs for predictors
+train_pc <- data_train
+train_pc$PC1 <- decomp$x[,1]
+pc_model <- lm(lpsa ~ PC1, data = train_pc)
+
+
+## -----------------------------------------------------------------------------
+test_pc <- as.data.frame(predict(decomp, data_test))
+pc_pred <- predict(pc_model,
+                   newdata = test_pc)
+(pc_mse <- mean((data_test$lpsa - pc_pred)^2))
+
+
+## -----------------------------------------------------------------------------
+contribution <- decomp$rotation[,"PC1"]
+round(contribution, 3)[1:6]
+round(contribution, 3)[7:8]
+
+(keep <- names(which(abs(contribution) > 0.01)))
+
+fs_model <- lm(lpsa ~ ., data = data_train[,c(keep, "lpsa")])
+fs_pred <- predict(fs_model, newdata = data_test)
+(fs_mse <- mean((data_test$lpsa - fs_pred)^2))
+
+
+## ---- message = FALSE---------------------------------------------------------
+model_plot <- data.frame(
+  "obs" = data_test$lpsa,
+  "LR" = lr_pred,
+  "PC" = pc_pred,
+  "FS" = fs_pred
+) %>%
+  gather(Model, pred, -obs)
+
+
+## ---- message = FALSE---------------------------------------------------------
+ggplot(model_plot,
+       aes(pred, obs, colour = Model)) +
+  geom_point() +
+  theme_minimal() +
+  geom_abline(slope = 1, intercept = 0) +
+  theme(legend.position = 'top') +
+  xlab("Predicted") + ylab("Observed")
+
