@@ -40,6 +40,20 @@ library(tidyverse)
   - More generally, we are looking for $k$ linear transformations $w_1, \ldots, w_k$ such that $w_j^T\mathbf{Y}$ has maximal variance and is uncorrelated with $w_1^T\mathbf{Y},\ldots,w_{j-1}^T\mathbf{Y}$.
   - First, note that $\mathrm{Var}(w^T\mathbf{Y}) = w^T\Sigma w$. So our optimisation problem is
   $$ \max_w w^T\Sigma w, \quad\mbox{with } w^Tw = 1.$$
+  - We will solve this constrained optimisation problem using the method of **Lagrange multipliers**.
+  
+## Lagrange Multipliers {.allowframebreaks}
+
+Let $f,g:\mathbb{R}^p \to \mathbb{R}$ be differentiable functions. Let $c$ be a real number, and assume that we are looking for an extremum point $\mathbf{y}_0\in\mathbb{R}^p$ of $f$ subject to the constraint $g(\mathbf{y}_0) = 0$. If such an extremum point exists, then there exists a scalar $\lambda$ such that
+$$\nabla f(\mathbf{y}_0) = \lambda \nabla g(\mathbf{y}_0).$$
+
+  - In practice, this means that we can replace the constrained optimisation problem in $p$ variables
+  $$\max_{\mathbf{y}} f(\mathbf{y}), \qquad\mbox{such that } g(\mathbf{y}) = c,$$
+  with the *unconstrained* optimisation problem in $p+1$ variables
+  $$\max_{\mathbf{y}, \lambda} \left\{f(\mathbf{y}) - \lambda \left(g(\mathbf{y}) - c\right)\right\}.$$
+
+## Population PCA (cont'd) {.allowframebreaks}
+
   - From the theory of Lagrange multipliers, we can look at the *unconstrained* problem 
   $$ \max_{w,\lambda} w^T\Sigma w - \lambda (w^Tw - 1).$$
   - Write $\phi(w, \lambda)$ for the function we are trying to optimise. We have
@@ -56,21 +70,21 @@ library(tidyverse)
   - In other words, to maximise the variance $\mathrm{Var}(w^T\mathbf{Y})$, we need to choose $\lambda$ to be the *largest* eigenvalue of $\Sigma$.
   - By induction, and using the extra constraints $w_i^Tw_j = 0$, we can show that all other linear transformations are given by eigenvectors of $\Sigma$.
   
-### PCA Theorem
+## PCA Theorem
 
 Let $\lambda_1\geq\cdots\geq\lambda_p$ be the eigenvalues of $\Sigma$, with corresponding unit-norm eigenvectors $w_1,\ldots, w_p$. To reduce the dimension of $\mathbf{Y}$ from $p$ to $k$ such that every component of $W^T\mathbf{Y}$ is uncorrelated and each direction has maximal variance, we can take $W=\begin{pmatrix} w_1&\cdots&w_k\end{pmatrix}$, whose $j$-th column is $w_j$.
 
 ## Properties of PCA {.allowframebreaks}
 
   - Some vocabulary:
-    + $\mathbf{Z}_i = w_i^T\mathbf{Y}$ is called the $i$-th **principal component** of $\mathbf{Y}$.
+    + $Z_i = w_i^T\mathbf{Y}$ is called the $i$-th **principal component** of $\mathbf{Y}$.
     + $w_i$ is the $i$-th vector of **loadings**.
   - Note that we can take $k=p$, in which case we do not reduce the dimension of $\mathbf{Y}$, but we *transform* it into a random vector with *uncorrelated* components.
   - Let $\Sigma = P\Lambda  P^T$ be the eigendecomposition of $\Sigma$. We have
   $$\sum_{i=1}^p \mathrm{Var}(w_i^T\mathbf{Y}) = \sum_{i=1}^p \lambda_i = \mathrm{tr}(\Lambda) = \mathrm{tr}(\Sigma) = \sum_{i=1}^p \mathrm{Var}(Y_i).$$
   - Therefore, each linear transformation $w_i^T\mathbf{Y}$ contributes $\lambda_i/\sum_j \lambda_j$ as percentage of the overall variance.
   - **Selecting $k$**: One common strategy is to select a threshold (e.g. $c = 0.9$) such that
-  $$\frac{\sum_{i=1}^{{\color{blue}k}} \lambda_i}{\sum_{i=1}^p \lambda_i} \geq c.$$
+  $$\frac{\sum_{i=1}^{k} \lambda_i}{\sum_{i=1}^p \lambda_i} \geq c.$$
   
 ## Scree plot
 
@@ -664,102 +678,102 @@ biplot(prcomp(dataset, scale = TRUE))
     + You can think of it as a projection of the $p$-dimensional scatter plot (points and axes) onto a 2-dimensional plane.
   - A **scree plot** displays the amount of variation in each principal component.
 
-<!-- # Applications of PCA -->
+# Applications of PCA to Model Building
 
-<!-- ## Training and testing {.allowframebreaks} -->
+## Training and testing {.allowframebreaks}
 
-<!--   - Recall: **Mean Squared Error** -->
-<!--   $$ MSE = \frac{1}{n}\sum_{i=1}^n(Y_i - \hat{Y}_i)^2,$$ -->
-<!--   where $Y_i,\hat{Y}_i$ are the *observed* and *predicted* values. -->
-<!--   - It is good practice to separate your dataset in two: -->
-<!--     + **Training** dataset, that is used to build and fit your model (e.g. choose covariates, estimate regression coefficients). -->
-<!--     + **Testing** dataset, that it used to compute the MSE or other performance metrics. -->
-<!--   - PCA can be used for predictive model building in (univariate) linear regression: -->
-<!--     + **Feature extraction**: Perform PCA on the covariates, extract the first $k$ PCs, and use them as predictors in your model. -->
-<!--     + **Feature selection**: Perform PCA on the covariates, look at the first PC, find the covariates whose loadings are the largest (in absolute value), and only use those covariates as predictors. -->
+  - Recall: **Mean Squared Error**
+  $$ MSE = \frac{1}{n}\sum_{i=1}^n(Y_i - \hat{Y}_i)^2,$$
+  where $Y_i,\hat{Y}_i$ are the *observed* and *predicted* values.
+  - It is good practice to separate your dataset in two:
+    + **Training** dataset, that is used to build and fit your model (e.g. choose covariates, estimate regression coefficients).
+    + **Testing** dataset, that it used to compute the MSE or other performance metrics.
+  - PCA can be used for predictive model building in (univariate) linear regression:
+    + **Feature extraction**: Perform PCA on the covariates, extract the first $k$ PCs, and use them as predictors in your model.
+    + **Feature selection**: Perform PCA on the covariates, look at the first PC, find the covariates whose loadings are the largest (in absolute value), and only use those covariates as predictors.
 
-<!-- ## Feature Extraction {.allowframebreaks} -->
+## Feature Extraction {.allowframebreaks}
 
-<!-- ```{r message = FALSE} -->
-<!-- library(tidyverse) -->
-<!-- url <- "https://maxturgeon.ca/w20-stat7200/prostate.csv" -->
-<!-- prostate <- read_csv(url) -->
+```{r message = FALSE}
+library(tidyverse)
+url <- "https://maxturgeon.ca/w20-stat7200/prostate.csv"
+prostate <- read_csv(url)
 
-<!-- # Separate into training and testing sets -->
-<!-- data_train <- filter(prostate, train == TRUE) %>%  -->
-<!--   dplyr::select(-train) -->
-<!-- data_test <- filter(prostate, train == FALSE) %>%  -->
-<!--   dplyr::select(-train) -->
+# Separate into training and testing sets
+data_train <- filter(prostate, train == TRUE) %>%
+  dplyr::select(-train)
+data_test <- filter(prostate, train == FALSE) %>%
+  dplyr::select(-train)
 
-<!-- # First model: Linear regression -->
-<!-- lr_model <- lm(lpsa ~ ., data = train) -->
-<!-- lr_pred <- predict(lr_model, newdata = test) -->
-<!-- (lr_mse <- mean((test$lpsa - lr_pred)^2)) -->
+# First model: Linear regression
+lr_model <- lm(lpsa ~ ., data = data_train)
+lr_pred <- predict(lr_model, newdata = data_test)
+(lr_mse <- mean((data_test$lpsa - lr_pred)^2))
 
-<!-- # PCA -->
-<!-- decomp <- train %>% -->
-<!--   subset(select = -lpsa) %>% -->
-<!--   as.matrix() %>% -->
-<!--   prcomp -->
-<!-- summary(decomp)$importance[,1:3] -->
+# PCA
+decomp <- data_train %>%
+  subset(select = -lpsa) %>%
+  as.matrix() %>%
+  prcomp
+summary(decomp)$importance[,1:3]
 
-<!-- screeplot(decomp, type = 'lines') -->
-<!-- ``` -->
-
-
-<!-- ```{r} -->
-<!-- # Second model: PCs for predictors -->
-<!-- train_pc <- train -->
-<!-- train_pc$PC1 <- decomp$x[,1] -->
-<!-- pc_model <- lm(lpsa ~ PC1, data = train_pc) -->
-<!-- ``` -->
+screeplot(decomp, type = 'lines')
+```
 
 
-<!-- ```{r} -->
-<!-- test_pc <- as.data.frame(predict(decomp, test)) -->
-<!-- pc_pred <- predict(pc_model, -->
-<!--                    newdata = test_pc) -->
-<!-- (pc_mse <- mean((test$lpsa - pc_pred)^2)) -->
-<!-- ``` -->
-
-<!-- ## Feature Selection {.allowframebreaks} -->
-
-<!-- ```{r} -->
-<!-- contribution <- decomp$rotation[,"PC1"] -->
-<!-- round(contribution, 3)[1:6] -->
-<!-- round(contribution, 3)[7:8] -->
-
-<!-- (keep <- names(which(abs(contribution) > 0.01))) -->
-
-<!-- fs_model <- lm(lpsa ~ ., data = train[,c(keep, "lpsa")]) -->
-<!-- fs_pred <- predict(fs_model, newdata = test) -->
-<!-- (fs_mse <- mean((test$lpsa - fs_pred)^2)) -->
-<!-- ``` -->
-
-<!-- ```{r, message = FALSE} -->
-<!-- model_plot <- data.frame( -->
-<!--   "obs" = test$lpsa, -->
-<!--   "LR" = lr_pred, -->
-<!--   "PC" = pc_pred, -->
-<!--   "FS" = fs_pred -->
-<!-- ) %>% -->
-<!--   gather(Model, pred, -obs) -->
-<!-- ``` -->
+```{r}
+# Second model: PCs for predictors
+train_pc <- data_train
+train_pc$PC1 <- decomp$x[,1]
+pc_model <- lm(lpsa ~ PC1, data = train_pc)
+```
 
 
-<!-- ```{r, message = FALSE} -->
-<!-- ggplot(model_plot, -->
-<!--        aes(pred, obs, colour = Model)) + -->
-<!--   geom_point() + -->
-<!--   theme_minimal() + -->
-<!--   geom_abline(slope = 1, intercept = 0) + -->
-<!--   theme(legend.position = 'top') + -->
-<!--   xlab("Predicted") + ylab("Observed") -->
-<!-- ``` -->
+```{r}
+test_pc <- as.data.frame(predict(decomp, data_test))
+pc_pred <- predict(pc_model,
+                   newdata = test_pc)
+(pc_mse <- mean((data_test$lpsa - pc_pred)^2))
+```
 
-<!-- ## Comments -->
+## Feature Selection {.allowframebreaks}
 
-<!--   - The full model performed better than the ones we created with PCA -->
-<!--     + It had a lower MSE -->
-<!--   - On the other hand, if we had multicollinearity issues, or too many covariates ($p > n$), the PCA models could outperform the full model. -->
-<!--   - However, note that PCA does not use the association between the covariates and the outcome, so it will never be the most efficient way of building a model. -->
+```{r}
+contribution <- decomp$rotation[,"PC1"]
+round(contribution, 3)[1:6]
+round(contribution, 3)[7:8]
+
+(keep <- names(which(abs(contribution) > 0.01)))
+
+fs_model <- lm(lpsa ~ ., data = data_train[,c(keep, "lpsa")])
+fs_pred <- predict(fs_model, newdata = data_test)
+(fs_mse <- mean((data_test$lpsa - fs_pred)^2))
+```
+
+```{r, message = FALSE}
+model_plot <- data.frame(
+  "obs" = data_test$lpsa,
+  "LR" = lr_pred,
+  "PC" = pc_pred,
+  "FS" = fs_pred
+) %>%
+  gather(Model, pred, -obs)
+```
+
+
+```{r, message = FALSE}
+ggplot(model_plot,
+       aes(pred, obs, colour = Model)) +
+  geom_point() +
+  theme_minimal() +
+  geom_abline(slope = 1, intercept = 0) +
+  theme(legend.position = 'top') +
+  xlab("Predicted") + ylab("Observed")
+```
+
+## Comments
+
+  - The full model performed better than the ones we created with PCA
+    + It had a lower MSE
+  - On the other hand, if we had multicollinearity issues, or too many covariates ($p > n$), the PCA models could outperform the full model.
+  - However, note that PCA does not use the association between the covariates and the outcome, so it will never be the most efficient way of building a model.
