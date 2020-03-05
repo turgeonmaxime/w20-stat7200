@@ -286,7 +286,7 @@ image(img2, col = gray.colors(12, rev = TRUE),
   - Let's suppose we have a lower dimension representation of $\mathbb{Y}$, denoted by a $n\times k$ matrix $\mathbb{Z}$.
   - We want to *reconstruct* $\mathbb{Y}$ using an affine transformation 
   $$ f(z) = \mu + W_k z,$$
-  where $W_k$ is a $p\times k$ matrix.
+  where $W_k$ is a $p\times k$ matrix whose columns are orthogonal vectors of unit length.
   - We want to find $\mu, W_k, \mathbf{Z}_i$ that minimises the **reconstruction error**:
   $$ \min_{\mu, W_k, \mathbf{Z}_i} \sum_{i=1}^n \| \mathbf{Y}_i - \mu - W_k \mathbf{Z}_i \|^2.$$
   - First, treating $W_k$ constant and minimising over $\mu, \mathbf{Z}_i$, we find
