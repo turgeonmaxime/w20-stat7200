@@ -251,6 +251,11 @@ summarise_all(results, mean)
 
 
 ## -----------------------------------------------------------------------------
+# Is there some correlation?
+GGally::ggpairs(results)
+
+
+## -----------------------------------------------------------------------------
 p <- 2
 results_vect <- purrr::map_df(seq_len(B), function(b) {
   X <- matrix(rnorm(p*n, sd = c(1, 2)), ncol = p,
