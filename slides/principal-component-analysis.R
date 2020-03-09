@@ -247,13 +247,12 @@ results %>%
 
 
 ## -----------------------------------------------------------------------------
-results %>% 
-  summarise_all(mean)
+summarise_all(results, mean)
 
 
 ## -----------------------------------------------------------------------------
 p <- 2
-results <- purrr::map_df(seq_len(B), function(b) {
+results_vect <- purrr::map_df(seq_len(B), function(b) {
   X <- matrix(rnorm(p*n, sd = c(1, 2)), ncol = p,
               byrow = TRUE)
   tmp <- eigen(cov(X), symmetric = TRUE)
@@ -266,8 +265,7 @@ results <- purrr::map_df(seq_len(B), function(b) {
 
 
 ## -----------------------------------------------------------------------------
-results %>% 
-  ggplot() +
+ggplot(results_vect) +
   geom_segment(aes(xend = xend, yend = yend),
                x = 0, y = 0, colour = 'grey60') +
   geom_segment(x = 0, xend = 0,
@@ -279,12 +277,69 @@ results %>%
 
 ## ---- message = FALSE---------------------------------------------------------
 # Or looking at angles
-results %>% 
-  transmute(theta = atan2(yend, xend)) %>% 
+transmute(results_vect, 
+          theta = atan2(yend, xend)) %>% 
   ggplot(aes(theta)) +
   geom_histogram() +
   theme_minimal() + 
   geom_vline(xintercept = pi/2)
+
+
+## -----------------------------------------------------------------------------
+library(mvtnorm)
+# What about the t distribution
+results_t <- purrr::map_df(seq_len(B), function(b) {
+    X <- rmvt(n, sigma = diag(2*c(1, 2, 3)/4), 
+              df = 4)
+    tmp <- eigen(cov(X), symmetric = TRUE, 
+                 only.values = TRUE)
+    tibble(ev1 = tmp$values[1],
+           ev2 = tmp$values[2],
+           ev3 = tmp$values[3])
+})
+
+
+## -----------------------------------------------------------------------------
+results_t %>% 
+  gather(ev, value) %>% 
+  ggplot(aes(value, fill = ev)) + 
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  geom_vline(xintercept = c(1, 2, 3),
+             linetype = 'dashed')
+
+
+## -----------------------------------------------------------------------------
+summarise_all(results_t, mean)
+
+
+## ---- message = FALSE, echo = FALSE-------------------------------------------
+library(cowplot)
+plot1 <- results %>% 
+  gather(ev, value) %>% 
+  ggplot(aes(value, fill = ev)) + 
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  geom_vline(xintercept = c(1, 2, 3),
+             linetype = 'dashed') +
+  coord_cartesian(xlim = c(0, 10),
+                  ylim = c(0, 3)) +
+  ggtitle("Normal dist.") + ylab("")
+
+plot2 <- results_t %>% 
+  gather(ev, value) %>% 
+  ggplot(aes(value, fill = ev)) + 
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  geom_vline(xintercept = c(1, 2, 3),
+             linetype = 'dashed') +
+  coord_cartesian(xlim = c(0, 10),
+                  ylim = c(0, 3)) +
+  ggtitle("t dist. (df = 4)") + ylab("")
+
+cowplot::plot_grid(plot1, plot2)
 
 
 ## -----------------------------------------------------------------------------
