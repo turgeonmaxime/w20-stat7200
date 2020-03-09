@@ -1,0 +1,72 @@
+\frametitle{Feature Selection}
+\protect\hypertarget{feature-selection}{}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{contribution <{-}}\StringTok{ }\NormalTok{decomp}\OperatorTok{$}\NormalTok{rotation[,}\StringTok{"PC1"}\NormalTok{]}
+\KeywordTok{round}\NormalTok{(contribution, }\DecValTok{3}\NormalTok{)[}\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  lcavol lweight     age    lbph     svi     lcp
+##   0.021   0.001   0.075  -0.001   0.007   0.032
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{round}\NormalTok{(contribution, }\DecValTok{3}\NormalTok{)[}\DecValTok{7}\OperatorTok{:}\DecValTok{8}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## gleason   pgg45
+##   0.018   0.996
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(keep <{-}}\StringTok{ }\KeywordTok{names}\NormalTok{(}\KeywordTok{which}\NormalTok{(}\KeywordTok{abs}\NormalTok{(contribution) }\OperatorTok{>}\StringTok{ }\FloatTok{0.01}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "lcavol"  "age"     "lcp"     "gleason" "pgg45"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fs\_model <{-}}\StringTok{ }\KeywordTok{lm}\NormalTok{(lpsa }\OperatorTok{\textasciitilde{}}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ data\_train[,}\KeywordTok{c}\NormalTok{(keep, }\StringTok{"lpsa"}\NormalTok{)])}
+\NormalTok{fs\_pred <{-}}\StringTok{ }\KeywordTok{predict}\NormalTok{(fs\_model, }\DataTypeTok{newdata =}\NormalTok{ data\_test)}
+\NormalTok{(fs\_mse <{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{((data\_test}\OperatorTok{$}\NormalTok{lpsa }\OperatorTok{{-}}\StringTok{ }\NormalTok{fs\_pred)}\OperatorTok{\^{}}\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5815571
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model\_plot <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}
+  \StringTok{"obs"}\NormalTok{ =}\StringTok{ }\NormalTok{data\_test}\OperatorTok{$}\NormalTok{lpsa,}
+  \StringTok{"LR"}\NormalTok{ =}\StringTok{ }\NormalTok{lr\_pred,}
+  \StringTok{"PC"}\NormalTok{ =}\StringTok{ }\NormalTok{pc\_pred,}
+  \StringTok{"FS"}\NormalTok{ =}\StringTok{ }\NormalTok{fs\_pred}
+\NormalTok{) }\OperatorTok{\%>\%}
+\StringTok{  }\KeywordTok{gather}\NormalTok{(Model, pred, }\OperatorTok{{-}}\NormalTok{obs)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(model\_plot,}
+       \KeywordTok{aes}\NormalTok{(pred, obs, }\DataTypeTok{colour =}\NormalTok{ Model)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme\_minimal}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom\_abline}\NormalTok{(}\DataTypeTok{slope =} \DecValTok{1}\NormalTok{, }\DataTypeTok{intercept =} \DecValTok{0}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{\textquotesingle{}top\textquotesingle{}}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Predicted"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Observed"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{/Users/maxturgeon/Documents/git_repos/w20-stat7200/static/slides/principal-component-analysis_files/figure-beamer/unnamed-chunk-48-1.pdf}

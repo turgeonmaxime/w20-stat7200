@@ -288,20 +288,46 @@ image(img2, col = gray.colors(12, rev = TRUE),
   $$ f(z) = \mu + W_k z,$$
   where $W_k$ is a $p\times k$ matrix whose columns are orthogonal vectors of unit length.
   - We want to find $\mu, W_k, \mathbf{Z}_i$ that minimises the **reconstruction error**:
-  $$ \min_{\mu, W_k, \mathbf{Z}_i} \sum_{i=1}^n \| \mathbf{Y}_i - \mu - W_k \mathbf{Z}_i \|^2.$$
-  - First, treating $W_k$ constant and minimising over $\mu, \mathbf{Z}_i$, we find
+  $$ \min_{\mu, W_k, \mathbf{Z}_i} \sum_{i=1}^n \| \mathbf{Y}_i - \mu - W_k \mathbf{Z}_i \|_2^2.$$
+  - First, we can treat $W_k$ constant and minimise over $\mu, \mathbf{Z}_i$. Write 
+  $$\phi(\mu, \mathbf{Z}_i) = \sum_{i=1}^n \| \mathbf{Y}_i - \mu - W_k \mathbf{Z}_i \|_2^2.$$
+  - We will take the derivative of $\phi$ with respect to both $\mu$ and $\mathbf{Z}_i$. Using the chain rule (and remembering that the derivatives should be a $p$- and a $k$-dimension column vector, respectively), we get:
+  \begin{align}
+  \frac{\partial}{\partial \mu} \phi(\mu, \mathbf{Z}_i) &= \sum_{i=1}^n -2(\mathbf{Y}_i - \mu - W_k \mathbf{Z}_i), \label{eqn:mu}\\
+   \frac{\partial}{\partial \mathbf{Z}_i} \phi(\mu, \mathbf{Z}_i) &=  -2W_k^T(\mathbf{Y}_i - \mu - W_k \mathbf{Z}_i).\label{eqn:zi}
+  \end{align}
+  - Equation \ref{eqn:mu} gives us
+  $$\frac{\partial}{\partial \mu} \phi(\mu, \mathbf{Z}_i) = -2\left(\sum_{i=1}^n\mathbf{Y}_i\right)  + 2n\mu  + 2W_k\left(\sum_{i=1}^n\mathbf{Z}_i\right).$$
+  Setting this equal to zero and solving for $\mu$, we get
+  $$ \mu = \bar{\mathbf{Y}} - W_k\bar{\mathbf{Z}}.$$
+  - Similarly, Equation \ref{eqn:zi} gives us
+  $$\frac{\partial}{\partial \mathbf{Z}_i} \phi(\mu, \mathbf{Z}_i) = -2W_k^T(\mathbf{Y}_i - \mu) + 2\mathbf{Z}_i.$$
+  Setting this equal to zero and solving for $\mathbf{Z}_i$, we get
+  $$ \mathbf{Z}_i = W_k^T(\mathbf{Y}_i - \mu).$$
+  - Now, observe that our system of equations is *overdetermined*, i.e. our equations are not independent. Indeed, if we take the sample average of both sides of the equality $\mathbf{Z}_i = W_k^T(\mathbf{Y}_i - \mu)$, we get a tautology:
+  \begin{align*}
+  \bar{\mathbf{Z}} &= W_k^T(\bar{\mathbf{Y}} - \mu)\\
+    &= W_k^T(\bar{\mathbf{Y}} - \bar{\mathbf{Y}} + W_k\bar{\mathbf{Z}})\qquad \mbox{(since $\mu = \bar{\mathbf{Y}} - W_k\bar{\mathbf{Z}}$)}\\
+    &= W_k^T(W_k\bar{\mathbf{Z}})\\
+    &= \bar{\mathbf{Z}}.
+  \end{align*}
+  - Since we have many solutions to this system of equations, we will choose one by requiring that $\bar{\mathbf{Z}} = 0$. This gives us
   \begin{align*}
   \hat{\mu} &= \mathbf{\bar{Y}},\\
   \hat{\mathbf{Z}}_i &= W_k^T(\mathbf{Y}_i - \mathbf{\bar{Y}}).
   \end{align*}
   - Putting these quantities into the reconstruction error, we get
-  $$ \min_{W_k} \sum_{i=1}^n \| (\mathbf{Y}_i - \mathbf{\bar{Y}}) - W_k W_k^T(\mathbf{Y}_i - \mathbf{\bar{Y}}) \|^2.$$
+  $$ \min_{W_k} \sum_{i=1}^n \| (\mathbf{Y}_i - \mathbf{\bar{Y}}) - W_k W_k^T(\mathbf{Y}_i - \mathbf{\bar{Y}}) \|_2^2.$$
 
 ### Eckart–Young theorem
 
 The reconstruction error is minimised by taking $W_k$ to be the matrix whose columns are the first $k$ eigenvectors of the sampling covariance matrix $S_n$.
 
 Equivalently, we can take the matrix whose columns are the first $k$ *right singular vectors* or the centered data matrix $\tilde{\mathbb{Y}}$.
+
+<!-- ## Proof (EY Theorem) {.allowframebreaks} -->
+
+
 
 ## Example {.allowframebreaks}
 
