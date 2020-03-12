@@ -481,6 +481,8 @@ data_train <- filter(prostate, train == TRUE) %>%
 data_test <- filter(prostate, train == FALSE) %>%
   dplyr::select(-train)
 
+
+## ----message = FALSE----------------------------------------------------------
 # First model: Linear regression
 lr_model <- lm(lpsa ~ ., data = data_train)
 lr_pred <- predict(lr_model, newdata = data_test)
