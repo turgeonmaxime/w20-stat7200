@@ -33,6 +33,7 @@ type: docs
     + [R code](penalized-regression.R)
   - [Principal Component Analysis](principal-component-analysis.pdf)
     + [R code](principal-component-analysis.R)
-  - Canonical Correlation Analysis
+  - [Canonical Correlation Analysis](canonical-correlation-analysis.pdf)
+    + [R code](canonical-correlation-analysis.R)
   - Factor Analysis
     

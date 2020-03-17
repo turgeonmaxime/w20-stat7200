@@ -1,0 +1,659 @@
+---
+title: "Canonical Correlation Analysis"
+draft: false
+source: true
+output: binb::metropolis
+fontsize: 12pt
+author: Max Turgeon
+institute: STAT 7200--Multivariate Statistics
+header-includes:
+  - \usefonttheme{professionalfonts}
+  - \usepackage{graphicx}
+  - \usepackage{tikzpagenodes}
+  - \usetikzlibrary{calc}
+  - \usepackage{caption}
+  - \usepackage{xcolor}
+  - \usepackage{bm}
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE,
+                      tidy.opts = list(width.cutoff = 20),
+                      tidy = TRUE)
+```
+
+## Objectives
+
+  - Introduce Canonical Correlation Analysis
+    + Both the population and sample models
+  - Discuss generalizations of correlation coefficients
+  - Give a geometric interpretation of CCA
+  - Explain the relationship between CCA and the likelihood ratio test for independence
+  - Introduce reduced-rank regression
+
+## Introduction
+
+  - Canonical Correlation Analysis (CCA) is a dimension reduction method that is similar to PCA, but where we simultaneously reduce the dimension of **two** random vectors $\mathbf{Y}$ and $\mathbf{X}$.
+  - Instead of trying to explain overall variance, we try to explain the correlation $\mathrm{Corr}(\mathbf{Y}, \mathbf{X})$.
+    + Note that this is a measure of **association** between $\mathbf{Y}$ and $\mathbf{X}$.
+  - Examples include:
+    + Arithmetic speed and power ($\mathbf{Y}$) and reading speed and power ($\mathbf{X}$)
+    + College performance metrics ($\mathbf{Y}$) and high-school achievement metrics ($\mathbf{X}$)
+
+## Population model {.allowframebreaks}
+
+  - Let $\mathbf{Y}$ and $\mathbf{X}$ be $p$- and $q$-dimensional random vectors, respectively.
+    + We will assume that $p\leq q$.
+  - Let $\mu_Y$ and $\mu_X$ be the mean of $\mathbf{Y}$ and $\mathbf{X}$, respectively.
+  - Let $\Sigma_Y$ and $\Sigma_X$ be the covariance matrix of $\mathbf{Y}$ and $\mathbf{X}$, respectively, and let $\Sigma_{YX} = \Sigma_{XY}^T$ be the covariance matrix $\mathrm{Cov}(\mathbf{Y}, \mathbf{X})$.
+    + Assume $\Sigma_Y$ and $\Sigma_X$ are positive definite.
+  - Note that $\Sigma_{YX}$ has $pq$ entries, corresponding to all covariances between a component of $\mathbf{Y}$ and a component of $\mathbf{X}$.
+  - **Goal of CCA**: Summarise $\Sigma_{YX}$ with $p$ numbers.
+    + These $p$ numbers will be called the *canonical correlations*.
+    
+## Dimension reduction {.allowframebreaks}
+
+  - Let $U = a^T\mathbf{Y}$ and $V = b^T\mathbf{Y}$ be linear combinations of $\mathbf{Y}$ and $\mathbf{X}$, respectively.
+  - We have:
+    + $\mathrm{Var}(U) = a^T\Sigma_Y a$
+    + $\mathrm{Var}(V) = b^T\Sigma_X b$
+    + $\mathrm{Cov}(U, V) = a^T\Sigma_{YX} b$.
+  - Therefore, we can write the correlation between $U$ and $V$ as follows:
+  $$\mathrm{Corr}(U, V) = \frac{a^T\Sigma_{YX} b}{\sqrt{a^T\Sigma_Y a}\sqrt{b^T\Sigma_X b}}.$$
+  - We are looking for vectors $a\in\mathbb{R}^p,b\in\mathbb{R}^q$ such that $\mathrm{Corr}(U, V)$ is **maximised**.
+
+## Definitions 
+
+  - The *first pair of canonical variates* is the pair of linear combinations $U_1, V_1$ with unit variance such that $\mathrm{Corr}(U_1, V_1)$ is maximised.
+  - The **$k$-th pair of canonical variates** is the pair of linear combinations $U_k, V_k$ with unit variance such that $\mathrm{Corr}(U_k, V_k)$ is maximised among all pairs that are uncorrelated with the previous $k-1$ pairs.
+  - When $U_k, V_k$ is the $k$-th pair of canonical variates, we say that $\rho_k = \mathrm{Corr}(U_k, V_k)$ is the $k$-th *canonical correlation*.
+  
+## Derivation of canonical variates {.allowframebreaks}
+
+  - Make a change of variables:
+    + $\tilde{a} = \Sigma^{1/2}_Ya$
+    + $\tilde{b} = \Sigma^{1/2}_Xb$
+  - We can then rewrite the correlation:
+  \begin{align*}
+  \mathrm{Corr}(U, V) &= \frac{a^T\Sigma_{YX} b}{\sqrt{a^T\Sigma_Y a}\sqrt{b^T\Sigma_X b}} \\
+  &= \frac{\tilde{a}^T\Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1/2}\tilde{b}}{\sqrt{\tilde{a}^T\tilde{a}}\sqrt{\tilde{b}^T\tilde{b}}}.
+  \end{align*}
+  - Let $M = \Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1/2}$. We have
+  $$ \max_{a,b}\mathrm{Corr}(a^T\mathbf{Y}, b^T\mathbf{Y}) \Longleftrightarrow \max_{\tilde{a},\tilde{b}:\|\tilde{a}\|=1,\|\tilde{b}\|=1} \tilde{a}^TM\tilde{b}$$
+  - As we will see, the solution to this maximisation problem involves the **singular value decomposition** of $M$.
+  - Equivalently, it involves the **eigendecomposition** of $MM^T$, where
+  $$MM^T = \Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1/2}.$$
+  
+## CCA: Main theorem {.allowframebreaks}
+
+  - Let $\lambda_1\geq\cdots\geq\lambda_p$ be the eigenvalues of $\Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1/2}$.
+    + Let $e_1, \ldots, e_p$ be the corresponding eigenvector with unit norm.
+  - Note that $\lambda_1\geq\cdots\geq\lambda_p$ are also the $p$ largest eigenvalues of 
+  $$M^TM = \Sigma_X^{-1/2}\Sigma_{XY}\Sigma_Y^{-1}\Sigma_{YX}\Sigma_X^{-1/2}.$$
+    + Let $f_1, \ldots, f_p$ be the corresponding eigenvectors with unit norm.
+  - Then the $k$-th pair of canonical variates is given by
+  $$U_k = e_k^T\Sigma_Y^{-1/2}\mathbf{Y}, \qquad V_k = f_k^T\Sigma_X^{-1/2}\mathbf{X}.$$
+  - Moreover, we have
+  $$ \rho_k = \mathrm{Corr}(U_k, V_k) = \sqrt{\lambda_k}.$$
+
+## Proof {.allowframebreaks}
+
+First, we write
+$$\rho_1 = \frac{\tilde{a}^TM\tilde{b}}{\sqrt{\tilde{a}^T\tilde{a}}\sqrt{\tilde{b}^T\tilde{b}}}.$$
+Applying the Cauchy-Schwartz inequality to the numerator of $\rho_1^2$, we have
+$$\left(\tilde{a}^TM\tilde{b}\right)^2 \leq \left(\tilde{a}^T\tilde{a}\right)\left(\tilde{b}^TM^TM\tilde{b}\right),$$
+with equality if there exists a scalar $C$ such that
+$$\tilde{a} = C M\tilde{b}.$$
+
+We now have
+\begin{align*}
+\rho_1^2 &\leq \frac{\left(\tilde{a}^T\tilde{a}\right)\left(\tilde{b}^TM^TM\tilde{b}\right)}{\left(\tilde{a}^T\tilde{a}\right)\left(\tilde{b}^T\tilde{b}\right)}\\
+  &= \frac{\left(\tilde{b}^TM^TM\tilde{b}\right)}{\tilde{b}^T\tilde{b}}.
+\end{align*}
+
+From our discussion on PCA, we know that we can maximise the ratio $\frac{\left(\tilde{b}^TM^TM\tilde{b}\right)}{\tilde{b}^T\tilde{b}}$ by taking $\tilde{b}$ to be the eigenvector corresponding to the largest eigenvalue $\lambda_1$ of $M^TM$.
+
+In turn, this gives us
+\begin{align*}
+MM^T \tilde{a} &= MM^T\left(C M\tilde{b}\right)\\
+  &= CM\left(M^TM\tilde{b}\right)\\
+  &= CM\left(\lambda_1\tilde{b}\right)\\
+  &= \lambda_1\left(CM\tilde{b}\right)\\
+  &= \lambda_1\tilde{a}.
+\end{align*}
+
+In other words, when $\rho_1^2$ attains its maximum, $\tilde{a}$ is equal to the eigenvector corresponding to the largest eigenvalue $\lambda_1$ of $MM^T$.
+
+Finally, we simply note that if $\tilde{a} = e_1$ and $\tilde{b} = f_1$, then we have
+$$a = \Sigma_Y^{-1/2}e_1,\qquad b = \Sigma_X^{-1/2}f_1.$$
+The next canonical variates are obtained by imposing an orthgonality constraint and repeating this analysis. \hfill\qed
+
+## Some vocabulary
+
+  1. **Canonical directions**: $(e_k^T\Sigma_Y^{-1/2}, f_k^T\Sigma_X^{-1/2})$
+  2. **Canonical variates**: $(U_k, V_k)=\left(e_k^T\Sigma_Y^{-1/2}\mathbf{Y}, f_k^T\Sigma_X^{-1/2}\mathbf{X}\right)$
+  3. **Canonical correlations**: $\rho_k = \sqrt{\lambda_k}$
+  
+## Example {.allowframebreaks}
+
+```{r}
+Sigma_Y <- matrix(c(1, 0.4, 0.4, 1), ncol = 2)
+Sigma_X <- matrix(c(1, 0.2, 0.2, 1), ncol = 2)
+Sigma_YX <- matrix(c(0.5, 0.3, 0.6, 0.4), ncol = 2)
+Sigma_XY <- t(Sigma_YX)
+
+rbind(cbind(Sigma_Y, Sigma_YX),
+      cbind(Sigma_XY, Sigma_X))
+```
+```{r, message = FALSE}
+library(expm)
+sqrt_Y <- sqrtm(Sigma_Y)
+sqrt_X <- sqrtm(Sigma_X)
+M1 <- solve(sqrt_Y) %*% Sigma_YX %*% solve(Sigma_X)%*% 
+  Sigma_XY %*% solve(sqrt_Y)
+
+(decomp1 <- eigen(M1))
+```
+
+```{r}
+decomp1$vectors[,1] %*% solve(sqrt_Y)
+```
+
+```{r}
+M2 <- solve(sqrt_X) %*% Sigma_XY %*% solve(Sigma_Y)%*% 
+  Sigma_YX %*% solve(sqrt_X)
+
+decomp2 <- eigen(M2)
+decomp2$vectors[,1] %*% solve(sqrt_X)
+```
+
+```{r}
+sqrt(decomp1$values)
+```
+
+## Sample CCA
+
+  - Let $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ and $\mathbf{X}_1, \ldots, \mathbf{X}_n$ be random samples, and arrange them in $n\times p$ and $n\times q$ matrices $\mathbb{Y},\mathbb{X}$, respectively.
+    + Note that both sample sizes are equal.
+    + Indeed, we assume that $(\mathbf{Y}_i, \mathbf{X}_i)$ are sampled jointly, i.e. on the **same** experimental unit.
+  - Let $\bar{\mathbf{Y}}$ and $\bar{\mathbf{X}}$ be the sample means.
+  - Let $S_Y$ and $S_X$ be the sample covariances.
+  - Define
+  $$S_{YX} = \frac{1}{n-1}\sum_{i=1}^n\left(\mathbf{Y}_i - \bar{\mathbf{Y}}\right)\left(\mathbf{X}_i - \bar{\mathbf{X}}\right)^T.$$
+
+## Sample CCA: Main theorem {.allowframebreaks}
+
+  - Let $\hat{\lambda}_1\geq\cdots\geq\hat{\lambda}_p$ be the eigenvalues of $S_Y^{-1/2}S_{YX}S_X^{-1}S_{XY}S_Y^{-1/2}$.
+    + Let $\hat{e}_1, \ldots, \hat{e}_p$ be the corresponding eigenvector with unit norm.
+  - Note that $\hat{\lambda}_1\geq\cdots\geq\hat{\lambda}_p$ are also the $p$ largest eigenvalues of 
+  $$S_X^{-1/2}S_{XY}S_Y^{-1}S_{YX}S_X^{-1/2}.$$
+    + Let $\hat{f}_1, \ldots, \hat{f}_p$ be the corresponding eigenvectors with unit norm.
+  - Then the $k$-th pair of *sample* canonical variates is given by
+  $$\hat{U}_k = \mathbb{Y}S_Y^{-1/2}\hat{e}_k, \qquad \hat{V}_k = \mathbb{X}S_X^{-1/2}\hat{f}_k.$$
+  - Moreover, we have that $\hat{\rho}_k = \sqrt{\hat{\lambda}_k}$ is the sample correlation of $\hat{U}_k$ and $\hat{V}_k$.
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+# Let's generate data
+library(mvtnorm)
+Sigma <- rbind(cbind(Sigma_Y, Sigma_YX),
+               cbind(Sigma_XY, Sigma_X))
+
+YX <- rmvnorm(100, sigma = Sigma)
+Y <- YX[,1:2]
+X <- YX[,3:4]
+
+decomp <- stats::cancor(x = X, y = Y)
+```
+
+
+```{r}
+U <- Y %*% decomp$ycoef
+V <- X %*% decomp$xcoef
+
+diag(cor(U, V))
+decomp$cor
+```
+
+## Example {.allowframebreaks}
+
+```{r, message=FALSE}
+library(tidyverse)
+library(dslabs)
+
+str(olive)
+```
+
+
+```{r, message=FALSE}
+# X contains the type of acids
+X <- select(olive, -area, -region) %>% 
+  as.matrix
+
+# Y contains the information about regions
+count(olive, region)
+Y <- select(olive, region) %>% 
+  model.matrix(~ region - 1, data = .)
+```
+
+
+```{r, message=FALSE}
+# We get three dummy variables
+head(unname(Y))
+
+decomp <- cancor(X, Y)
+
+V <- X %*% decomp$xcoef
+```
+
+
+```{r, message=FALSE}
+data.frame(
+  V1 = V[,1],
+  V2 = V[,2],
+  region = olive$region
+) %>% 
+  ggplot(aes(V1, V2, colour = region)) +
+  geom_point() + 
+  theme_minimal() +
+  theme(legend.position = 'top')
+```
+
+## Comments {.allowframebreaks}
+
+  - The main difference between CCA and Multivariate Linear Regression is that CCA treats $\mathbb{Y}$ and $\mathbb{X}$ *symmetrically*.
+  - As with PCA, you can use CCA and the covariance matrix or the correlation matrix.
+    + The latter is equivalent to performing CCA on the standardised variables.
+  - Note that sample CCA involves inverting the sample covariance matrices $S_Y$ and $S_X$:
+    + This means we need to assume $p,q < n$.
+    + In general, this is what drives most of the performance (or lack thereof) of CCA.
+    + There may be gains in efficiency by directly estimating the inverse covariance.
+  - When one of the two datasets $\mathbb{Y}$ or $\mathbb{X}$ represent indicators variables for a categorical variables (cf. the olive dataset), CCA is equivalent to **Linear Discriminant Analysis**.
+    + To learn more about this method, see a course/textbook on Statistical Learning.
+  
+## Proportions of Explained Sample Variance {.allowframebreaks}
+
+  - Just like in PCA, there is a notion of *proportion of explained variance* that may be helpful in determining the number of canonical variates to retain.
+  - Assume that $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ and $\mathbf{X}_1, \ldots, \mathbf{X}_n$ have been **standardized**. The matrices $A$ and $B$ of canonical directions have the following properties:
+    + The **rows** are the canonical directions (by definition!)
+    + The **columns** of the inverses $A^{-1},B^{-1}$ are the sample correlations between the canonical variates and the standardized variables.
+    \vspace{1cm}
+    
+  - Moreover, we have
+    + $\mathrm{Corr}(\mathbb{Y}) = A^{-1}A^{-T}$
+    + $\mathrm{Corr}(\mathbb{X}) = B^{-1}B^{-T}$
+    \vspace{1cm}
+  - But recall that 
+    + $\mathrm{tr}\left(\mathrm{Corr}(\mathbb{Y})\right) = p$
+    + $\mathrm{tr}\left(\mathrm{Corr}(\mathbb{X})\right) = q$
+    
+    \vspace{3cm}
+  - Putting this all together, we have that
+    + Proportion of total standardized sample variance in $\mathbb{Y} = \begin{pmatrix} \mathbb{Y}_1 & \cdots & \mathbb{Y}_p\end{pmatrix}$ explained by $\hat{U}_1, \ldots, \hat{U}_r$:
+    $$R^2(\mathbf{Y}\mid \hat{U}_1, \ldots, \hat{U}_r) = \frac{\sum_{i=1}^r\sum_{j=1}^p \mathrm{Corr}\left(\hat{U}_i, \mathbb{Y}_k\right)^2}{p}$$
+    + Proportion of total standardized sample variance in $\mathbb{X} = \begin{pmatrix} \mathbb{X}_1 & \cdots & \mathbb{X}_q\end{pmatrix}$ explained by $\hat{V}_1, \ldots, \hat{V}_r$:
+    $$R^2(\mathbf{X}\mid \hat{V}_1, \ldots, \hat{V}_r) = \frac{\sum_{i=1}^r\sum_{j=1}^q \mathrm{Corr}\left(\hat{V}_i, \mathbb{X}_k\right)^2}{q}$$
+
+## Example {.allowframebreaks}
+
+```{r, echo = -1}
+old_opts <- options(digits = 2)
+# Olive data
+X_sc <- scale(X)
+Y_sc <- scale(Y)
+decomp_sc <- cancor(X_sc, Y_sc)
+
+V_sc <- X_sc %*% decomp_sc$xcoef
+colnames(V_sc) <- paste0("CC", seq_len(ncol(V_sc)))
+
+(prop_X <- rowMeans(cor(V_sc, X_sc)^2))
+
+cumsum(prop_X)
+```
+
+```{r, echo = -1}
+old_opts <- options(digits = 2)
+# But since we are dealing with correlations
+# We get the same with unstandardized variables
+decomp <- cancor(X, Y)
+V <- X %*% decomp$xcoef
+colnames(V) <- paste0("CC", seq_len(ncol(V)))
+
+(prop_X <- rowMeans(cor(V, X)^2))
+
+cumsum(prop_X)
+```
+
+  
+## Interpreting the population canonical variates {.allowframebreaks}
+
+  - To help interpretating the canonical variates, let's go back to the population model.
+  - Define
+  \begin{align*}
+  A &= \begin{pmatrix}e_1^T\Sigma_Y^{-1/2} & \cdots & e_p^T\Sigma_Y^{-1/2}\end{pmatrix}^T, \\ 
+  B &= \begin{pmatrix}f_1^T\Sigma_X^{-1/2} & \cdots & f_p^T\Sigma_X^{-1/2}\end{pmatrix}^T.
+  \end{align*}
+  - In other words, both $A$ and $B$ are $p\times p$, and their *rows* are the canonical directions.
+  - Using this notation, we can get all canonical variates using one linear transformation:
+  $$\mathbf{U} = A\mathbf{Y}, \qquad \mathbf{Y} = B\mathbf{X}.$$
+  - We then have
+  $$ \mathrm{Cov}(\mathbf{U}, \mathbf{Y}) = \mathrm{Cov}(A\mathbf{Y}, \mathbf{Y}) = A\Sigma_Y.$$
+  - Since $\mathrm{Cov}(\mathbf{U}) = I_p$, we have
+  $$ \mathrm{Corr}(U_k, Y_i) = \mathrm{Cov}(U_k, \sigma_i^{-1}Y_i),$$
+  where $\sigma^2_i$ is the variance of $Y_i$.
+  - If we let $D_Y$ be the diagonal matrix whose $i$-th diagonal element is $\sigma_i = \sqrt{\mathrm{Var}(Y_i)}$, we can write
+  $$\mathrm{Corr}(\mathbf{U}, \mathbf{Y}) = A\Sigma_YD_Y^{-1}.$$
+  - Using similar computations, we get
+  \begin{align*}
+  \mathrm{Corr}(\mathbf{U}, \mathbf{Y}) = A\Sigma_YD_Y^{-1}, &\qquad \mathrm{Corr}(\mathbf{V}, \mathbf{Y}) = B\Sigma_{XY}D_Y^{-1},\\
+  \mathrm{Corr}(\mathbf{U}, \mathbf{X}) = A\Sigma_{YX}D_X^{-1}, &\qquad \mathrm{Corr}(\mathbf{V}, \mathbf{X}) = B\Sigma_XD_X^{-1}.
+  \end{align*}
+  - **These quantities** (and their sample counterparts) **give us information about the contribution of the original variables to the canonical variates**.
+  
+## Example {.allowframebreaks}
+
+```{r, echo = -1}
+options(digits = old_opts$digits)
+# Let's go back to the olive data
+decomp <- cancor(X, Y)
+V <- X %*% decomp$xcoef
+colnames(V) <- paste0("CC", seq_len(8))
+
+library(lattice)
+levelplot(cor(X, V[,1:2]), 
+          at = seq(-1, 1, by = 0.1),
+          xlab = "", ylab = "")
+```
+
+
+```{r}
+levelplot(cor(Y, V[,1:2]), 
+          at = seq(-1, 1, by = 0.1),
+          xlab = "", ylab = "")
+```
+
+## Generalization of Correlation coefficients {.allowframebreaks}
+
+  - The canonical correlations can be seen as a generalization of many notions of "correlation".
+  - If both $\mathbf{Y},\mathbf{X}$ are one dimensional, then
+  $$\mathrm{Corr}(a^T\mathbf{Y}, b^T\mathbf{X}) = \mathrm{Corr}(\mathbf{Y}, \mathbf{X}), \quad\mbox{for all }a,b.$$
+  - In other words, the canonical correlation generalizes the **univariate correlation coefficient**.
+  - Then assume $\mathbf{Y}$ is one-dimensional, but $\mathbf{X}$ is $q$-dimensional. Then CCA is equivalent to (univariate) linear regression, and the first canonical correlation is equal to the **multiple correlation coefficient**.
+  - Now, let's go back to full-generality: $\mathbf{Y}=(Y_1, \ldots, Y_p)$, $\mathbf{X}=(X_1, \ldots, X_q)$. Let $a$ be all zero except for a one in position $i$, and let $b$ be all zero except for a one in position $j$. We have
+  \begin{align*}
+  \lvert\mathrm{Corr}(Y_i, X_j)\rvert &= \lvert\mathrm{Corr}(a^T\mathbf{Y}, b^T\mathbf{X})\rvert\\
+  &\leq \max_{a,b} \mathrm{Corr}(a^T\mathbf{Y}, b^T\mathbf{X})\\
+  &= \rho_1.
+  \end{align*}
+  - In other words, the **first canonical correlation is larger than any entry** (in  absolute value) **in the matrix** $\mathrm{Corr}(\mathbf{Y}, \mathbf{X})$.
+  - Finally, the $k$-th canonical correlation $\rho_k$ can be interpreted as the **multiple correlation coefficient** of two different univariate linear regression model:
+    + $U_k$ against $\mathbf{X}$;
+    + $V_k$ against $\mathbf{Y}$.
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+# Canonical correlations
+decomp$cor
+
+# Maximum value in correlation matrix
+max(abs(cor(Y, X)))
+
+# Multiple correlation coefficients
+sqrt(summary(lm(V[,1] ~ Y))$r.squared)
+sqrt(summary(lm(V[,2] ~ Y))$r.squared)
+```
+
+## Geometric interpretation {.allowframebreaks}
+
+  - Let's look at a geometric interpretation of CCA.
+  - First, some notation:
+    + Let $A$ be the matrix whose $k$-th row is the $k$-th canonical direction $e_k^T\Sigma_Y^{-1/2}$.
+    + Let $E$ be the matrix whose $k$-th *column* is the eigenvector $e_k$. Note that $E^TE=I_p$.
+    + We thus have $A = E^T\Sigma_Y^{-1/2}$.
+  - We get all canonical variates $U_k$ by transforming $\mathbf{Y}$ using $A$:
+  $$ \mathbf{U} = A\mathbf{Y}.$$
+  - Now, using the spectral decomposition of $\Sigma_Y$, we can write
+  $$A = E^T\Sigma_Y^{-1/2} = E^TP_Y\Lambda_Y^{-1/2}P_Y^T,$$
+  where $P_Y$ contains the eigenvectors of $\Sigma_Y$ and $\Lambda_Y$ is the diagonal matrix with its eigenvalues.
+  - Therefore, we can see that
+  $$ \mathbf{U} = A\mathbf{Y} = E^TP_Y\Lambda_Y^{-1/2}P_Y^T\mathbf{Y}.$$
+  \vspace{1cm}
+  - Let's look at this expression in stages:
+    + $P_Y^T\mathbf{Y}$: This is the matrix of **principal components** of $\mathbf{Y}$.
+    + $\Lambda_Y^{-1/2}\left(P_Y^T\mathbf{Y}\right)$: We standardize the principal components to have unit variance.
+    + $P_Y\left(\Lambda_Y^{-1/2}P_Y^T\mathbf{Y}\right)$: We rotate the standardized PCs using a transformation that **only involves** $\Sigma_Y$.
+    + $E^T\left(P_Y\Lambda_Y^{-1/2}P_Y^T\mathbf{Y}\right)$: We rotate the result using a transformation that **involves the whole covariance matrix** $\Sigma$.
+    
+## Example {.allowframebreaks}
+
+  - Let's go back to the covariance matrix at the beginning of this slide deck:
+  
+  $$\Sigma = \begin{pmatrix}
+  1.0 & 0.4 & 0.5 & 0.6\\
+  0.4 & 1.0 & 0.3 & 0.4\\
+  0.5 & 0.3 & 1.0 & 0.2\\
+  0.6 & 0.4 & 0.2 & 1.0
+  \end{pmatrix}.$$
+
+---
+
+```{r, message = FALSE, echo = FALSE}
+Sigma_Y <- matrix(c(1, 0.4, 0.4, 1), ncol = 2)
+Sigma_X <- matrix(c(1, 0.2, 0.2, 1), ncol = 2)
+Sigma_YX <- matrix(c(0.5, 0.3, 0.6, 0.4), ncol = 2)
+Sigma_XY <- t(Sigma_YX)
+
+library(expm)
+sqrt_Y <- sqrtm(Sigma_Y)
+sqrt_X <- sqrtm(Sigma_X)
+M1 <- solve(sqrt_Y) %*% Sigma_YX %*% solve(Sigma_X)%*% 
+  Sigma_XY %*% solve(sqrt_Y)
+
+decomp1 <- eigen(M1, symmetric = TRUE)
+decompY <- eigen(Sigma_Y, symmetric = TRUE)
+```
+
+```{r echo = FALSE}
+plot(x = 0, y = 0, xlim = c(-1, 1), ylim = c(-1, 1),
+     xlab = "Y1", ylab = "Y2", type = 'n', asp = 1)
+arrows(x0 = 0, y0 = 0,
+       x1 = 1, y1 = 0, col = 'red')
+arrows(x0 = 0, y0 = 0,
+       x1 = 0, y1 = 1, col = 'red')
+```
+
+--- 
+
+```{r echo = FALSE}
+Ytrans <- decompY$vectors
+plot(x = 0, y = 0, xlim = c(-1, 1), ylim = c(-1, 1),
+     xlab = "Y1", ylab = "Y2", type = 'n', asp = 1)
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,1], y1 = Ytrans[2,1], 
+       col = 'red')
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,2], y1 = Ytrans[2,2], 
+       col = 'red')
+```
+
+--- 
+
+```{r echo = FALSE}
+Ytrans <- decompY$vectors %*% diag(1/sqrt(decompY$values))
+plot(x = 0, y = 0, xlim = c(-1, 1), ylim = c(-1, 1),
+     xlab = "Y1", ylab = "Y2", type = 'n', asp = 1)
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,1], y1 = Ytrans[2,1], 
+       col = 'red')
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,2], y1 = Ytrans[2,2], 
+       col = 'red')
+```
+
+--- 
+
+```{r echo = FALSE}
+Ytrans <- decompY$vectors %*% (decompY$vectors %*% diag(1/sqrt(decompY$values)))
+plot(x = 0, y = 0, xlim = c(-1, 1), ylim = c(-1, 1),
+     xlab = "Y1", ylab = "Y2", type = 'n', asp = 1)
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,1], y1 = Ytrans[2,1], 
+       col = 'red')
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,2], y1 = Ytrans[2,2], 
+       col = 'red')
+```
+
+--- 
+
+```{r echo = FALSE}
+Ytrans <- decomp1$vectors %*% solve(sqrt_Y)
+plot(x = 0, y = 0, xlim = c(-1, 1), ylim = c(-1, 1),
+     xlab = "Y1", ylab = "Y2", type = 'n', asp = 1)
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,1], y1 = Ytrans[2,1], 
+       col = 'red')
+arrows(x0 = 0, y0 = 0,
+       x1 = Ytrans[1,2], y1 = Ytrans[2,2], 
+       col = 'red')
+```
+
+# Large sample inference
+
+## Test of independence {.allowframebreaks}
+
+  - Recall what we said at the outset: CCA trys to explain the covariance $\mathrm{Cov}(\mathbf{Y}, \mathbf{X})$.
+  - If there is no correlation between $\mathbf{Y}, \mathbf{X}$, then $\Sigma_{YX} = 0$.
+    + In particular, $a^T\Sigma_{YX}b = 0$ for any choice of $a\in\mathbb{R}^p, b\in\mathbb{R}^q$, and therefore all canonical correlations are equal to 0.
+  - To test for independence between $\mathbf{Y}$ and $\mathbf{X}$, we can use a **likelihood ratio test**.
+    + Recall our discussion of tests for covariance matrices.
+  
+## LRT for $\Sigma_{YX} = 0$ {.allowframebreaks}
+
+Let $(\mathbf{Y}_i, \mathbf{X}_i)$, $i=1,\ldots,n$, be a random sample from a normal distribution $N_{p+q}(\mu, \Sigma)$, with 
+$$\Sigma = \begin{pmatrix} \Sigma_Y & \Sigma_{YX}\\\Sigma_{XY}&\Sigma_X\end{pmatrix}.$$
+Let $S_Y,S_X$ be the sample covariances of $\mathbf{Y}_1, \ldots,\mathbf{Y}_n$, respectively, and let $S_n$ be the $p+q$-dimensional sample covariance of $(\mathbf{Y}_i, \mathbf{X}_i)$. 
+
+Then the likelihood ratio test for $H_0:\Sigma_{YX} = 0$ rejects $H_0$ for large values of 
+$$ -2\log\Lambda = n\log\left(\frac{\lvert S_Y \rvert \lvert S_X \rvert}{\lvert S_n \rvert}\right) = -n \log \prod_{i=1}^p (1 - \hat{\rho}_i^2),$$
+where $\hat{\rho}_1, \ldots, \hat{\rho}_p$ are the sample canonical correlations.
+
+## Null distribution
+
+  1. For large $n$, the statistic $-2\log\Lambda$ is approximately chi-square with degrees of freedom equal to
+  $$ \left(\frac{(p + q)(p + q + 1)}{2}\right) - \left(\frac{p(p + 1)}{2}+\frac{q(q + 1)}{2}\right) = pq.$$
+  2. Bartlett's correction uses a different statistic (but the same null distribution):
+  $$-\left(n - 1 -\frac{1}{2}(p+q+1)\right)\log \prod_{i=1}^p (1 - \hat{\rho}_i^2).$$
+  
+## Example {.allowframebreaks}
+
+  - We will look at a different example, this time from the field of vegetation ecology.
+  - We have two datasets:
+    + `varechem`: 14 chemical measurements from the soil.
+    + `varespec`: 44 estimated cover values for lichen species.
+  - The data has 24 observations.
+  - For more details, see Väre, H., Ohtonen, R. and Oksanen, J. (1995) *Effects of reindeer grazing on understorey vegetation in dry Pinus sylvestris forests*. Journal of Vegetation Science 6, 523–530.
+  
+```{r}
+library(vegan)
+
+data(varespec)
+data(varechem)
+
+# There are too many variables in varespec
+# Let's pick first 10
+Y <- varespec %>% 
+  select(Callvulg:Diphcomp) %>% 
+  as.matrix
+```
+
+
+```{r}
+# The help page in `vegan` suggests a better 
+# chemical model
+X <- varechem %>% 
+  model.matrix( ~ Al + P*(K + Baresoil) - 1, 
+                data = .)
+```
+
+
+```{r}
+decomp <- cancor(x = X, y = Y)
+
+n <- nrow(X)
+(LRT <- -n*log(prod(1 - decomp$cor^2)))
+
+p <- min(ncol(X), ncol(Y))
+q <- max(ncol(X), ncol(Y))
+LRT > qchisq(0.95, df = p*q)
+
+LRT_bart <- -(n - 1 - 0.5*(p + q + 1)) *
+  log(prod(1 - decomp$cor^2))
+
+c("Large Sample" = LRT,
+  "Bartlett" = LRT_bart)
+
+LRT_bart > qchisq(0.95, df = p*q)
+```
+
+## Sequential inference {.allowframebreaks}
+
+  - The LRT above was for independence, i.e. $\Sigma_{YX} = 0$.
+  - Given our description of CCA above, this test is equivalent to having all canonical correlations being equal to 0.
+  $$ \Sigma_{YX} = 0 \Longleftrightarrow \rho_1 = \cdots = \rho_p = 0.$$
+  - If we reject the null hypothesis, it is natural to ask how many canonical correlations are nonzero.
+  - Recall that by design $\rho_1\geq\cdots\geq\rho_p$. We thus get a sequence of null hypotheses:
+  $$H_0^k : \rho_1 \neq 0, \ldots, \rho_k \neq 0, \rho_{k+1} =  \cdots = \rho_p = 0.$$
+  - We can test the $k$-th hypothesis using a *truncated* version of the likelihood ratio test statistic:
+  $$LRT_k = -\left(n - 1 -\frac{1}{2}(p+q+1)\right)\log \prod_{i=k+1}^p (1 - \hat{\rho}_i^2),$$
+  where its null distribution is approximately chi-square on $(p-k)(q-k)$ degrees of freedom.
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r echo = -1}
+old_opts <- options(digits = 2)
+# We can get the truncated LRTs in one go
+(log_ccs <- rev(log(cumprod(1 - rev(decomp$cor)^2))))
+
+(LRTs <- -(n - 1 - 0.5*(p + q + 1)) * log_ccs)
+
+k_seq <- seq(0, p - 1)
+LRTs > qchisq(0.95,
+              df = (p - k_seq)*(q - k_seq))
+# We only reject the first null hypothesis 
+# of independence
+```
+
+
+```{r echo = FALSE}
+data.frame(
+  k = k_seq,
+  LRT = LRTs,
+  CC = qchisq(0.95,
+              df = (p - k_seq)*(q - k_seq))
+) %>% 
+  gather(Type, Value, LRT, CC) %>% 
+  ggplot(aes(k, Value, colour = Type)) + 
+  geom_point() +
+  geom_line() +
+  theme_minimal() +
+  ylab("") +
+  scale_colour_discrete(name = "",
+                        breaks = c("LRT", "CC"),
+                        labels = c("LRT", "Critical value"))
+```
+
+<!-- ## Reduced-Rank Regression -->
+
+<!-- ## Summary -->
+
+<!--   - CCA is a dimension reduction method like PCA -->
+<!--     + But we are reducing the dimension of two datasets **jointly**. -->
+<!--     + Instead of maximising variance, we maximise **correlation**. -->
+<!--   - The goal is to explain the association between $\mathbf{Y}$ and $\mathbf{X}$. -->
+<!--     + Unlike MLR, both datasets are treated equally. -->
+<!--   - All visualization methods we discussed in the context of PCA (e.g. component plots, loading plots, biplots) are available for CCA. -->
+<!--     + See the `R` package `vegan`. -->
+<!--   - **Limitation**: CCA performs poorly when $p$ and/or $q$ are close to $n$. -->
