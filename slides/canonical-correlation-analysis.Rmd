@@ -17,9 +17,7 @@ header-includes:
 ---
 
 ```{r,setup, include=FALSE}
-knitr::opts_chunk$set(cache=TRUE,
-                      tidy.opts = list(width.cutoff = 20),
-                      tidy = TRUE)
+knitr::opts_chunk$set(cache=TRUE)
 ```
 
 ## Objectives
@@ -53,7 +51,7 @@ knitr::opts_chunk$set(cache=TRUE,
     
 ## Dimension reduction {.allowframebreaks}
 
-  - Let $U = a^T\mathbf{Y}$ and $V = b^T\mathbf{Y}$ be linear combinations of $\mathbf{Y}$ and $\mathbf{X}$, respectively.
+  - Let $U = a^T\mathbf{Y}$ and $V = b^T\mathbf{X}$ be linear combinations of $\mathbf{Y}$ and $\mathbf{X}$, respectively.
   - We have:
     + $\mathrm{Var}(U) = a^T\Sigma_Y a$
     + $\mathrm{Var}(V) = b^T\Sigma_X b$
@@ -79,7 +77,7 @@ knitr::opts_chunk$set(cache=TRUE,
   &= \frac{\tilde{a}^T\Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1/2}\tilde{b}}{\sqrt{\tilde{a}^T\tilde{a}}\sqrt{\tilde{b}^T\tilde{b}}}.
   \end{align*}
   - Let $M = \Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1/2}$. We have
-  $$ \max_{a,b}\mathrm{Corr}(a^T\mathbf{Y}, b^T\mathbf{Y}) \Longleftrightarrow \max_{\tilde{a},\tilde{b}:\|\tilde{a}\|=1,\|\tilde{b}\|=1} \tilde{a}^TM\tilde{b}$$
+  $$ \max_{a,b}\mathrm{Corr}(a^T\mathbf{Y}, b^T\mathbf{X}) \Longleftrightarrow \max_{\tilde{a},\tilde{b}:\|\tilde{a}\|=1,\|\tilde{b}\|=1} \tilde{a}^TM\tilde{b}$$
   - As we will see, the solution to this maximisation problem involves the **singular value decomposition** of $M$.
   - Equivalently, it involves the **eigendecomposition** of $MM^T$, where
   $$MM^T = \Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1/2}.$$
@@ -275,38 +273,35 @@ data.frame(
 ## Proportions of Explained Sample Variance {.allowframebreaks}
 
   - Just like in PCA, there is a notion of *proportion of explained variance* that may be helpful in determining the number of canonical variates to retain.
-  - Assume that $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ and $\mathbf{X}_1, \ldots, \mathbf{X}_n$ have been **standardized**. The matrices $A$ and $B$ of canonical directions have the following properties:
-    + The **rows** are the canonical directions (by definition!)
-    + The **columns** of the inverses $A^{-1},B^{-1}$ are the sample correlations between the canonical variates and the standardized variables.
-    \vspace{1cm}
-    
-  - Moreover, we have
-    + $\mathrm{Corr}(\mathbb{Y}) = A^{-1}A^{-T}$
-    + $\mathrm{Corr}(\mathbb{X}) = B^{-1}B^{-T}$
-    \vspace{1cm}
-  - But recall that 
+  - Assume that $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ and $\mathbf{X}_1, \ldots, \mathbf{X}_n$ have been **standardized**.
+  - Recall that 
     + $\mathrm{tr}\left(\mathrm{Corr}(\mathbb{Y})\right) = p$
     + $\mathrm{tr}\left(\mathrm{Corr}(\mathbb{X})\right) = q$
+    \vspace{2cm}
     
-    \vspace{3cm}
-  - Putting this all together, we have that
+  - We define the following quantities:
     + Proportion of total standardized sample variance in $\mathbb{Y} = \begin{pmatrix} \mathbb{Y}_1 & \cdots & \mathbb{Y}_p\end{pmatrix}$ explained by $\hat{U}_1, \ldots, \hat{U}_r$:
-    $$R^2(\mathbf{Y}\mid \hat{U}_1, \ldots, \hat{U}_r) = \frac{\sum_{i=1}^r\sum_{j=1}^p \mathrm{Corr}\left(\hat{U}_i, \mathbb{Y}_k\right)^2}{p}$$
+    $$R^2(\mathbf{Y}\mid \hat{U}_1, \ldots, \hat{U}_r) = \frac{\sum_{i=1}^r\sum_{j=1}^p \mathrm{Corr}\left(\hat{U}_i, \mathbb{Y}_j\right)^2}{p}$$
     + Proportion of total standardized sample variance in $\mathbb{X} = \begin{pmatrix} \mathbb{X}_1 & \cdots & \mathbb{X}_q\end{pmatrix}$ explained by $\hat{V}_1, \ldots, \hat{V}_r$:
-    $$R^2(\mathbf{X}\mid \hat{V}_1, \ldots, \hat{V}_r) = \frac{\sum_{i=1}^r\sum_{j=1}^q \mathrm{Corr}\left(\hat{V}_i, \mathbb{X}_k\right)^2}{q}$$
+    $$R^2(\mathbf{X}\mid \hat{V}_1, \ldots, \hat{V}_r) = \frac{\sum_{i=1}^r\sum_{j=1}^q \mathrm{Corr}\left(\hat{V}_i, \mathbb{X}_j\right)^2}{q}$$
 
 ## Example {.allowframebreaks}
 
 ```{r, echo = -1}
 old_opts <- options(digits = 2)
-# Olive data
+# Olive data--Standardize
 X_sc <- scale(X)
 Y_sc <- scale(Y)
 decomp_sc <- cancor(X_sc, Y_sc)
 
+# Extract Canonical variates
 V_sc <- X_sc %*% decomp_sc$xcoef
 colnames(V_sc) <- paste0("CC", seq_len(ncol(V_sc)))
+```
 
+
+```{r, echo = -1}
+old_opts <- options(digits = 2)
 (prop_X <- rowMeans(cor(V_sc, X_sc)^2))
 
 cumsum(prop_X)
@@ -334,9 +329,9 @@ cumsum(prop_X)
   A &= \begin{pmatrix}e_1^T\Sigma_Y^{-1/2} & \cdots & e_p^T\Sigma_Y^{-1/2}\end{pmatrix}^T, \\ 
   B &= \begin{pmatrix}f_1^T\Sigma_X^{-1/2} & \cdots & f_p^T\Sigma_X^{-1/2}\end{pmatrix}^T.
   \end{align*}
-  - In other words, both $A$ and $B$ are $p\times p$, and their *rows* are the canonical directions.
+  - In other words, the *rows* of $A$ and $B$ are the canonical directions.
   - Using this notation, we can get all canonical variates using one linear transformation:
-  $$\mathbf{U} = A\mathbf{Y}, \qquad \mathbf{Y} = B\mathbf{X}.$$
+  $$\mathbf{U} = A\mathbf{Y}, \qquad \mathbf{V} = B\mathbf{X}.$$
   - We then have
   $$ \mathrm{Cov}(\mathbf{U}, \mathbf{Y}) = \mathrm{Cov}(A\mathbf{Y}, \mathbf{Y}) = A\Sigma_Y.$$
   - Since $\mathrm{Cov}(\mathbf{U}) = I_p$, we have
@@ -366,6 +361,7 @@ levelplot(cor(X, V[,1:2]),
           xlab = "", ylab = "")
 ```
 
+\vspace{2cm}
 
 ```{r}
 levelplot(cor(Y, V[,1:2]), 
@@ -373,7 +369,7 @@ levelplot(cor(Y, V[,1:2]),
           xlab = "", ylab = "")
 ```
 
-## Generalization of Correlation coefficients {.allowframebreaks}
+## Generalization of correlation coefficients {.allowframebreaks}
 
   - The canonical correlations can be seen as a generalization of many notions of "correlation".
   - If both $\mathbf{Y},\mathbf{X}$ are one dimensional, then
@@ -419,7 +415,7 @@ sqrt(summary(lm(V[,2] ~ Y))$r.squared)
   where $P_Y$ contains the eigenvectors of $\Sigma_Y$ and $\Lambda_Y$ is the diagonal matrix with its eigenvalues.
   - Therefore, we can see that
   $$ \mathbf{U} = A\mathbf{Y} = E^TP_Y\Lambda_Y^{-1/2}P_Y^T\mathbf{Y}.$$
-  \vspace{1cm}
+  \vspace{2cm}
   - Let's look at this expression in stages:
     + $P_Y^T\mathbf{Y}$: This is the matrix of **principal components** of $\mathbf{Y}$.
     + $\Lambda_Y^{-1/2}\left(P_Y^T\mathbf{Y}\right)$: We standardize the principal components to have unit variance.
@@ -534,11 +530,35 @@ arrows(x0 = 0, y0 = 0,
 
 Let $(\mathbf{Y}_i, \mathbf{X}_i)$, $i=1,\ldots,n$, be a random sample from a normal distribution $N_{p+q}(\mu, \Sigma)$, with 
 $$\Sigma = \begin{pmatrix} \Sigma_Y & \Sigma_{YX}\\\Sigma_{XY}&\Sigma_X\end{pmatrix}.$$
-Let $S_Y,S_X$ be the sample covariances of $\mathbf{Y}_1, \ldots,\mathbf{Y}_n$, respectively, and let $S_n$ be the $p+q$-dimensional sample covariance of $(\mathbf{Y}_i, \mathbf{X}_i)$. 
+Let $S_Y,S_X$ be the sample covariances of $\mathbf{Y}_1, \ldots,\mathbf{Y}_n$ and $\mathbf{X}_1, \ldots,\mathbf{X}_n$, respectively, and let $S_n$ be the $p+q$-dimensional sample covariance of $(\mathbf{Y}_i, \mathbf{X}_i)$. 
 
 Then the likelihood ratio test for $H_0:\Sigma_{YX} = 0$ rejects $H_0$ for large values of 
 $$ -2\log\Lambda = n\log\left(\frac{\lvert S_Y \rvert \lvert S_X \rvert}{\lvert S_n \rvert}\right) = -n \log \prod_{i=1}^p (1 - \hat{\rho}_i^2),$$
 where $\hat{\rho}_1, \ldots, \hat{\rho}_p$ are the sample canonical correlations.
+
+Let's prove the second equality: first, note that this is equivalent to showing
+$$\Lambda^{2/n} = \frac{\lvert S_n \rvert}{\lvert S_Y \rvert \lvert S_X \rvert} = \prod_{i=1}^p(1 - \hat{\rho}_i^2).$$
+
+Also, note that we can decompose $S_n$ into a block matrix:
+
+$$S_n = \begin{pmatrix}S_Y&S_{YX}\\S_{XY}&S_X\end{pmatrix}.$$
+We can then use the formula for the determinant of block matrix:
+$$\lvert S_n \rvert = \lvert S_X\rvert \cdot \lvert S_Y - S_{YX} S_X^{-1}S_{XY}\rvert.$$
+
+We can thus write
+\begin{align*}
+\Lambda^{2/n} &= \frac{\lvert S_n \rvert}{\lvert S_Y \rvert \lvert S_X \rvert}\\
+  &= \frac{\lvert S_X\rvert \cdot \lvert S_Y - S_{YX} S_X^{-1}S_{XY}\rvert}{\lvert S_Y \rvert \lvert S_X \rvert}\\
+  &= \frac{\lvert S_Y - S_{YX} S_X^{-1}S_{XY}\rvert}{\lvert S_Y \rvert}\\
+  &= \lvert I_p - S_{YX} S_X^{-1}S_{XY}S_{Y}^{-1}\rvert\\
+  &= \lvert I_p - S_{Y}^{-1/2}S_{YX} S_X^{-1}S_{XY}S_{Y}^{-1/2}\rvert
+  &= \lvert I_p - \hat{M}\hat{M}^T\rvert,
+\end{align*}
+where
+$$\hat{M}\hat{M}^T = S_{Y}^{-1/2}S_{YX} S_X^{-1}S_{XY}S_{Y}^{-1/2}.$$
+But we know that the eigenvalues of $\hat{M}\hat{M}^T$ are $\hat{\rho}_1^2 > \ldots > \hat{\rho}_p^2$, and therefore we can write
+$$\Lambda^{2/n} = \prod_{i=1}^p(1 - \hat{\rho}_i^2).$$
+\hfill\qed
 
 ## Null distribution
 
@@ -564,8 +584,7 @@ data(varechem)
 
 # There are too many variables in varespec
 # Let's pick first 10
-Y <- varespec %>% 
-  select(Callvulg:Diphcomp) %>% 
+Y <- select(varespec, Callvulg:Diphcomp) %>% 
   as.matrix
 ```
 
@@ -573,9 +592,10 @@ Y <- varespec %>%
 ```{r}
 # The help page in `vegan` suggests a better 
 # chemical model
-X <- varechem %>% 
-  model.matrix( ~ Al + P*(K + Baresoil) - 1, 
-                data = .)
+X <- model.matrix( ~ Al + P*(K + Baresoil) - 1,
+                  data = varechem)
+colnames(X)[1:4]
+colnames(X)[5:6]
 ```
 
 
