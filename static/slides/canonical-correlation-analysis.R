@@ -1,7 +1,5 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(cache=TRUE,
-                      tidy.opts = list(width.cutoff = 20),
-                      tidy = TRUE)
+knitr::opts_chunk$set(cache=TRUE)
 
 
 ## -----------------------------------------------------------------------------
@@ -101,14 +99,18 @@ data.frame(
 
 ## ---- echo = -1---------------------------------------------------------------
 old_opts <- options(digits = 2)
-# Olive data
+# Olive data--Standardize
 X_sc <- scale(X)
 Y_sc <- scale(Y)
 decomp_sc <- cancor(X_sc, Y_sc)
 
+# Extract Canonical variates
 V_sc <- X_sc %*% decomp_sc$xcoef
 colnames(V_sc) <- paste0("CC", seq_len(ncol(V_sc)))
 
+
+## ---- echo = -1---------------------------------------------------------------
+old_opts <- options(digits = 2)
 (prop_X <- rowMeans(cor(V_sc, X_sc)^2))
 
 cumsum(prop_X)
@@ -239,17 +241,17 @@ data(varechem)
 
 # There are too many variables in varespec
 # Let's pick first 10
-Y <- varespec %>% 
-  select(Callvulg:Diphcomp) %>% 
+Y <- select(varespec, Callvulg:Diphcomp) %>% 
   as.matrix
 
 
 ## -----------------------------------------------------------------------------
 # The help page in `vegan` suggests a better 
 # chemical model
-X <- varechem %>% 
-  model.matrix( ~ Al + P*(K + Baresoil) - 1, 
-                data = .)
+X <- model.matrix( ~ Al + P*(K + Baresoil) - 1,
+                  data = varechem)
+colnames(X)[1:4]
+colnames(X)[5:6]
 
 
 ## -----------------------------------------------------------------------------
