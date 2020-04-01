@@ -36,4 +36,6 @@ type: docs
   - [Canonical Correlation Analysis](canonical-correlation-analysis.pdf)
     + [R code](canonical-correlation-analysis.R)
   - Factor Analysis
+    + [Lecture notes](https://www.maxturgeon.ca/f19-stat4690/slides/factor-analysis.pdf) from STAT 4690
+    + [R code](https://www.maxturgeon.ca/f19-stat4690/slides/factor-analysis.R) from STAT 4690
     
