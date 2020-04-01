@@ -665,7 +665,193 @@ data.frame(
                         labels = c("LRT", "Critical value"))
 ```
 
-<!-- ## Reduced-Rank Regression -->
+# Reduced-Rank Regression
+
+## Multiple Linear Regression
+
+  - Recall the setup for MLR: Let $\mathbf{Y}_1\ldots,\mathbf{Y}_n$ be a random sample of size $n$, and let $\mathbf{X}_1, \ldots, \mathbf{X}_n$ be the corresponding sample of covariates.
+  - We assume a **linear relationship**:
+  $$E(\mathbf{Y}_i\mid \mathbf{X}_i) = B^T\mathbf{X}_i,$$
+  where $B$ is a $q\times p$ matrix of *regression coefficients*.
+  - We write $\mathbb{Y}$ and $\mathbb{X}$ for the matrices whose $i$-th row is $\mathbf{Y}_i$ and $\mathbf{X}_i$, respectively.
+  - The OLS estimator is then given by
+  $$\hat{B}_{OLS} = (\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}.$$
+
+## Reduced-Rank Regression---Motivation {.allowframebreaks}
+
+\vspace{1cm}
+  - Two important observations:
+    + The OLS estimate is equivalent to $p$ independent univariate regressions. In other words, **no sharing of information across outcome variables.**
+    + There are $pq$ regression coefficients to estimate. **Every time we had an outcome variable, we need to estimate $q$ new parameters.**
+    
+\vspace{1cm}
+  - One way to mitigate both effects is to impose a rank restriction on $B$:
+    + $\mathrm{rank}(B) = k$ is equivalent to having $p - k$ linear constraints
+    $$ \ell_j^T B = 0, \qquad j=1, \ldots, p-k.$$
+    + $\mathrm{rank}(B) = k$ is also equivalent to writing $B^T = UV$, where $U$ is $p\times k$, $V$ is $k\times q$, and both are of rank $k$. This means that we have at most $(p+q)k$ regression coefficients to estimate.
+    
+## Brillinger's Theorem
+
+Assume $\mathbf{X}_i,\mathbf{Y}_i$ have mean zero. Define $\Sigma_Y = \mathrm{Cov}(\mathbf{Y}_i)$, $\Sigma_X = \mathrm{Cov}(\mathbf{X}_i)$, and $\Sigma_{YX} = \mathrm{Cov}(\mathbf{Y}_i, \mathbf{X}_i)$, and assume that $\Sigma_X$ is invertible. Finally, let $\Gamma$ be a $p\times p$ positive-definite weight matrix. The $p\times k$ and $k\times q$ matrices $U,V$ of rank $k$ that minimize
+$$\mathrm{tr}\left(E\left(\Gamma^{1/2}(\mathbf{Y}_i - UV\mathbf{X}_i)(\mathbf{Y}_i - UV\mathbf{X}_i)^T\Gamma^{1/2}\right)\right)$$
+are given by
+\begin{align*}
+\hat{U} &= \Gamma^{-1/2}W_k,\\
+\hat{V} &= W_k^T\Gamma^{1/2}\Sigma_{YX} \Sigma^{-1}_{X},
+\end{align*}
+where the columns of $W_k$ are the normalized eigenvectors corresponding to the $k$ largest eigenvalues of $\Gamma^{1/2}\Sigma_{YX} \Sigma^{-1}_{X} \Sigma^T_{YX}\Gamma^{1/2}$.
+
+## Comments {.allowframebreaks}
+
+  - This theorem can be proven using the Eckart-Young theorem (see lectures on PCA).
+  - When $p \leq q$ and we choose $k = p$, we recover the OLS estimate:
+    + $\hat{B} = \hat{V}^T\hat{U}^T = \Sigma_X^{-1}\Sigma_{YX}^T$
+  - When $\Gamma = \Sigma_Y^{-1}$, the columns of $U$ are the **canonical directions** for $\mathbf{Y}_i$
+  - The term *reduced-rank regression* is typically reserve for the case when $\Gamma = I_p$, i.e. the weight matrix is the identity matrix.
+  - At the sample level, the result becomes
+  \begin{align*}
+  \hat{U} &= W_k,\\
+  \hat{V} &= W_k^T\mathbb{Y}^T\mathbb{X}(\mathbb{X}^T\mathbb{X})^{-1},
+  \end{align*}
+  where the columns of $W_k$ are the normalized eigenvectors corresponding to the $k$ largest eigenvalues of $\mathbb{Y}^T\mathbb{X}(\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}$.
+    + This gives
+    $$\hat{B}_{RR} = (\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}W_kW_k^T = \hat{B}_{OLS}W_kW_k^T$$
+    
+## Example {.allowframebreaks}
+
+```{r, message = FALSE}
+# Recall the plastic film data
+library(heplots)
+
+fit <- lm(cbind(tear, gloss, opacity) ~ rate + additive,
+          data = Plastic)
+coef(fit)
+```
+
+```{r}
+Y <- Plastic %>% 
+  select(tear, gloss, opacity) %>% 
+  as.matrix
+X <- model.matrix(~ rate + additive, data = Plastic)
+
+# We get the same as OLS
+(beta_ols <- solve(crossprod(X), crossprod(X, Y)))
+```
+
+```{r}
+# Reduced-Rank regression
+M <- crossprod(Y, X) %*% beta_ols
+decomp <- eigen(M)
+
+# Take rank = 1
+W <- decomp$vectors[,1, drop=FALSE]
+rownames(W) <- colnames(Y)
+(beta_rrr <- beta_ols %*% tcrossprod(W))
+
+# Note that rank 1 means rows are colinear
+beta_rrr[1,]/beta_rrr[2,]
+```
+
+## Selecting the rank {.allowframebreaks}
+
+  - Of course, the rank $k$ is a *tuning parameter* that we need to select.
+  - One approach is to use sequential inference (see Section 2.6 of Reinsel and Velu).
+  - Another approach is to choose $k$ that minimises the cross-validated MSE (cf. Lectures on Regularized Regression).
+  - In this lecture, we will focus on **Information Criteria**.
+    + Recall the general form of Akaike's information criterion:
+    $$ -2\log L(\hat{B}, \hat{\Sigma}) + 2d,$$
+    where $d$ is the number of parameters to estimate.
+  - If $\hat{\mathbb{Y}}$ is the matrix of fitted values, then we have
+  $$-2\log L(\hat{B}_{RR}, \hat{\Sigma}_{RR}) = n\log\left\lvert\hat{\Sigma}_{RR}\right\rvert,$$
+  where $\hat{\Sigma}_{RR} = \frac{1}{n}\left(\mathbb{Y} - \hat{\mathbb{Y}}\right)^T\left(\mathbb{Y} - \hat{\mathbb{Y}}\right)$.
+  - On the other hand, if we restrict $B$ to have rank $k$, there are only $d = (p+q-k)k$ free parameters.
+    + $kq$ free parameters for the column space of $B$
+    + $k(p-k)$ free parameters for the remaining columns
+  - However, a careful analysis shows that this is actually an *underestimate* of the true degrees of freedom
+    + If $\lambda_1, \ldots, \lambda_p$ are the eigenvalues of $\mathbb{Y}^T\mathbb{X}(\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}$, then 
+    $$ d = (p+q-k)k + 2\sum_{\ell = 1}^{k}\sum_{j = k+ 1}^{p} \frac{\lambda_j}{\lambda_\ell - \lambda_j}.$$ 
+    + See for example Yuan (2016) *Degrees of freedom in low rank matrix estimation*
+  - The function `rrpack::rrr` calls the first type of degrees of freedom *naive*, and the second type, *exact*.
+    + By default, it uses the exact degrees of freedom.
+
+## Example (cont'd) {.allowframebreaks}
+
+```{r}
+# Let's create a function
+redrank <- function(Y, X, rank = 1) {
+  beta_ols <- solve(crossprod(X), crossprod(X, Y))
+  M <- crossprod(Y, X) %*% beta_ols
+  decomp <- eigen(M)
+  W <- decomp$vectors[,seq_len(rank),drop=FALSE]
+  rownames(W) <- colnames(Y)
+  return(beta_ols %*% tcrossprod(W))
+}
+```
+
+```{r}
+all.equal(beta_rrr, redrank(Y, X))
+```
+
+```{r}
+# First the log likelihoods
+loglik <- sapply(c(1, 2, 3), function(k) {
+  beta_rrr <- redrank(Y, X, k)
+  resids <- Y - X %*% beta_rrr
+  n*log(det(crossprod(resids)/nrow(Y)))
+})
+```
+
+```{r}
+# With naive degrees of freedom
+2*seq_len(3)*(ncol(X) + ncol(Y) - 
+                seq_len(3)) + loglik
+```
+
+```{r}
+# With exact degrees of freedom
+dfs <- sapply(seq_len(3), function(k) {
+  total <- 0
+  lambdas <- decomp$values[seq(k+1, ncol(Y))]
+  for (ell in seq(1, k)) {
+    total <- sum(lambdas/(decomp$values[ell] - lambdas)) + total
+  }
+  if (k == ncol(Y)) return(0) else return(2*total)
+})
+```
+
+```{r}
+2*seq_len(3)*(ncol(X) + ncol(Y) - 
+                seq_len(3)) + 2*dfs + loglik
+# Both approaches select the full rank model
+```
+
+```{r}
+# Constrast this with rrpack::rrr
+# Which uses a different AIC
+rrpack::rrr(Y, X, ic.type = "AIC")
+```
+
+## Example 2 {.allowframebreaks}
+
+```{r}
+# Tobacco dataset
+tobacco_y <- as.matrix(rrr::tobacco[,1:3])
+tobacco_x <- as.matrix(rrr::tobacco[,4:9])
+
+dim(tobacco_x)
+dim(tobacco_y)
+```
+
+```{r}
+(rr_fit <- rrpack::rrr(tobacco_y, tobacco_x))
+```
+
+```{r}
+library(lattice)
+coef <- rr_fit$coef
+colnames(coef) <- colnames(tobacco_y)
+levelplot(coef)
+```
 
 <!-- ## Summary -->
 

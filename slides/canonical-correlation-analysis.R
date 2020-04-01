@@ -304,3 +304,111 @@ data.frame(
                         breaks = c("LRT", "CC"),
                         labels = c("LRT", "Critical value"))
 
+
+## ---- message = FALSE---------------------------------------------------------
+# Recall the plastic film data
+library(heplots)
+
+fit <- lm(cbind(tear, gloss, opacity) ~ rate + additive,
+          data = Plastic)
+coef(fit)
+
+
+## -----------------------------------------------------------------------------
+Y <- Plastic %>% 
+  select(tear, gloss, opacity) %>% 
+  as.matrix
+X <- model.matrix(~ rate + additive, data = Plastic)
+
+# We get the same as OLS
+(beta_ols <- solve(crossprod(X), crossprod(X, Y)))
+
+
+## -----------------------------------------------------------------------------
+# Reduced-Rank regression
+M <- crossprod(Y, X) %*% beta_ols
+decomp <- eigen(M)
+
+# Take rank = 1
+W <- decomp$vectors[,1, drop=FALSE]
+rownames(W) <- colnames(Y)
+(beta_rrr <- beta_ols %*% tcrossprod(W))
+
+# Note that rank 1 means rows are colinear
+beta_rrr[1,]/beta_rrr[2,]
+
+
+## -----------------------------------------------------------------------------
+# Let's create a function
+redrank <- function(Y, X, rank = 1) {
+  beta_ols <- solve(crossprod(X), crossprod(X, Y))
+  M <- crossprod(Y, X) %*% beta_ols
+  decomp <- eigen(M)
+  W <- decomp$vectors[,seq_len(rank),drop=FALSE]
+  rownames(W) <- colnames(Y)
+  return(beta_ols %*% tcrossprod(W))
+}
+
+
+## -----------------------------------------------------------------------------
+all.equal(beta_rrr, redrank(Y, X))
+
+
+## -----------------------------------------------------------------------------
+# First the log likelihoods
+loglik <- sapply(c(1, 2, 3), function(k) {
+  beta_rrr <- redrank(Y, X, k)
+  resids <- Y - X %*% beta_rrr
+  n*log(det(crossprod(resids)/nrow(Y)))
+})
+
+
+## -----------------------------------------------------------------------------
+# With naive degrees of freedom
+2*seq_len(3)*(ncol(X) + ncol(Y) - 
+                seq_len(3)) + loglik
+
+
+## -----------------------------------------------------------------------------
+# With exact degrees of freedom
+dfs <- sapply(seq_len(3), function(k) {
+  total <- 0
+  lambdas <- decomp$values[seq(k+1, ncol(Y))]
+  for (ell in seq(1, k)) {
+    total <- sum(lambdas/(decomp$values[ell] - lambdas)) + total
+  }
+  if (k == ncol(Y)) return(0) else return(2*total)
+})
+
+
+## -----------------------------------------------------------------------------
+2*seq_len(3)*(ncol(X) + ncol(Y) - 
+                seq_len(3)) + 2*dfs + loglik
+# Both approaches select the full rank model
+
+
+## -----------------------------------------------------------------------------
+# Constrast this with rrpack::rrr
+# Which uses a different AIC
+rrpack::rrr(Y, X, ic.type = "AIC")
+
+
+## -----------------------------------------------------------------------------
+# Tobacco dataset
+tobacco_y <- as.matrix(rrr::tobacco[,1:3])
+tobacco_x <- as.matrix(rrr::tobacco[,4:9])
+
+dim(tobacco_x)
+dim(tobacco_y)
+
+
+## -----------------------------------------------------------------------------
+(rr_fit <- rrpack::rrr(tobacco_y, tobacco_x))
+
+
+## -----------------------------------------------------------------------------
+library(lattice)
+coef <- rr_fit$coef
+colnames(coef) <- colnames(tobacco_y)
+levelplot(coef)
+
