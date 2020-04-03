@@ -667,7 +667,7 @@ data.frame(
 
 # Reduced-Rank Regression
 
-## Multiple Linear Regression
+## Multivariate Linear Regression
 
   - Recall the setup for MLR: Let $\mathbf{Y}_1\ldots,\mathbf{Y}_n$ be a random sample of size $n$, and let $\mathbf{X}_1, \ldots, \mathbf{X}_n$ be the corresponding sample of covariates.
   - We assume a **linear relationship**:
@@ -761,9 +761,9 @@ beta_rrr[1,]/beta_rrr[2,]
     + Recall the general form of Akaike's information criterion:
     $$ -2\log L(\hat{B}, \hat{\Sigma}) + 2d,$$
     where $d$ is the number of parameters to estimate.
-  - If $\hat{\mathbb{Y}}$ is the matrix of fitted values, then we have
-  $$-2\log L(\hat{B}_{RR}, \hat{\Sigma}_{RR}) = n\log\left\lvert\hat{\Sigma}_{RR}\right\rvert,$$
-  where $\hat{\Sigma}_{RR} = \frac{1}{n}\left(\mathbb{Y} - \hat{\mathbb{Y}}\right)^T\left(\mathbb{Y} - \hat{\mathbb{Y}}\right)$.
+  <!-- - If $\hat{\mathbb{Y}}$ is the matrix of fitted values, then we have -->
+  <!-- $$-2\log L(\hat{B}_{RR}, \hat{\Sigma}_{RR}) = n\log\left\lvert\hat{\Sigma}_{RR}\right\rvert,$$ -->
+  <!-- where $\hat{\Sigma}_{RR} = \frac{1}{n}\left(\mathbb{Y} - \hat{\mathbb{Y}}\right)^T\left(\mathbb{Y} - \hat{\mathbb{Y}}\right)$. -->
   - On the other hand, if we restrict $B$ to have rank $k$, there are only $d = (p+q-k)k$ free parameters.
     + $kq$ free parameters for the column space of $B$
     + $k(p-k)$ free parameters for the remaining columns
@@ -797,7 +797,8 @@ all.equal(beta_rrr, redrank(Y, X))
 loglik <- sapply(c(1, 2, 3), function(k) {
   beta_rrr <- redrank(Y, X, k)
   resids <- Y - X %*% beta_rrr
-  n*log(det(crossprod(resids)/nrow(Y)))
+  -2*sum(dmvnorm(resids, log = TRUE,
+                 sigma = crossprod(resids)/nrow(resids)))
 })
 ```
 
@@ -822,7 +823,7 @@ dfs <- sapply(seq_len(3), function(k) {
 ```{r}
 2*seq_len(3)*(ncol(X) + ncol(Y) - 
                 seq_len(3)) + 2*dfs + loglik
-# Both approaches select the full rank model
+# Both approaches select the full-rank model
 ```
 
 ```{r}
