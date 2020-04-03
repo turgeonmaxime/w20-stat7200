@@ -359,7 +359,8 @@ all.equal(beta_rrr, redrank(Y, X))
 loglik <- sapply(c(1, 2, 3), function(k) {
   beta_rrr <- redrank(Y, X, k)
   resids <- Y - X %*% beta_rrr
-  n*log(det(crossprod(resids)/nrow(Y)))
+  -2*sum(dmvnorm(resids, log = TRUE,
+                 sigma = crossprod(resids)/nrow(resids)))
 })
 
 
@@ -384,7 +385,7 @@ dfs <- sapply(seq_len(3), function(k) {
 ## -----------------------------------------------------------------------------
 2*seq_len(3)*(ncol(X) + ncol(Y) - 
                 seq_len(3)) + 2*dfs + loglik
-# Both approaches select the full rank model
+# Both approaches select the full-rank model
 
 
 ## -----------------------------------------------------------------------------
